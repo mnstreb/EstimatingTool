@@ -1,603 +1,522 @@
-import React, { useState } from 'react';
-import { Calculator, Plus, Trash2, Download, FileText, Settings } from 'lucide-react';
-
-const ConstructionEstimateCalculator = () => {
-  const [trades, setTrades] = useState({
-    'Engineering Services': false,
-    'Concrete & Structural Systems': false,
-    'Electrical': false,
-    'HVAC/Plumbing/Controls': false,
-    'Fire Suppression & Life Safety': false,
-    'Demolition': false,
-    'Flooring': false,
-    'Inspections/Services': false,
-    'Building Envelope': false,
-    'Interior Finishes': false,
-    'Millwork & Casework': false,
-    'Landscaping & Exterior Improvements': false,
-    'Specialty Equipment': false,
-    'Miscellaneous / Other': false
-  });
-
-  const [laborRates] = useState({
-    'Project Manager': 150,
-    'Superintendent': 100,
-    'General Foreman': 95,
-    'Foreman': 90,
-    'Journeyman': 85,
-    'Apprentice': 60,
-    'Other': 0
-  });
-
-  const [estimateItems, setEstimateItems] = useState([
-    {
-      id: 1,
-      taskName: 'GENERAL REQUIREMENTS',
-      description: 'Project management and coordination',
-      overtime: 1,
-      skillLevel: 'Foreman',
-      hourlyRate: 90,
-      hours: 5,
-      laborTotal: 450,
-      materialQty: 0,
-      materialRate: 0,
-      materialTotal: 0,
-      travel: 0,
-      equipment: 0,
-      fixed: 0,
-      subcontractor: 0,
-      otherTotal: 0,
-      subtotal: 450,
-      allowances: 0,
-      markupPercent: 0,
-      markupAmount: 0,
-      estimatedTotal: 450,
-      allowanceTotal: 0,
-      total: 450
-    }
-  ]);
-
-  const [projectSettings, setProjectSettings] = useState({
-    projectName: 'Commercial Construction Project',
-    profitMargin: 15,
-    salesTax: 8.25,
-    miscPercent: 5
-  });
-
-  const addEstimateItem = () => {
-    const newId = Math.max(...estimateItems.map(item => item.id)) + 1;
-    const newItem = {
-      id: newId,
-      taskName: '',
-      description: '',
-      overtime: 1,
-      skillLevel: 'Journeyman',
-      hourlyRate: 85,
-      hours: 0,
-      laborTotal: 0,
-      materialQty: 0,
-      materialRate: 0,
-      materialTotal: 0,
-      travel: 0,
-      equipment: 0,
-      fixed: 0,
-      subcontractor: 0,
-      otherTotal: 0,
-      subtotal: 0,
-      allowances: 0,
-      markupPercent: 0,
-      markupAmount: 0,
-      estimatedTotal: 0,
-      allowanceTotal: 0,
-      total: 0
-    };
-    setEstimateItems([...estimateItems, newItem]);
-  };
-
-  const removeEstimateItem = (id) => {
-    setEstimateItems(estimateItems.filter(item => item.id !== id));
-  };
-
-  const updateEstimateItem = (id, field, value) => {
-    setEstimateItems(items => items.map(item => {
-      if (item.id === id) {
-        const updatedItem = { ...item, [field]: value };
-        
-        // Auto-update hourly rate when skill level changes
-        if (field === 'skillLevel') {
-          updatedItem.hourlyRate = laborRates[value] || 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Estimate Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            min-height: 100vh;
         }
-        
-        // Recalculate totals
-        const hours = parseFloat(updatedItem.hours) || 0;
-        const hourlyRate = parseFloat(updatedItem.hourlyRate) || 0;
-        const overtime = parseFloat(updatedItem.overtime) || 1;
-        
-        updatedItem.laborTotal = hours * hourlyRate * overtime;
-        
-        const materialQty = parseFloat(updatedItem.materialQty) || 0;
-        const materialRate = parseFloat(updatedItem.materialRate) || 0;
-        updatedItem.materialTotal = materialQty * materialRate;
-        
-        const travel = parseFloat(updatedItem.travel) || 0;
-        const equipment = parseFloat(updatedItem.equipment) || 0;
-        const fixed = parseFloat(updatedItem.fixed) || 0;
-        const subcontractor = parseFloat(updatedItem.subcontractor) || 0;
-        
-        updatedItem.otherTotal = travel + equipment + fixed + subcontractor;
-        updatedItem.subtotal = updatedItem.laborTotal + updatedItem.materialTotal + updatedItem.otherTotal;
-        
-        const markupPercent = parseFloat(updatedItem.markupPercent) || 0;
-        updatedItem.markupAmount = updatedItem.subtotal * (markupPercent / 100);
-        updatedItem.estimatedTotal = updatedItem.subtotal + updatedItem.markupAmount;
-        
-        const allowances = parseFloat(updatedItem.allowances) || 0;
-        updatedItem.allowanceTotal = allowances;
-        updatedItem.total = updatedItem.estimatedTotal + updatedItem.allowanceTotal;
-        
-        return updatedItem;
-      }
-      return item;
-    }));
-  };
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 20px; }
+        .input-field { 
+            width: 100%; 
+            padding: 8px 12px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 6px; 
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { 
+            outline: none; 
+            border-color: #3b82f6; 
+        }
+        .btn { 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-green { background: #059669; color: white; }
+        .btn-green:hover { background: #047857; }
+        .btn-red { background: #dc2626; color: white; }
+        .btn-red:hover { background: #b91c1c; }
+        .total-card { 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+            color: white; 
+            text-align: center;
+            padding: 30px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; font-weight: 600; }
+        tr:hover { background: #f0f9ff; }
+        .setup-wizard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .wizard-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .step.active { background: #3b82f6; color: white; }
+        .step.inactive { background: #e5e7eb; color: #6b7280; }
+        .form-group { margin-bottom: 20px; }
+        .label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Setup Wizard -->
+        <div id="setupWizard" class="setup-wizard">
+            <div class="wizard-content">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="background: #3b82f6; width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-size: 36px;">🏗️</span>
+                    </div>
+                    <h1 style="color: #1f2937; margin-bottom: 10px;">Project Setup</h1>
+                    <p style="color: #6b7280;">Let's configure your estimate for accuracy</p>
+                </div>
 
-  const calculateTotals = () => {
-    const totalProjectCost = estimateItems.reduce((sum, item) => sum + item.total, 0);
-    const totalMiscCost = totalProjectCost * (projectSettings.miscPercent / 100);
-    const subtotalWithMisc = totalProjectCost + totalMiscCost;
-    const profitAmount = subtotalWithMisc * (projectSettings.profitMargin / 100);
-    const subtotalWithProfit = subtotalWithMisc + profitAmount;
-    const salesTaxAmount = subtotalWithProfit * (projectSettings.salesTax / 100);
-    const grandTotal = subtotalWithProfit + salesTaxAmount;
-    
-    return {
-      totalProjectCost,
-      totalMiscCost,
-      totalMarkup: estimateItems.reduce((sum, item) => sum + item.markupAmount, 0),
-      profitAmount,
-      salesTaxAmount,
-      grandTotal
-    };
-  };
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step inactive" id="step2">2</div>
+                    <div class="step inactive" id="step3">3</div>
+                </div>
 
-  const totals = calculateTotals();
+                <!-- Step 1: Project Info -->
+                <div id="stepContent1">
+                    <h2 style="margin-bottom: 20px;">Project Information</h2>
+                    <div class="form-group">
+                        <label class="label">Project Name</label>
+                        <input type="text" id="projectName" class="input-field" value="Commercial Construction Project" placeholder="Enter project name">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Project Type</label>
+                        <select id="projectType" class="input-field">
+                            <option value="Commercial">Commercial</option>
+                            <option value="Residential">Residential</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Infrastructure">Infrastructure</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">State/Location</label>
+                        <select id="projectLocation" class="input-field">
+                            <option value="">Select State</option>
+                            <option value="California">California</option>
+                            <option value="Texas">Texas</option>
+                            <option value="New York">New York</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Washington">Washington</option>
+                            <option value="Oregon">Oregon</option>
+                        </select>
+                    </div>
+                </div>
 
-  const exportEstimate = () => {
-    const estimate = {
-      projectName: projectSettings.projectName,
-      date: new Date().toLocaleDateString(),
-      trades,
-      items: estimateItems,
-      settings: projectSettings,
-      totals
-    };
-    
-    const dataStr = JSON.stringify(estimate, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `estimate_${projectSettings.projectName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+                <!-- Step 2: Labor Rates -->
+                <div id="stepContent2" style="display: none;">
+                    <h2 style="margin-bottom: 20px;">Labor Rates Configuration</h2>
+                    <p style="color: #6b7280; margin-bottom: 20px;">Set your labor rates for this project</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div class="form-group">
+                            <label class="label">Project Manager ($/hr)</label>
+                            <input type="number" id="rate_manager" class="input-field" value="150">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Superintendent ($/hr)</label>
+                            <input type="number" id="rate_super" class="input-field" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">General Foreman ($/hr)</label>
+                            <input type="number" id="rate_general" class="input-field" value="95">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Foreman ($/hr)</label>
+                            <input type="number" id="rate_foreman" class="input-field" value="90">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Journeyman ($/hr)</label>
+                            <input type="number" id="rate_journey" class="input-field" value="85">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Apprentice ($/hr)</label>
+                            <input type="number" id="rate_apprentice" class="input-field" value="60">
+                        </div>
+                    </div>
+                </div>
 
-  const generateReport = () => {
-    const selectedTrades = Object.entries(trades)
-      .filter(([trade, selected]) => selected)
-      .map(([trade]) => trade);
+                <!-- Step 3: Project Settings -->
+                <div id="stepContent3" style="display: none;">
+                    <h2 style="margin-bottom: 20px;">Project Settings</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div class="form-group">
+                            <label class="label">Profit Margin (%)</label>
+                            <input type="number" id="profitMargin" class="input-field" value="15" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Sales Tax (%)</label>
+                            <input type="number" id="salesTax" class="input-field" value="8.25" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Miscellaneous (%)</label>
+                            <input type="number" id="miscPercent" class="input-field" value="5" step="0.1">
+                        </div>
+                    </div>
+                </div>
 
-    const reportData = `
-CONSTRUCTION ESTIMATE REPORT
-============================
-
-Project: ${projectSettings.projectName}
-Date: ${new Date().toLocaleDateString()}
-
-TRADES/DISCIPLINES REQUIRED:
-${selectedTrades.length > 0 ? selectedTrades.map(trade => `• ${trade}`).join('\n') : 'No trades selected'}
-
-ESTIMATE LINE ITEMS:
-${estimateItems.map(item => `
-${item.taskName}
-Description: ${item.description}
-Labor: ${item.hours} hrs × $${item.hourlyRate}/hr × ${item.overtime} = $${item.laborTotal.toLocaleString()}
-Materials: ${item.materialQty} × $${item.materialRate} = $${item.materialTotal.toLocaleString()}
-Other Costs: $${item.otherTotal.toLocaleString()}
-Markup (${item.markupPercent}%): $${item.markupAmount.toLocaleString()}
-Total: $${item.total.toLocaleString()}
-`).join('\n')}
-
-FINANCIAL SUMMARY:
-================
-Project Subtotal: $${totals.totalProjectCost.toLocaleString()}
-Miscellaneous (${projectSettings.miscPercent}%): $${totals.totalMiscCost.toLocaleString()}
-Profit Margin (${projectSettings.profitMargin}%): $${totals.profitAmount.toLocaleString()}
-Sales Tax (${projectSettings.salesTax}%): $${totals.salesTaxAmount.toLocaleString()}
-
-GRAND TOTAL: $${totals.grandTotal.toLocaleString()}
-    `.trim();
-
-    const dataBlob = new Blob([reportData], { type: 'text/plain' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `estimate_report_${projectSettings.projectName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-xl p-6 mb-6 border border-gray-200">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-3 rounded-lg">
-                <Calculator className="text-white w-8 h-8" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  Construction Estimate Calculator
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  Professional estimation tool for contractors and builders
-                </p>
-              </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                    <button class="btn btn-primary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">Previous</button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next</button>
+                    <button class="btn btn-green" id="startBtn" onclick="startEstimating()" style="display: none;">Start Estimating</button>
+                </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <button
-                onClick={generateReport}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <FileText className="w-4 h-4" />
-                Generate Report
-              </button>
-              <button
-                onClick={exportEstimate}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <Download className="w-4 h-4" />
-                Export Data
-              </button>
-            </div>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          {/* Left Sidebar */}
-          <div className="xl:col-span-1 space-y-6">
-            {/* Trades Required */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-blue-600" />
-                Trades/Disciplines Required
-              </h3>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {Object.entries(trades).map(([trade, selected]) => (
-                  <label key={trade} className="flex items-start space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={selected}
-                      onChange={(e) => setTrades({ ...trades, [trade]: e.target.checked })}
-                      className="rounded mt-0.5 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className={`leading-tight ${selected ? 'text-blue-600 font-medium' : 'text-gray-700'}`}>
-                      {trade}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Executive Summary */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Executive Summary</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600 text-sm">Total Project Cost:</span>
-                  <span className="font-semibold text-gray-900">${totals.totalProjectCost.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600 text-sm">Total Misc Cost:</span>
-                  <span className="font-semibold text-gray-900">${totals.totalMiscCost.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600 text-sm">Total Markup:</span>
-                  <span className="font-semibold text-gray-900">${totals.totalMarkup.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600 text-sm">Profit ({projectSettings.profitMargin}%):</span>
-                  <span className="font-semibold text-green-600">${totals.profitAmount.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600 text-sm">Sales Tax ({projectSettings.salesTax}%):</span>
-                  <span className="font-semibold text-gray-900">${totals.salesTaxAmount.toLocaleString()}</span>
-                </div>
-                <div className="bg-blue-50 p-4 rounded-lg mt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-900">Grand Total:</span>
-                    <span className="text-xl font-bold text-blue-600">${totals.grandTotal.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Labor Breakdown */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Labor Breakdown</h3>
-              <div className="space-y-2">
-                {Object.entries(laborRates).map(([role, rate]) => (
-                  <div key={role} className="flex justify-between text-sm py-1">
-                    <span className="text-gray-600">{role}:</span>
-                    <span className="font-medium text-gray-900">${rate}/hr</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Project Settings */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Project Settings</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    value={projectSettings.projectName}
-                    onChange={(e) => setProjectSettings({ ...projectSettings, projectName: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profit Margin (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={projectSettings.profitMargin}
-                    onChange={(e) => setProjectSettings({ ...projectSettings, profitMargin: parseFloat(e.target.value) || 0 })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sales Tax (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={projectSettings.salesTax}
-                    onChange={(e) => setProjectSettings({ ...projectSettings, salesTax: parseFloat(e.target.value) || 0 })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Misc. (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={projectSettings.miscPercent}
-                    onChange={(e) => setProjectSettings({ ...projectSettings, miscPercent: parseFloat(e.target.value) || 0 })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content - Estimate Items */}
-          <div className="xl:col-span-3">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                <h3 className="text-xl font-semibold text-gray-900">Estimate Line Items</h3>
-                <button
-                  onClick={addEstimateItem}
-                  className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Item
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-gray-200 bg-gray-50">
-                      <th className="text-left p-3 font-semibold text-gray-700">Task Name</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Description</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">OT/DT</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Skill Level</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">$/HR</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Hours</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Labor Total</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Material Qty</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">$/Unit</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Material Total</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Other Costs</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Markup %</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Total</th>
-                      <th className="text-left p-3 font-semibold text-gray-700">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {estimateItems.map((item, index) => (
-                      <tr key={item.id} className={`border-b border-gray-100 hover:bg-blue-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <td className="p-3">
-                          <input
-                            type="text"
-                            value={item.taskName}
-                            onChange={(e) => updateEstimateItem(item.id, 'taskName', e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Task name"
-                          />
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="text"
-                            value={item.description}
-                            onChange={(e) => updateEstimateItem(item.id, 'description', e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Description"
-                          />
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={item.overtime}
-                            onChange={(e) => updateEstimateItem(item.id, 'overtime', e.target.value)}
-                            className="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </td>
-                        <td className="p-3">
-                          <select
-                            value={item.skillLevel}
-                            onChange={(e) => updateEstimateItem(item.id, 'skillLevel', e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                          >
-                            {Object.keys(laborRates).map(role => (
-                              <option key={role} value={role}>{role}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            value={item.hourlyRate}
-                            onChange={(e) => updateEstimateItem(item.id, 'hourlyRate', e.target.value)}
-                            className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={item.hours}
-                            onChange={(e) => updateEstimateItem(item.id, 'hours', e.target.value)}
-                            className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </td>
-                        <td className="p-3 font-semibold text-blue-600">
-                          ${item.laborTotal.toLocaleString()}
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            value={item.materialQty}
-                            onChange={(e) => updateEstimateItem(item.id, 'materialQty', e.target.value)}
-                            className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Qty"
-                          />
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={item.materialRate}
-                            onChange={(e) => updateEstimateItem(item.id, 'materialRate', e.target.value)}
-                            className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Rate"
-                          />
-                        </td>
-                        <td className="p-3 font-semibold text-green-600">
-                          ${item.materialTotal.toLocaleString()}
-                        </td>
-                        <td className="p-3">
-                          <div className="space-y-1">
-                            <input
-                              type="number"
-                              value={item.travel}
-                              onChange={(e) => updateEstimateItem(item.id, 'travel', e.target.value)}
-                              className="w-16 border border-gray-300 rounded-md px-1 py-1 text-xs focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Travel"
-                            />
-                            <input
-                              type="number"
-                              value={item.equipment}
-                              onChange={(e) => updateEstimateItem(item.id, 'equipment', e.target.value)}
-                              className="w-16 border border-gray-300 rounded-md px-1 py-1 text-xs focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Equipment"
-                            />
-                            <input
-                              type="number"
-                              value={item.subcontractor}
-                              onChange={(e) => updateEstimateItem(item.id, 'subcontractor', e.target.value)}
-                              className="w-16 border border-gray-300 rounded-md px-1 py-1 text-xs focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Sub"
-                            />
-                          </div>
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={item.markupPercent}
-                            onChange={(e) => updateEstimateItem(item.id, 'markupPercent', e.target.value)}
-                            className="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="%"
-                          />
-                        </td>
-                        <td className="p-3 font-bold text-lg text-blue-600">
-                          ${item.total.toLocaleString()}
-                        </td>
-                        <td className="p-3">
-                          <button
-                            onClick={() => removeEstimateItem(item.id)}
-                            className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                            disabled={estimateItems.length === 1}
-                            title="Remove item"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Totals Summary */}
-              <div className="mt-8 pt-6 border-t-2 border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
-                    <div className="text-sm text-blue-700 font-medium">Project Subtotal</div>
-                    <div className="text-2xl font-bold text-blue-800 mt-1">
-                      ${totals.totalProjectCost.toLocaleString()}
+        <!-- Main Application -->
+        <div id="mainApp" style="display: none;">
+            <div class="container">
+                <!-- Header -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background: #3b82f6; padding: 15px; border-radius: 12px;">
+                                <span style="color: white; font-size: 32px;">🏗️</span>
+                            </div>
+                            <div>
+                                <h1 style="margin: 0; color: #1f2937; font-size: 28px;">Construction Estimate Calculator</h1>
+                                <p style="margin: 5px 0 0 0; color: #6b7280;" id="projectInfo">Commercial Construction Project</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showSetup()">⚙️ Reconfigure</button>
+                            <button class="btn btn-green" onclick="generateReport()">📄 Generate Report</button>
+                        </div>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
-                    <div className="text-sm text-green-700 font-medium">Profit</div>
-                    <div className="text-2xl font-bold text-green-800 mt-1">
-                      ${totals.profitAmount.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl border border-yellow-200">
-                    <div className="text-sm text-yellow-700 font-medium">Sales Tax</div>
-                    <div className="text-2xl font-bold text-yellow-800 mt-1">
-                      ${totals.salesTaxAmount.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
-                    <div className="text-sm text-purple-700 font-medium">Grand Total</div>
-                    <div className="text-2xl font-bold text-purple-800 mt-1">
-                      ${totals.grandTotal.toLocaleString()}
-                    </div>
-                  </div>
                 </div>
-              </div>
+
+                <!-- Quick Summary -->
+                <div class="total-card">
+                    <h2 style="margin: 0 0 10px 0;">Grand Total</h2>
+                    <div style="font-size: 48px; font-weight: bold;" id="grandTotal">$0</div>
+                    <div style="opacity: 0.9; margin-top: 10px;" id="totalBreakdown">Project: $0 | Profit: $0 | Tax: $0</div>
+                </div>
+
+                <!-- Estimate Items -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #1f2937;">Estimate Line Items</h3>
+                        <button class="btn btn-green" onclick="addItem()">➕ Add Item</button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table id="estimateTable">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th>Description</th>
+                                    <th>Hours</th>
+                                    <th>Rate ($/hr)</th>
+                                    <th>Labor Total</th>
+                                    <th>Materials</th>
+                                    <th>Other Costs</th>
+                                    <th>Line Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="estimateBody">
+                                <!-- Items will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  );
-};
 
-export default ConstructionEstimateCalculator;
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let itemCounter = 1;
+        let laborRates = {
+            'Project Manager': 150,
+            'Superintendent': 100,
+            'General Foreman': 95,
+            'Foreman': 90,
+            'Journeyman': 85,
+            'Apprentice': 60
+        };
+        let projectSettings = {
+            name: 'Commercial Construction Project',
+            type: 'Commercial',
+            location: '',
+            profitMargin: 15,
+            salesTax: 8.25,
+            miscPercent: 5
+        };
+        let stateData = {
+            'California': { salesTax: 7.25, wagePremium: 1.2 },
+            'Texas': { salesTax: 6.25, wagePremium: 0.9 },
+            'New York': { salesTax: 8.0, wagePremium: 1.15 },
+            'Florida': { salesTax: 6.0, wagePremium: 0.95 },
+            'Illinois': { salesTax: 6.25, wagePremium: 1.1 },
+            'Nevada': { salesTax: 6.85, wagePremium: 1.05 },
+            'Arizona': { salesTax: 5.6, wagePremium: 0.95 },
+            'Colorado': { salesTax: 2.9, wagePremium: 1.0 },
+            'Washington': { salesTax: 6.5, wagePremium: 1.1 },
+            'Oregon': { salesTax: 0, wagePremium: 1.05 }
+        };
+
+        // Setup wizard functions
+        function changeStep(direction) {
+            if (direction === 1 && currentStep < 3) {
+                currentStep++;
+            } else if (direction === -1 && currentStep > 1) {
+                currentStep--;
+            }
+            updateWizardDisplay();
+        }
+
+        function updateWizardDisplay() {
+            // Hide all steps
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById('stepContent' + i).style.display = 'none';
+                document.getElementById('step' + i).className = 'step inactive';
+            }
+            
+            // Show current step
+            document.getElementById('stepContent' + currentStep).style.display = 'block';
+            document.getElementById('step' + currentStep).className = 'step active';
+            
+            // Update buttons
+            document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
+            document.getElementById('startBtn').style.display = currentStep === 3 ? 'block' : 'none';
+        }
+
+        function startEstimating() {
+            // Save settings
+            projectSettings.name = document.getElementById('projectName').value;
+            projectSettings.type = document.getElementById('projectType').value;
+            projectSettings.location = document.getElementById('projectLocation').value;
+            projectSettings.profitMargin = parseFloat(document.getElementById('profitMargin').value);
+            projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value);
+            projectSettings.miscPercent = parseFloat(document.getElementById('miscPercent').value);
+
+            // Save labor rates
+            laborRates['Project Manager'] = parseFloat(document.getElementById('rate_manager').value);
+            laborRates['Superintendent'] = parseFloat(document.getElementById('rate_super').value);
+            laborRates['General Foreman'] = parseFloat(document.getElementById('rate_general').value);
+            laborRates['Foreman'] = parseFloat(document.getElementById('rate_foreman').value);
+            laborRates['Journeyman'] = parseFloat(document.getElementById('rate_journey').value);
+            laborRates['Apprentice'] = parseFloat(document.getElementById('rate_apprentice').value);
+
+            // Update project info display
+            document.getElementById('projectInfo').textContent = 
+                `${projectSettings.name} - ${projectSettings.location || 'Location not set'}`;
+
+            // Hide wizard, show main app
+            document.getElementById('setupWizard').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            // Add initial item
+            addItem();
+            updateTotals();
+        }
+
+        function showSetup() {
+            document.getElementById('setupWizard').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            currentStep = 1;
+            updateWizardDisplay();
+        }
+
+        // Handle state selection
+        document.getElementById('projectLocation').addEventListener('change', function() {
+            const state = this.value;
+            if (stateData[state]) {
+                // Update sales tax
+                document.getElementById('salesTax').value = stateData[state].salesTax;
+                
+                // Adjust labor rates based on state premium
+                const premium = stateData[state].wagePremium;
+                const baseRates = [150, 100, 95, 90, 85, 60];
+                const rateIds = ['rate_manager', 'rate_super', 'rate_general', 'rate_foreman', 'rate_journey', 'rate_apprentice'];
+                
+                rateIds.forEach((id, index) => {
+                    document.getElementById(id).value = Math.round(baseRates[index] * premium);
+                });
+            }
+        });
+
+        // Main application functions
+        function addItem() {
+            const tbody = document.getElementById('estimateBody');
+            const row = tbody.insertRow();
+            const itemId = 'item_' + itemCounter++;
+            
+            row.innerHTML = `
+                <td><input type="text" class="input-field" placeholder="Task name" onchange="updateTotals()"></td>
+                <td><input type="text" class="input-field" placeholder="Description" onchange="updateTotals()"></td>
+                <td><input type="number" class="input-field" placeholder="0" step="0.1" onchange="updateTotals()"></td>
+                <td>
+                    <select class="input-field" onchange="updateRate(this); updateTotals();">
+                        <option value="85">Journeyman ($85)</option>
+                        <option value="150">Project Manager ($150)</option>
+                        <option value="100">Superintendent ($100)</option>
+                        <option value="95">General Foreman ($95)</option>
+                        <option value="90">Foreman ($90)</option>
+                        <option value="60">Apprentice ($60)</option>
+                    </select>
+                </td>
+                <td class="labor-total">$0</td>
+                <td><input type="number" class="input-field material-cost" placeholder="0" step="0.01" onchange="updateTotals()"></td>
+                <td><input type="number" class="input-field other-cost" placeholder="0" step="0.01" onchange="updateTotals()"></td>
+                <td class="line-total font-bold">$0</td>
+                <td><button class="btn btn-red" onclick="removeItem(this)" style="padding: 8px 12px;">🗑️</button></td>
+            `;
+            
+            updateTotals();
+        }
+
+        function removeItem(button) {
+            const row = button.closest('tr');
+            row.remove();
+            updateTotals();
+        }
+
+        function updateRate(select) {
+            // Rate is already in the select value
+        }
+
+        function updateTotals() {
+            const rows = document.querySelectorAll('#estimateBody tr');
+            let totalProject = 0;
+
+            rows.forEach(row => {
+                const hours = parseFloat(row.cells[2].querySelector('input').value) || 0;
+                const rate = parseFloat(row.cells[3].querySelector('select').value) || 0;
+                const materials = parseFloat(row.cells[5].querySelector('input').value) || 0;
+                const other = parseFloat(row.cells[6].querySelector('input').value) || 0;
+
+                const laborTotal = hours * rate;
+                const lineTotal = laborTotal + materials + other;
+
+                row.cells[4].textContent = '$' + laborTotal.toLocaleString();
+                row.cells[7].textContent = '$' + lineTotal.toLocaleString();
+
+                totalProject += lineTotal;
+            });
+
+            // Calculate final totals
+            const miscCost = totalProject * (projectSettings.miscPercent / 100);
+            const subtotalWithMisc = totalProject + miscCost;
+            const profit = subtotalWithMisc * (projectSettings.profitMargin / 100);
+            const subtotalWithProfit = subtotalWithMisc + profit;
+            const tax = subtotalWithProfit * (projectSettings.salesTax / 100);
+            const grandTotal = subtotalWithProfit + tax;
+
+            // Update display
+            document.getElementById('grandTotal').textContent = '$' + grandTotal.toLocaleString();
+            document.getElementById('totalBreakdown').textContent = 
+                `Project: $${totalProject.toLocaleString()} | Profit: $${profit.toLocaleString()} | Tax: $${tax.toLocaleString()}`;
+        }
+
+        function generateReport() {
+            const rows = document.querySelectorAll('#estimateBody tr');
+            let reportData = `CONSTRUCTION ESTIMATE REPORT\n`;
+            reportData += `============================\n\n`;
+            reportData += `Project: ${projectSettings.name}\n`;
+            reportData += `Date: ${new Date().toLocaleDateString()}\n`;
+            reportData += `Location: ${projectSettings.location || 'Not specified'}\n`;
+            reportData += `Type: ${projectSettings.type}\n\n`;
+            
+            reportData += `ESTIMATE LINE ITEMS:\n`;
+            reportData += `===================\n`;
+            
+            rows.forEach((row, index) => {
+                const task = row.cells[0].querySelector('input').value || `Item ${index + 1}`;
+                const desc = row.cells[1].querySelector('input').value || 'No description';
+                const hours = row.cells[2].querySelector('input').value || '0';
+                const rate = row.cells[3].querySelector('select').value || '0';
+                const materials = row.cells[5].querySelector('input').value || '0';
+                const other = row.cells[6].querySelector('input').value || '0';
+                const total = row.cells[7].textContent;
+                
+                reportData += `\n${task}\n`;
+                reportData += `Description: ${desc}\n`;
+                reportData += `Labor: ${hours} hrs × $${rate}/hr = $${(hours * rate).toLocaleString()}\n`;
+                reportData += `Materials: $${parseFloat(materials).toLocaleString()}\n`;
+                reportData += `Other: $${parseFloat(other).toLocaleString()}\n`;
+                reportData += `Total: ${total}\n`;
+            });
+
+            // Calculate totals for report
+            let totalProject = 0;
+            rows.forEach(row => {
+                const hours = parseFloat(row.cells[2].querySelector('input').value) || 0;
+                const rate = parseFloat(row.cells[3].querySelector('select').value) || 0;
+                const materials = parseFloat(row.cells[5].querySelector('input').value) || 0;
+                const other = parseFloat(row.cells[6].querySelector('input').value) || 0;
+                totalProject += (hours * rate) + materials + other;
+            });
+
+            const miscCost = totalProject * (projectSettings.miscPercent / 100);
+            const profit = (totalProject + miscCost) * (projectSettings.profitMargin / 100);
+            const tax = (totalProject + miscCost + profit) * (projectSettings.salesTax / 100);
+            const grandTotal = totalProject + miscCost + profit + tax;
+
+            reportData += `\n\nFINANCIAL SUMMARY:\n`;
+            reportData += `================\n`;
+            reportData += `Project Subtotal: $${totalProject.toLocaleString()}\n`;
+            reportData += `Miscellaneous (${projectSettings.miscPercent}%): $${miscCost.toLocaleString()}\n`;
+            reportData += `Profit (${projectSettings.profitMargin}%): $${profit.toLocaleString()}\n`;
+            reportData += `Sales Tax (${projectSettings.salesTax}%): $${tax.toLocaleString()}\n`;
+            reportData += `\nGRAND TOTAL: $${grandTotal.toLocaleString()}\n`;
+
+            // Download report
+            const blob = new Blob([reportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `estimate_${projectSettings.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        updateWizardDisplay();
+    </script>
+</body>
+</html>
