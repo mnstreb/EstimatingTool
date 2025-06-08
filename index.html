@@ -4,599 +4,1067 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Construction Estimate Calculator</title>
+    <!-- Link to Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to Chart.js for the pie chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { 
-            margin: 0; 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        /* Base styles and UI improvements */
+        body {
+            margin: 0;
+            font-family: 'Inter var', system-ui, -apple-system, sans-serif; /* Added Inter var for modern feel */
+            background: linear-gradient(135deg, #e0f2fe 0%, #c1e0fa 100%); /* Lighter, softer blue gradient */
             min-height: 100vh;
+            color: #374151; /* Default text color */
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 20px; }
-        .input-field { 
-            width: 100%; 
-            padding: 8px 12px; 
-            border: 2px solid #e5e7eb; 
-            border-radius: 6px; 
-            font-size: 14px;
-            transition: border-color 0.2s;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .input-field:focus { 
-            outline: none; 
-            border-color: #3b82f6; 
+        .card {
+            background: white;
+            border-radius: 16px; /* Slightly more rounded */
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08); /* Softer, larger shadow */
+            padding: 30px; /* More padding */
+            margin-bottom: 25px;
         }
-        .btn { 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s;
+        .input-field {
+            width: 100%;
+            padding: 10px 14px; /* Larger padding */
+            border: 1px solid #d1d5db; /* Softer border */
+            border-radius: 8px; /* More rounded */
+            font-size: 15px; /* Slightly larger font */
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); /* Subtle inner shadow */
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #60a5fa; /* Lighter blue focus */
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3); /* Subtle blue glow */
+        }
+        .btn {
+            padding: 12px 25px; /* More padding */
+            border-radius: 10px; /* More rounded */
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out; /* Smoother transition */
             border: none;
+            font-size: 15px;
         }
-        .btn-primary { background: #3b82f6; color: white; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-green { background: #059669; color: white; }
-        .btn-green:hover { background: #047857; }
-        .btn-red { background: #dc2626; color: white; }
-        .btn-red:hover { background: #b91c1c; }
-        .total-card { 
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
-            color: white; 
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px); /* Slight lift */
+        }
+        .btn-green {
+            background: #10b981; /* Brighter green */
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+        .btn-green:hover {
+            background: #059669;
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);
+            transform: translateY(-1px);
+        }
+        .btn-red {
+            background: #ef4444; /* Brighter red */
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+        .btn-red:hover {
+            background: #dc2626;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+            transform: translateY(-1px);
+        }
+        .total-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
             text-align: center;
-            padding: 30px;
+            padding: 40px; /* More padding */
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(29, 78, 216, 0.3); /* Deeper shadow */
         }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background: #f9fafb; font-weight: 600; }
-        tr:hover { background: #f0f9ff; }
+        table {
+            width: 100%;
+            border-collapse: separate; /* Allows border-radius on cells */
+            border-spacing: 0; /* Remove space between cells */
+        }
+        th, td {
+            padding: 15px; /* More padding */
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f3f4f6; /* Softer header background */
+            font-weight: 600;
+            color: #4b5563;
+            position: sticky; /* Sticky header for scrollable tables */
+            top: 0;
+            z-index: 1;
+        }
+        /* Rounded corners for table header */
+        th:first-child { border-top-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; }
+
+        tr:nth-child(even) {
+            background: #f8fafc; /* Subtle zebra striping */
+        }
+        tr:hover {
+            background: #e0f2fe; /* Light blue on hover */
+            transition: background 0.15s ease-in-out;
+        }
         .setup-wizard {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6); /* Slightly darker overlay */
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            backdrop-filter: blur(5px); /* Subtle blur effect */
         }
         .wizard-content {
             background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 600px;
+            border-radius: 20px; /* More rounded */
+            padding: 45px; /* More padding */
+            max-width: 650px; /* Slightly wider */
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); /* Stronger shadow */
         }
         .step-indicator {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px; /* More spacing */
         }
         .step {
-            width: 40px;
-            height: 40px;
+            width: 45px; /* Larger step circles */
+            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 10px;
+            margin: 0 12px;
             font-weight: bold;
+            font-size: 18px; /* Larger number */
+            transition: background 0.3s, color 0.3s;
         }
-        .step.active { background: #3b82f6; color: white; }
-        .step.inactive { background: #e5e7eb; color: #6b7280; }
-        .form-group { margin-bottom: 20px; }
-        .label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
+        .step.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+        .step.inactive {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .form-group {
+            margin-bottom: 25px; /* More spacing between form groups */
+        }
+        .label {
+            display: block;
+            margin-bottom: 8px; /* More space below label */
+            font-weight: 600;
+            color: #4b5563; /* Softer label color */
+            font-size: 15px;
+        }
+        h1 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 15px !important; /* Ensure consistent heading margin */
+        }
+        h2 {
+            font-size: 26px;
+            color: #1f2937;
+            margin-bottom: 25px !important;
+        }
+        h3 {
+            font-size: 22px;
+            color: #1f2937;
+            margin-bottom: 20px !important;
+        }
+        /* Specific styles for the project info header in main app */
+        .header-info-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+        }
+        .header-icon-box {
+            background: #3b82f6;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-title-container {
+            line-height: 1.3;
+        }
+        .header-title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 28px;
+            font-weight: 700; /* Make title bolder */
+        }
+        .header-subtitle {
+            margin: 5px 0 0 0;
+            color: #6b7280;
+            font-size: 16px;
+        }
+        /* Small adjustment for the action buttons in the header */
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px; /* Add margin for small screens */
+        }
+
+        /* Executive Summary specific styles */
+        .executive-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for summary */
+            gap: 20px;
+        }
+        .summary-block {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .summary-block h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+        .summary-item strong {
+            color: #1f2937;
+        }
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #0d47a1; /* Darker blue for totals */
+            border-top: 1px dashed #cbd5e1;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        /* Pie Chart specific styles */
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+            margin-bottom: 25px; /* Spacing between chart and other cards */
+        }
+        .chart-canvas {
+            max-width: 400px; /* Control max width of chart */
+            max-height: 400px;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card, .wizard-content {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            .header-title {
+                font-size: 24px;
+            }
+            .header-subtitle {
+                font-size: 15px;
+            }
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .total-card { /* This will be replaced by executive summary, but keeping for reference if needed */
+                padding: 25px;
+            }
+            #grandTotal {
+                font-size: 36px;
+            }
+            #totalBreakdown {
+                font-size: 14px;
+            }
+            .executive-summary-grid {
+                grid-template-columns: 1fr; /* Stack columns on small screens */
+            }
+        }
     </style>
 </head>
-<body>
-    <div id="app">
-        <!-- Setup Wizard -->
-        <div id="setupWizard" class="setup-wizard">
-            <div class="wizard-content">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="background: #3b82f6; width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                        <span style="color: white; font-size: 36px;">🏗️</span>
-                    </div>
-                    <h1 style="color: #1f2937; margin-bottom: 10px;">Project Setup</h1>
-                    <p style="color: #6b7280;">Let's configure your estimate for accuracy</p>
-                </div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-                <div class="step-indicator">
-                    <div class="step active" id="step1">1</div>
-                    <div class="step inactive" id="step2">2</div>
-                    <div class="step inactive" id="step3">3</div>
-                </div>
-
-                <!-- Step 1: Project Info -->
-                <div id="stepContent1">
-                    <h2 style="margin-bottom: 20px;">Project Information</h2>
-                    <div class="form-group">
-                        <label class="label">Project Name</label>
-                        <input type="text" id="projectName" class="input-field" value="Commercial Construction Project" placeholder="Enter project name">
+    <!-- Main Application Interface -->
+    <div id="mainApp" class="container hidden">
+        <div class="card mb-6">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div class="header-info-container">
+                    <div class="header-icon-box">
+                        <span style="color: white; font-size: 32px;">🏗️</span>
                     </div>
-                    <div class="form-group">
-                        <label class="label">Project Type</label>
-                        <select id="projectType" class="input-field">
-                            <option value="Commercial">Commercial</option>
-                            <option value="Residential">Residential</option>
-                            <option value="Industrial">Industrial</option>
-                            <option value="Infrastructure">Infrastructure</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="label">State/Location</label>
-                        <select id="projectLocation" class="input-field">
-                            <option value="">Select State</option>
-                            <option value="Alabama">Alabama</option>
-                            <option value="Alaska">Alaska</option>
-                            <option value="Arizona">Arizona</option>
-                            <option value="Arkansas">Arkansas</option>
-                            <option value="California">California</option>
-                            <option value="Colorado">Colorado</option>
-                            <option value="Connecticut">Connecticut</option>
-                            <option value="Delaware">Delaware</option>
-                            <option value="Florida">Florida</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Hawaii">Hawaii</option>
-                            <option value="Idaho">Idaho</option>
-                            <option value="Illinois">Illinois</option>
-                            <option value="Indiana">Indiana</option>
-                            <option value="Iowa">Iowa</option>
-                            <option value="Kansas">Kansas</option>
-                            <option value="Kentucky">Kentucky</option>
-                            <option value="Louisiana">Louisiana</option>
-                            <option value="Maine">Maine</option>
-                            <option value="Maryland">Maryland</option>
-                            <option value="Massachusetts">Massachusetts</option>
-                            <option value="Michigan">Michigan</option>
-                            <option value="Minnesota">Minnesota</option>
-                            <option value="Mississippi">Mississippi</option>
-                            <option value="Missouri">Missouri</option>
-                            <option value="Montana">Montana</option>
-                            <option value="Nebraska">Nebraska</option>
-                            <option value="Nevada">Nevada</option>
-                            <option value="New Hampshire">New Hampshire</option>
-                            <option value="New Jersey">New Jersey</option>
-                            <option value="New Mexico">New Mexico</option>
-                            <option value="New York">New York</option>
-                            <option value="North Carolina">North Carolina</option>
-                            <option value="North Dakota">North Dakota</option>
-                            <option value="Ohio">Ohio</option>
-                            <option value="Oklahoma">Oklahoma</option>
-                            <option value="Oregon">Oregon</option>
-                            <option value="Pennsylvania">Pennsylvania</option>
-                            <option value="Rhode Island">Rhode Island</option>
-                            <option value="South Carolina">South Carolina</option>
-                            <option value="South Dakota">South Dakota</option>
-                            <option value="Tennessee">Tennessee</option>
-                            <option value="Texas">Texas</option>
-                            <option value="Utah">Utah</option>
-                            <option value="Vermont">Vermont</option>
-                            <option value="Virginia">Virginia</option>
-                            <option value="Washington">Washington</option>
-                            <option value="West Virginia">West Virginia</option>
-                            <option value="Wisconsin">Wisconsin</option>
-                            <option value="Wyoming">Wyoming</option>
-                        </select>
+                    <div class="header-title-container">
+                        <h1 class="header-title">Construction Estimate Calculator</h1>
+                        <p class="header-subtitle" id="projectInfo">Commercial Construction Project</p>
                     </div>
                 </div>
-
-                <!-- Step 2: Labor Rates -->
-                <div id="stepContent2" style="display: none;">
-                    <h2 style="margin-bottom: 20px;">Labor Rates Configuration</h2>
-                    <p style="color: #6b7280; margin-bottom: 20px;">Set your labor rates for this project</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                        <div class="form-group">
-                            <label class="label">Project Manager ($/hr)</label>
-                            <input type="number" id="rate_manager" class="input-field" value="150">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Superintendent ($/hr)</label>
-                            <input type="number" id="rate_super" class="input-field" value="100">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">General Foreman ($/hr)</label>
-                            <input type="number" id="rate_general" class="input-field" value="95">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Foreman ($/hr)</label>
-                            <input type="number" id="rate_foreman" class="input-field" value="90">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Journeyman ($/hr)</label>
-                            <input type="number" id="rate_journey" class="input-field" value="85">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Apprentice ($/hr)</label>
-                            <input type="number" id="rate_apprentice" class="input-field" value="60">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Project Settings -->
-                <div id="stepContent3" style="display: none;">
-                    <h2 style="margin-bottom: 20px;">Project Settings</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <div class="form-group">
-                            <label class="label">Profit Margin (%)</label>
-                            <input type="number" id="profitMargin" class="input-field" value="15" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Sales Tax (%)</label>
-                            <input type="number" id="salesTax" class="input-field" value="8.25" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label class="label">Miscellaneous (%)</label>
-                            <input type="number" id="miscPercent" class="input-field" value="5" step="0.1">
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                    <button class="btn btn-primary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">Previous</button>
-                    <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next</button>
-                    <button class="btn btn-green" id="startBtn" onclick="startEstimating()" style="display: none;">Start Estimating</button>
+                <div class="header-buttons">
+                    <button class="btn btn-primary" onclick="showSetup()">⚙️ Reconfigure</button>
+                    <button class="btn btn-green" onclick="generateReport()">📄 Generate Report</button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Application -->
-        <div id="mainApp" style="display: none;">
-            <div class="container">
-                <!-- Header -->
+        <!-- Executive Summary & Pie Chart -->
+        <div class="executive-summary-section mb-6">
+            <div class="executive-summary-grid">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="background: #3b82f6; padding: 15px; border-radius: 12px;">
-                                <span style="color: white; font-size: 32px;">🏗️</span>
-                            </div>
-                            <div>
-                                <h1 style="margin: 0; color: #1f2937; font-size: 28px;">Construction Estimate Calculator</h1>
-                                <p style="margin: 5px 0 0 0; color: #6b7280;" id="projectInfo">Commercial Construction Project</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="showSetup()">⚙️ Reconfigure</button>
-                            <button class="btn btn-green" onclick="generateReport()">📄 Generate Report</button>
-                        </div>
-                    </div>
+                    <h4>Executive Summary</h4>
+                    <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
+                    <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
+                    <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
+                    <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">15.00%</strong></div>
+                    <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">8.25%</strong></div>
+                    <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">5.00%</strong></div>
+                    <div class="summary-item total"><span>GRAND TOTAL:</span> <strong id="summaryGrandTotal">$0.00</strong></div>
                 </div>
 
-                <!-- Quick Summary -->
-                <div class="total-card">
-                    <h2 style="margin: 0 0 10px 0;">Grand Total</h2>
-                    <div style="font-size: 48px; font-weight: bold;" id="grandTotal">$0</div>
-                    <div style="opacity: 0.9; margin-top: 10px;" id="totalBreakdown">Project: $0 | Profit: $0 | Tax: $0</div>
+                <div class="card">
+                    <h4>Labor Breakdown</h4>
+                    <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">$0.00</strong></div>
+                    <div class="summary-item total"><span>Total Labor Hours:</span> <strong id="totalLaborHours">0</strong></div>
                 </div>
 
-                <!-- Estimate Items -->
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="margin: 0; color: #1f2937;">Estimate Line Items</h3>
-                        <button class="btn btn-green" onclick="addItem()">➕ Add Item</button>
-                    </div>
+                    <h4>Project Cost Breakdown</h4>
+                    <div class="summary-item"><span>Labor Total:</span> <strong id="breakdownLaborTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Material Total:</span> <strong id="breakdownMaterialTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Travel Total:</span> <strong id="breakdownTravelTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Equipment Total:</span> <strong id="breakdownEquipmentTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Fixed Total:</span> <strong id="breakdownFixedTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Sub-contractor Total:</span> <strong id="breakdownSubcontractorTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Allowance Total:</span> <strong id="breakdownAllowanceTotal">$0.00</strong></div>
+                    <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
+                </div>
+            </div>
+            <!-- Pie Chart Container -->
+            <div class="chart-container">
+                <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
 
-                    <div style="overflow-x: auto;">
-                        <table id="estimateTable">
-                            <thead>
-                                <tr>
-                                    <th>Task Name</th>
-                                    <th>Description</th>
-                                    <th>Hours</th>
-                                    <th>Rate ($/hr)</th>
-                                    <th>Labor Total</th>
-                                    <th>Materials</th>
-                                    <th>Other Costs</th>
-                                    <th>Line Total</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="estimateBody">
-                                <!-- Items will be added here -->
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="card overflow-x-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-semibold text-gray-800">Estimate Line Items</h3>
+                <button class="btn btn-green" onclick="addItem()">➕ Add Item</button>
+            </div>
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Description</th>
+                        <th>Hours</th>
+                        <th>Rate ($/hr)</th>
+                        <th>OT/DT</th> <!-- New Column Header -->
+                        <th>Labor Total</th>
+                        <th>Materials</th>
+                        <th>Other Costs</th>
+                        <th>Line Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="estimateTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Project Setup Wizard -->
+    <div id="setupWizard" class="setup-wizard">
+        <div class="wizard-content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="background: #3b82f6; width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: white; font-size: 36px;">🏗️</span>
+                </div>
+                <h1>Project Setup</h1>
+                <p style="color: #6b7280;">Let's configure your estimate for accuracy</p>
+            </div>
+
+            <div class="step-indicator">
+                <div id="step1" class="step active">1</div>
+                <div id="step2" class="step inactive">2</div>
+                <div id="step3" class="step inactive">3</div>
+            </div>
+
+            <!-- Step 1: Project Information -->
+            <div id="wizardStep1">
+                <h2 class="text-xl font-semibold mb-6">Project Information</h2>
+                <div class="form-group">
+                    <label for="projectName" class="label">Project Name:</label>
+                    <input type="text" id="projectName" class="input-field" value="Commercial Construction Project">
+                </div>
+                <div class="form-group">
+                    <label for="projectType" class="label">Project Type:</label>
+                    <select id="projectType" class="input-field">
+                        <option value="Commercial">Commercial</option>
+                        <option value="Residential">Residential</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Renovation">Renovation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="projectState" class="label">State/Location:</label>
+                    <select id="projectState" class="input-field">
+                        <option value="CA">California</option>
+                        <option value="TX">Texas</option>
+                        <option value="NY">New York</option>
+                        <option value="FL">Florida</option>
+                        <option value="WA">Washington</option>
+                        <option value="IL">Illinois</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 mt-8">
+                    <button class="btn btn-primary" onclick="nextStep(1)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Labor Rates Configuration -->
+            <div id="wizardStep2" class="hidden">
+                <h2 class="text-xl font-semibold mb-6">Labor Rates Configuration</h2>
+                <div class="form-group">
+                    <label for="ratePM" class="label">Project Manager ($/hr):</label>
+                    <input type="number" id="ratePM" class="input-field" value="120">
+                </div>
+                <div class="form-group">
+                    <label for="rateSuperintendent" class="label">Superintendent ($/hr):</label>
+                    <input type="number" id="rateSuperintendent" class="input-field" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="rateGeneralForeman" class="label">General Foreman ($/hr):</label>
+                    <input type="number" id="rateGeneralForeman" class="input-field" value="90">
+                </div>
+                <div class="form-group">
+                    <label for="rateForeman" class="label">Foreman ($/hr):</label>
+                    <input type="number" id="rateForeman" class="input-field" value="85">
+                </div>
+                <div class="form-group">
+                    <label for="rateJourneyman" class="label">Journeyman ($/hr):</label>
+                    <input type="number" id="rateJourneyman" class="input-field" value="75">
+                </div>
+                <div class="form-group">
+                    <label for="rateApprentice" class="label">Apprentice ($/hr):</label>
+                    <input type="number" id="rateApprentice" class="input-field" value="50">
+                </div>
+                <div class="flex justify-between gap-3 mt-8">
+                    <button class="btn btn-primary" onclick="prevStep(2)">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Project Settings -->
+            <div id="wizardStep3" class="hidden">
+                <h2 class="text-xl font-semibold mb-6">Project Settings</h2>
+                <div class="form-group">
+                    <label for="profitMargin" class="label">Profit Margin (%):</label>
+                    <input type="number" id="profitMargin" class="input-field" value="15">
+                </div>
+                <div class="form-group">
+                    <label for="salesTax" class="label">Sales Tax (%):</label>
+                    <input type="number" id="salesTax" class="input-field" value="8.25" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="miscellaneous" class="label">Miscellaneous (%):</label>
+                    <input type="number" id="miscellaneous" class="input-field" value="5">
+                </div>
+                <div class="flex justify-between gap-3 mt-8">
+                    <button class="btn btn-primary" onclick="prevStep(3)">Previous</button>
+                    <button class="btn btn-green" onclick="startEstimating()">Start Estimating</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables
-        let currentStep = 1;
-        let itemCounter = 1;
-        let laborRates = {
-            'Project Manager': 150,
-            'Superintendent': 100,
-            'General Foreman': 95,
-            'Foreman': 90,
-            'Journeyman': 85,
-            'Apprentice': 60
-        };
+        // Global variables for project settings
         let projectSettings = {
-            name: 'Commercial Construction Project',
-            type: 'Commercial',
-            location: '',
+            projectName: "Commercial Construction Project",
+            projectType: "Commercial",
+            projectState: "CA",
             profitMargin: 15,
             salesTax: 8.25,
-            miscPercent: 5
-        };
-        let stateData = {
-            'Alabama': { salesTax: 4.0, wagePremium: 0.85 },
-            'Alaska': { salesTax: 0, wagePremium: 1.25 },
-            'Arizona': { salesTax: 5.6, wagePremium: 0.95 },
-            'Arkansas': { salesTax: 6.5, wagePremium: 0.8 },
-            'California': { salesTax: 7.25, wagePremium: 1.2 },
-            'Colorado': { salesTax: 2.9, wagePremium: 1.0 },
-            'Connecticut': { salesTax: 6.35, wagePremium: 1.15 },
-            'Delaware': { salesTax: 0, wagePremium: 1.05 },
-            'Florida': { salesTax: 6.0, wagePremium: 0.95 },
-            'Georgia': { salesTax: 4.0, wagePremium: 0.9 },
-            'Hawaii': { salesTax: 4.0, wagePremium: 1.2 },
-            'Idaho': { salesTax: 6.0, wagePremium: 0.9 },
-            'Illinois': { salesTax: 6.25, wagePremium: 1.1 },
-            'Indiana': { salesTax: 7.0, wagePremium: 0.95 },
-            'Iowa': { salesTax: 6.0, wagePremium: 0.95 },
-            'Kansas': { salesTax: 6.5, wagePremium: 0.9 },
-            'Kentucky': { salesTax: 6.0, wagePremium: 0.85 },
-            'Louisiana': { salesTax: 4.45, wagePremium: 0.9 },
-            'Maine': { salesTax: 5.5, wagePremium: 1.0 },
-            'Maryland': { salesTax: 6.0, wagePremium: 1.1 },
-            'Massachusetts': { salesTax: 6.25, wagePremium: 1.15 },
-            'Michigan': { salesTax: 6.0, wagePremium: 1.05 },
-            'Minnesota': { salesTax: 6.875, wagePremium: 1.1 },
-            'Mississippi': { salesTax: 7.0, wagePremium: 0.8 },
-            'Missouri': { salesTax: 4.225, wagePremium: 0.9 },
-            'Montana': { salesTax: 0, wagePremium: 1.0 },
-            'Nebraska': { salesTax: 5.5, wagePremium: 0.9 },
-            'Nevada': { salesTax: 6.85, wagePremium: 1.05 },
-            'New Hampshire': { salesTax: 0, wagePremium: 1.05 },
-            'New Jersey': { salesTax: 6.625, wagePremium: 1.15 },
-            'New Mexico': { salesTax: 5.125, wagePremium: 0.9 },
-            'New York': { salesTax: 8.0, wagePremium: 1.15 },
-            'North Carolina': { salesTax: 4.75, wagePremium: 0.9 },
-            'North Dakota': { salesTax: 5.0, wagePremium: 1.05 },
-            'Ohio': { salesTax: 5.75, wagePremium: 0.95 },
-            'Oklahoma': { salesTax: 4.5, wagePremium: 0.85 },
-            'Oregon': { salesTax: 0, wagePremium: 1.05 },
-            'Pennsylvania': { salesTax: 6.0, wagePremium: 1.05 },
-            'Rhode Island': { salesTax: 7.0, wagePremium: 1.1 },
-            'South Carolina': { salesTax: 6.0, wagePremium: 0.85 },
-            'South Dakota': { salesTax: 4.5, wagePremium: 0.9 },
-            'Tennessee': { salesTax: 7.0, wagePremium: 0.85 },
-            'Texas': { salesTax: 6.25, wagePremium: 0.9 },
-            'Utah': { salesTax: 4.85, wagePremium: 0.95 },
-            'Vermont': { salesTax: 6.0, wagePremium: 1.05 },
-            'Virginia': { salesTax: 5.3, wagePremium: 1.0 },
-            'Washington': { salesTax: 6.5, wagePremium: 1.1 },
-            'West Virginia': { salesTax: 6.0, wagePremium: 0.9 },
-            'Wisconsin': { salesTax: 5.0, wagePremium: 1.0 },
-            'Wyoming': { salesTax: 4.0, wagePremium: 1.0 }
+            miscellaneous: 5,
+            laborRates: {
+                "Project Manager": 120,
+                "Superintendent": 100,
+                "General Foreman": 90,
+                "Foreman": 85,
+                "Journeyman": 75,
+                "Apprentice": 50
+            },
+            // New breakdown categories
+            travelCost: 0,
+            equipmentCost: 0,
+            fixedCost: 0,
+            subcontractorCost: 0,
+            allowanceCost: 0
         };
 
-        // Setup wizard functions
-        function changeStep(direction) {
-            if (direction === 1 && currentStep < 3) {
-                currentStep++;
-            } else if (direction === -1 && currentStep > 1) {
-                currentStep--;
-            }
-            updateWizardDisplay();
+        // Estimate data structure
+        let estimateItems = [];
+
+        // UI Element references
+        const setupWizard = document.getElementById('setupWizard');
+        const mainApp = document.getElementById('mainApp');
+        const wizardSteps = [
+            document.getElementById('wizardStep1'),
+            document.getElementById('wizardStep2'),
+            document.getElementById('wizardStep3')
+        ];
+        const stepIndicators = [
+            document.getElementById('step1'),
+            document.getElementById('step2'),
+            document.getElementById('step3')
+        ];
+        const estimateTableBody = document.getElementById('estimateTableBody');
+
+        // Executive Summary elements
+        const summaryProjectCost = document.getElementById('summaryProjectCost');
+        const summaryMiscCost = document.getElementById('summaryMiscCost');
+        const summaryMarkup = document.getElementById('summaryMarkup');
+        const summaryEstimateSubtotal = document.getElementById('summaryEstimateSubtotal');
+        const summaryProfitMargin = document.getElementById('summaryProfitMargin');
+        const summarySalesTax = document.getElementById('summarySalesTax');
+        const summaryMiscPercent = document.getElementById('summaryMiscPercent');
+        const summaryGrandTotal = document.getElementById('summaryGrandTotal');
+
+        const laborPMTotal = document.getElementById('laborPMTotal');
+        const laborSuperintendentTotal = document.getElementById('laborSuperintendentTotal');
+        const laborGeneralForemanTotal = document.getElementById('laborGeneralForemanTotal');
+        const laborForemanTotal = document.getElementById('laborForemanTotal');
+        const laborJourneymanTotal = document.getElementById('laborJourneymanTotal');
+        const laborApprenticeTotal = document.getElementById('laborApprenticeTotal');
+        const totalLaborHours = document.getElementById('totalLaborHours');
+
+        const breakdownLaborTotal = document.getElementById('breakdownLaborTotal');
+        const breakdownMaterialTotal = document.getElementById('breakdownMaterialTotal');
+        const breakdownTravelTotal = document.getElementById('breakdownTravelTotal');
+        const breakdownEquipmentTotal = document.getElementById('breakdownEquipmentTotal');
+        const breakdownFixedTotal = document.getElementById('breakdownFixedTotal');
+        const breakdownSubcontractorTotal = document.getElementById('breakdownSubcontractorTotal');
+        const breakdownAllowanceTotal = document.getElementById('breakdownAllowanceTotal');
+        const breakdownOtherTotal = document.getElementById('breakdownOtherTotal'); // Sum of all other costs
+
+        const projectInfoElem = document.getElementById('projectInfo');
+        const laborMaterialPieChartCanvas = document.getElementById('laborMaterialPieChart');
+        let laborMaterialPieChart; // To store the Chart.js instance
+
+        // Initial setup - show wizard
+        document.addEventListener('DOMContentLoaded', () => {
+            showSetup();
+            // Populate initial rates for the first time
+            populateLaborRatesToUI();
+            // Set initial state tax
+            updateSalesTaxForState(projectSettings.projectState);
+        });
+
+        // --- Wizard Navigation ---
+        let currentStep = 1;
+
+        function showStep(stepNumber) {
+            wizardSteps.forEach((stepDiv, index) => {
+                if (index + 1 === stepNumber) {
+                    stepDiv.classList.remove('hidden');
+                } else {
+                    stepDiv.classList.add('hidden');
+                }
+            });
+            stepIndicators.forEach((indicator, index) => {
+                if (index + 1 === stepNumber) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('inactive');
+                } else {
+                    indicator.classList.remove('active');
+                    indicator.classList.add('inactive');
+                }
+            });
+            currentStep = stepNumber;
         }
 
-        function updateWizardDisplay() {
-            // Hide all steps
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById('stepContent' + i).style.display = 'none';
-                document.getElementById('step' + i).className = 'step inactive';
+        function nextStep(stepNumber) {
+            if (stepNumber === 1) {
+                // Save Project Info
+                projectSettings.projectName = document.getElementById('projectName').value;
+                projectSettings.projectType = document.getElementById('projectType').value;
+                projectSettings.projectState = document.getElementById('projectState').value;
+                updateSalesTaxForState(projectSettings.projectState);
+                populateLaborRatesToUI(); // Ensure step 2 fields are populated
+            } else if (stepNumber === 2) {
+                // Save Labor Rates
+                saveLaborRatesFromUI();
             }
-            
-            // Show current step
-            document.getElementById('stepContent' + currentStep).style.display = 'block';
-            document.getElementById('step' + currentStep).className = 'step active';
-            
-            // Update buttons
-            document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
-            document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
-            document.getElementById('startBtn').style.display = currentStep === 3 ? 'block' : 'none';
+            showStep(stepNumber + 1);
         }
 
-        function startEstimating() {
-            // Save settings
-            projectSettings.name = document.getElementById('projectName').value;
-            projectSettings.type = document.getElementById('projectType').value;
-            projectSettings.location = document.getElementById('projectLocation').value;
-            projectSettings.profitMargin = parseFloat(document.getElementById('profitMargin').value);
-            projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value);
-            projectSettings.miscPercent = parseFloat(document.getElementById('miscPercent').value);
-
-            // Save labor rates
-            laborRates['Project Manager'] = parseFloat(document.getElementById('rate_manager').value);
-            laborRates['Superintendent'] = parseFloat(document.getElementById('rate_super').value);
-            laborRates['General Foreman'] = parseFloat(document.getElementById('rate_general').value);
-            laborRates['Foreman'] = parseFloat(document.getElementById('rate_foreman').value);
-            laborRates['Journeyman'] = parseFloat(document.getElementById('rate_journey').value);
-            laborRates['Apprentice'] = parseFloat(document.getElementById('rate_apprentice').value);
-
-            // Update project info display
-            document.getElementById('projectInfo').textContent = 
-                `${projectSettings.name} - ${projectSettings.location || 'Location not set'}`;
-
-            // Hide wizard, show main app
-            document.getElementById('setupWizard').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-
-            // Add initial item
-            addItem();
-            updateTotals();
+        function prevStep(stepNumber) {
+            showStep(stepNumber - 1);
         }
 
         function showSetup() {
-            document.getElementById('setupWizard').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            currentStep = 1;
-            updateWizardDisplay();
+            setupWizard.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+            showStep(1); // Always start from step 1 when reconfiguring
+            populateWizardInputs(); // Load current settings into wizard inputs
         }
 
-        // Handle state selection
-        document.getElementById('projectLocation').addEventListener('change', function() {
-            const state = this.value;
-            if (stateData[state]) {
-                // Update sales tax
-                document.getElementById('salesTax').value = stateData[state].salesTax;
-                
-                // Adjust labor rates based on state premium
-                const premium = stateData[state].wagePremium;
-                const baseRates = [150, 100, 95, 90, 85, 60];
-                const rateIds = ['rate_manager', 'rate_super', 'rate_general', 'rate_foreman', 'rate_journey', 'rate_apprentice'];
-                
-                rateIds.forEach((id, index) => {
-                    document.getElementById(id).value = Math.round(baseRates[index] * premium);
-                });
+        function startEstimating() {
+            // Save final settings from Wizard
+            projectSettings.projectName = document.getElementById('projectName').value;
+            projectSettings.projectType = document.getElementById('projectType').value;
+            projectSettings.projectState = document.getElementById('projectState').value;
+            saveLaborRatesFromUI();
+            projectSettings.profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+            projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value) || 0;
+            projectSettings.miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
+
+            // Hide wizard, show main app
+            setupWizard.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+
+            // Update project info in main app header
+            projectInfoElem.textContent = `${projectSettings.projectType} - ${projectSettings.projectName} - ${projectSettings.projectState}`;
+
+            // Initial render of items (if any exist) and calculate totals
+            renderItems();
+        }
+
+        // --- Data Management Functions ---
+
+        function populateWizardInputs() {
+            document.getElementById('projectName').value = projectSettings.projectName;
+            document.getElementById('projectType').value = projectSettings.projectType;
+            document.getElementById('projectState').value = projectSettings.projectState;
+            document.getElementById('profitMargin').value = projectSettings.profitMargin;
+            document.getElementById('salesTax').value = projectSettings.salesTax;
+            document.getElementById('miscellaneous').value = projectSettings.miscellaneous;
+            populateLaborRatesToUI(); // Populate Step 2 inputs
+        }
+
+        function populateLaborRatesToUI() {
+            for (const role in projectSettings.laborRates) {
+                const inputId = 'rate' + role.replace(/\s/g, ''); // e.g., 'Project Manager' -> 'rateProjectManager'
+                const inputElem = document.getElementById(inputId);
+                if (inputElem) {
+                    inputElem.value = projectSettings.laborRates[role];
+                }
             }
+        }
+
+        function saveLaborRatesFromUI() {
+            projectSettings.laborRates["Project Manager"] = parseFloat(document.getElementById('ratePM').value) || 0;
+            projectSettings.laborRates["Superintendent"] = parseFloat(document.getElementById('rateSuperintendent').value) || 0;
+            projectSettings.laborRates["General Foreman"] = parseFloat(document.getElementById('rateGeneralForeman').value) || 0;
+            projectSettings.laborRates["Foreman"] = parseFloat(document.getElementById('rateForeman').value) || 0;
+            projectSettings.laborRates["Journeyman"] = parseFloat(document.getElementById('rateJourneyman').value) || 0;
+            projectSettings.laborRates["Apprentice"] = parseFloat(document.getElementById('rateApprentice').value) || 0;
+        }
+
+        const stateSalesTax = {
+            'CA': 8.25, 'TX': 6.25, 'NY': 4.0, 'FL': 6.0, 'WA': 6.5, 'IL': 6.25,
+            'AL': 4.0, 'AK': 0.0, 'AZ': 5.6, 'AR': 6.5, 'CO': 2.9, 'CT': 6.35, 'DE': 0.0,
+            'GA': 4.0, 'HI': 4.0, 'ID': 6.0, 'IN': 7.0, 'IA': 6.0, 'KS': 6.5, 'KY': 6.0,
+            'LA': 4.45, 'ME': 5.5, 'MD': 6.0, 'MA': 6.25, 'MI': 6.0, 'MN': 6.875, 'MS': 7.0,
+            'MO': 4.225, 'MT': 0.0, 'NE': 5.5, 'NV': 6.85, 'NH': 0.0, 'NJ': 6.625, 'NM': 5.125,
+            'NC': 4.75, 'ND': 5.0, 'OH': 5.75, 'OK': 4.5, 'OR': 0.0, 'PA': 6.0, 'RI': 7.0,
+            'SC': 6.0, 'SD': 4.5, 'TN': 7.0, 'UT': 4.85, 'VT': 6.0, 'VA': 5.3, 'WV': 6.0,
+            'WI': 5.0, 'WY': 4.0
+        };
+
+        function updateSalesTaxForState(stateCode) {
+            const taxRate = stateSalesTax[stateCode] || 0; // Default to 0 if state not found
+            document.getElementById('salesTax').value = taxRate;
+            projectSettings.salesTax = taxRate; // Update project settings immediately
+        }
+
+        document.getElementById('projectState').addEventListener('change', (event) => {
+            updateSalesTaxForState(event.target.value);
         });
 
-        // Main application functions
+        // --- Estimate Item Management ---
+
         function addItem() {
-            const tbody = document.getElementById('estimateBody');
-            const row = tbody.insertRow();
-            const itemId = 'item_' + itemCounter++;
-            
-            row.innerHTML = `
-                <td><input type="text" class="input-field" placeholder="Task name" onchange="updateTotals()"></td>
-                <td><input type="text" class="input-field" placeholder="Description" onchange="updateTotals()"></td>
-                <td><input type="number" class="input-field" placeholder="0" step="0.1" onchange="updateTotals()"></td>
-                <td>
-                    <select class="input-field" onchange="updateRate(this); updateTotals();">
-                        <option value="85">Journeyman ($85)</option>
-                        <option value="150">Project Manager ($150)</option>
-                        <option value="100">Superintendent ($100)</option>
-                        <option value="95">General Foreman ($95)</option>
-                        <option value="90">Foreman ($90)</option>
-                        <option value="60">Apprentice ($60)</option>
-                    </select>
-                </td>
-                <td class="labor-total">$0</td>
-                <td><input type="number" class="input-field material-cost" placeholder="0" step="0.01" onchange="updateTotals()"></td>
-                <td><input type="number" class="input-field other-cost" placeholder="0" step="0.01" onchange="updateTotals()"></td>
-                <td class="line-total font-bold">$0</td>
-                <td><button class="btn btn-red" onclick="removeItem(this)" style="padding: 8px 12px;">🗑️</button></td>
-            `;
-            
-            updateTotals();
+            const newItem = {
+                id: Date.now(), // Unique ID for each item
+                taskName: '',
+                description: '',
+                hours: 0,
+                rateRole: 'Journeyman', // Default to Journeyman
+                otDtMultiplier: 1.0, // New: OT/DT multiplier
+                materials: 0,
+                otherCosts: 0 // This will now represent a sum of the new categories if not specified globally
+            };
+            estimateItems.push(newItem);
+            renderItems();
         }
 
-        function removeItem(button) {
-            const row = button.closest('tr');
-            row.remove();
-            updateTotals();
+        function deleteItem(id) {
+            estimateItems = estimateItems.filter(item => item.id !== id);
+            renderItems();
         }
 
-        function updateRate(select) {
-            // Rate is already in the select value
+        function updateItem(id, field, value) {
+            const item = estimateItems.find(item => item.id === id);
+            if (item) {
+                if (['hours', 'materials', 'otherCosts', 'otDtMultiplier'].includes(field)) {
+                    item[field] = parseFloat(value) || 0;
+                } else { // For text fields like taskName, description, rateRole
+                    item[field] = value;
+                }
+                renderItems(); // Re-render to update calculations
+            }
         }
 
-        function updateTotals() {
-            const rows = document.querySelectorAll('#estimateBody tr');
-            let totalProject = 0;
+        function renderItems() {
+            estimateTableBody.innerHTML = ''; // Clear existing rows
+            let totalLaborHoursVal = 0; // To accumulate total labor hours
 
-            rows.forEach(row => {
-                const hours = parseFloat(row.cells[2].querySelector('input').value) || 0;
-                const rate = parseFloat(row.cells[3].querySelector('select').value) || 0;
-                const materials = parseFloat(row.cells[5].querySelector('input').value) || 0;
-                const other = parseFloat(row.cells[6].querySelector('input').value) || 0;
+            estimateItems.forEach(item => {
+                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0); // Apply OT/DT multiplier
+                const laborTotal = item.hours * effectiveLaborRate;
+                const lineTotal = laborTotal + item.materials + item.otherCosts;
 
-                const laborTotal = hours * rate;
-                const lineTotal = laborTotal + materials + other;
+                totalLaborHoursVal += item.hours;
 
-                row.cells[4].textContent = '$' + laborTotal.toLocaleString();
-                row.cells[7].textContent = '$' + lineTotal.toLocaleString();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" value="${item.taskName}" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field"></td>
+                    <td><input type="text" value="${item.description}" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
+                    <td>
+                        <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
+                            ${Object.keys(projectSettings.laborRates).map(role => `
+                                <option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
+                                    ${role} ($${projectSettings.laborRates[role].toFixed(2)}/hr)
+                                </option>
+                            `).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <select onchange="updateItem(${item.id}, 'otDtMultiplier', this.value)" class="input-field">
+                            <option value="1.0" ${item.otDtMultiplier === 1.0 ? 'selected' : ''}>1.0</option>
+                            <option value="1.5" ${item.otDtMultiplier === 1.5 ? 'selected' : ''}>1.5</option>
+                            <option value="2.0" ${item.otDtMultiplier === 2.0 ? 'selected' : ''}>2.0</option>
+                        </select>
+                    </td>
+                    <td>$${laborTotal.toFixed(2)}</td>
+                    <td><input type="number" value="${item.materials}" onchange="updateItem(${item.id}, 'materials', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.otherCosts}" onchange="updateItem(${item.id}, 'otherCosts', this.value)" class="input-field"></td>
+                    <td class="font-bold text-gray-900">$${lineTotal.toFixed(2)}</td>
+                    <td><button class="btn btn-red btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
+                `;
+                estimateTableBody.appendChild(row);
+            });
+            totalLaborHours.textContent = totalLaborHoursVal; // Update total labor hours in summary
+            calculateTotals(); // Recalculate and update executive summary
+        }
 
-                totalProject += lineTotal;
+        // --- Calculations ---
+
+        function calculateTotals() {
+            let totalProjectSubtotal = 0; // Sum of all line item totals
+            let totalLaborCost = 0;
+            let totalMaterialCost = 0;
+            let totalOtherCosts = 0; // This aggregates the 'otherCosts' from line items
+            let laborBreakdown = {}; // To store labor cost per role
+            let totalHoursByRole = {}; // To store total hours per role
+
+            // Initialize labor breakdown totals
+            for (const role in projectSettings.laborRates) {
+                laborBreakdown[role] = 0;
+                totalHoursByRole[role] = 0;
+            }
+
+            estimateItems.forEach(item => {
+                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
+                const laborTotal = item.hours * effectiveLaborRate;
+                const lineTotal = laborTotal + item.materials + item.otherCosts;
+
+                totalProjectSubtotal += lineTotal;
+                totalLaborCost += laborTotal;
+                totalMaterialCost += item.materials;
+                totalOtherCosts += item.otherCosts;
+
+                laborBreakdown[item.rateRole] += laborTotal;
+                totalHoursByRole[item.rateRole] += item.hours;
             });
 
-            // Calculate final totals
-            const miscCost = totalProject * (projectSettings.miscPercent / 100);
-            const subtotalWithMisc = totalProject + miscCost;
-            const profit = subtotalWithMisc * (projectSettings.profitMargin / 100);
-            const subtotalWithProfit = subtotalWithMisc + profit;
-            const tax = subtotalWithProfit * (projectSettings.salesTax / 100);
-            const grandTotal = subtotalWithProfit + tax;
+            // For the global cost categories (Travel, Equipment, Fixed, Subcontractor, Allowance)
+            // Assuming these are separate from line-item 'otherCosts' for now based on screenshot
+            // For now, these are manually set in projectSettings.
+            // In a real app, you might have separate input fields for these global costs.
+            // For the purpose of this example, I'll add them to the totalOtherCosts for the breakdown.
+            projectSettings.travelCost = 1000; // Example placeholder
+            projectSettings.equipmentCost = 2000; // Example placeholder
+            projectSettings.fixedCost = 500; // Example placeholder
+            projectSettings.subcontractorCost = 3000; // Example placeholder
+            projectSettings.allowanceCost = 1500; // Example placeholder
 
-            // Update display
-            document.getElementById('grandTotal').textContent = '$' + grandTotal.toLocaleString();
-            document.getElementById('totalBreakdown').textContent = 
-                `Project: $${totalProject.toLocaleString()} | Profit: $${profit.toLocaleString()} | Tax: $${tax.toLocaleString()}`;
+            totalOtherCosts += projectSettings.travelCost + projectSettings.equipmentCost +
+                               projectSettings.fixedCost + projectSettings.subcontractorCost +
+                               projectSettings.allowanceCost;
+
+
+            // Calculate main totals
+            const totalMiscCost = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
+            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCost;
+            const totalMarkup = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100); // Markup is essentially profit here
+            const estimateSubtotal = subtotalBeforeProfitTax + totalMarkup; // This term matches screenshot's 'Estimate Subtotal'
+
+            const salesTaxAmount = estimateSubtotal * (projectSettings.salesTax / 100);
+            const grandTotal = estimateSubtotal + salesTaxAmount;
+
+            // Update Executive Summary UI
+            summaryProjectCost.textContent = `$${totalProjectSubtotal.toFixed(2)}`;
+            summaryMiscCost.textContent = `$${totalMiscCost.toFixed(2)}`;
+            summaryMarkup.textContent = `$${totalMarkup.toFixed(2)}`;
+            summaryEstimateSubtotal.textContent = `$${estimateSubtotal.toFixed(2)}`;
+            summaryProfitMargin.textContent = `${projectSettings.profitMargin.toFixed(2)}%`;
+            summarySalesTax.textContent = `${projectSettings.salesTax.toFixed(2)}%`;
+            summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
+            summaryGrandTotal.textContent = `$${grandTotal.toFixed(2)}`;
+
+            // Update Labor Breakdown
+            laborPMTotal.textContent = `$${laborBreakdown["Project Manager"].toFixed(2)}`;
+            laborSuperintendentTotal.textContent = `$${laborBreakdown["Superintendent"].toFixed(2)}`;
+            laborGeneralForemanTotal.textContent = `$${laborBreakdown["General Foreman"].toFixed(2)}`;
+            laborForemanTotal.textContent = `$${laborBreakdown["Foreman"].toFixed(2)}`;
+            laborJourneymanTotal.textContent = `$${laborBreakdown["Journeyman"].toFixed(2)}`;
+            laborApprenticeTotal.textContent = `$${laborBreakdown["Apprentice"].toFixed(2)}`;
+
+            // Update Project Cost Breakdown
+            breakdownLaborTotal.textContent = `$${totalLaborCost.toFixed(2)}`;
+            breakdownMaterialTotal.textContent = `$${totalMaterialCost.toFixed(2)}`;
+            breakdownTravelTotal.textContent = `$${projectSettings.travelCost.toFixed(2)}`;
+            breakdownEquipmentTotal.textContent = `$${projectSettings.equipmentCost.toFixed(2)}`;
+            breakdownFixedTotal.textContent = `$${projectSettings.fixedCost.toFixed(2)}`;
+            breakdownSubcontractorTotal.textContent = `$${projectSettings.subcontractorCost.toFixed(2)}`;
+            breakdownAllowanceTotal.textContent = `$${projectSettings.allowanceCost.toFixed(2)}`;
+            breakdownOtherTotal.textContent = `$${totalOtherCosts.toFixed(2)}`; // Updated sum including new global costs
+
+            // Render Pie Chart
+            renderPieChart(totalLaborCost, totalMaterialCost);
         }
+
+        // --- Pie Chart Rendering ---
+        function renderPieChart(laborTotal, materialTotal) {
+            if (laborMaterialPieChart) {
+                laborMaterialPieChart.destroy(); // Destroy previous chart instance if it exists
+            }
+
+            const ctx = laborMaterialPieChartCanvas.getContext('2d');
+            laborMaterialPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Labor Cost', 'Material Cost'],
+                    datasets: [{
+                        data: [laborTotal, materialTotal],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)', // Blue for Labor
+                            'rgba(16, 185, 129, 0.8)'  // Green for Materials
+                        ],
+                        borderColor: [
+                            'rgba(255, 255, 255, 1)',
+                            'rgba(255, 255, 255, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow canvas to resize freely
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += '$' + context.parsed.toFixed(2).toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Labor vs. Material Cost Distribution',
+                            font: {
+                                size: 16
+                            },
+                            color: '#1f2937'
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Report Generation ---
 
         function generateReport() {
-            const rows = document.querySelectorAll('#estimateBody tr');
-            let reportData = `CONSTRUCTION ESTIMATE REPORT\n`;
-            reportData += `============================\n\n`;
-            reportData += `Project: ${projectSettings.name}\n`;
-            reportData += `Date: ${new Date().toLocaleDateString()}\n`;
-            reportData += `Location: ${projectSettings.location || 'Not specified'}\n`;
-            reportData += `Type: ${projectSettings.type}\n\n`;
-            
-            reportData += `ESTIMATE LINE ITEMS:\n`;
-            reportData += `===================\n`;
-            
-            rows.forEach((row, index) => {
-                const task = row.cells[0].querySelector('input').value || `Item ${index + 1}`;
-                const desc = row.cells[1].querySelector('input').value || 'No description';
-                const hours = row.cells[2].querySelector('input').value || '0';
-                const rate = row.cells[3].querySelector('select').value || '0';
-                const materials = row.cells[5].querySelector('input').value || '0';
-                const other = row.cells[6].querySelector('input').value || '0';
-                const total = row.cells[7].textContent;
-                
-                reportData += `\n${task}\n`;
-                reportData += `Description: ${desc}\n`;
-                reportData += `Labor: ${hours} hrs × $${rate}/hr = $${(hours * rate).toLocaleString()}\n`;
-                reportData += `Materials: $${parseFloat(materials).toLocaleString()}\n`;
-                reportData += `Other: $${parseFloat(other).toLocaleString()}\n`;
-                reportData += `Total: ${total}\n`;
+            let totalProjectSubtotal = 0;
+            let totalLaborCost = 0;
+            let totalMaterialCost = 0;
+            let totalOtherCostsAggregated = 0; // Sum of all other costs from line items
+            let laborBreakdownReport = {};
+            let totalLaborHoursReport = 0;
+
+            for (const role in projectSettings.laborRates) {
+                laborBreakdownReport[role] = 0;
+            }
+
+            estimateItems.forEach((item) => {
+                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
+                const laborTotal = item.hours * effectiveLaborRate;
+                const lineTotal = laborTotal + item.materials + item.otherCosts;
+
+                totalProjectSubtotal += lineTotal;
+                totalLaborCost += laborTotal;
+                totalMaterialCost += item.materials;
+                totalOtherCostsAggregated += item.otherCosts;
+                totalLaborHoursReport += item.hours;
+
+                laborBreakdownReport[item.rateRole] += laborTotal;
             });
 
-            // Calculate totals for report
-            let totalProject = 0;
-            rows.forEach(row => {
-                const hours = parseFloat(row.cells[2].querySelector('input').value) || 0;
-                const rate = parseFloat(row.cells[3].querySelector('select').value) || 0;
-                const materials = parseFloat(row.cells[5].querySelector('input').value) || 0;
-                const other = parseFloat(row.cells[6].querySelector('input').value) || 0;
-                totalProject += (hours * rate) + materials + other;
+            // Add global costs to totalOtherCostsAggregated for report
+            totalOtherCostsAggregated += projectSettings.travelCost + projectSettings.equipmentCost +
+                                         projectSettings.fixedCost + projectSettings.subcontractorCost +
+                                         projectSettings.allowanceCost;
+
+
+            const totalMiscCost = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
+            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCost;
+            const totalMarkup = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
+            const estimateSubtotal = subtotalBeforeProfitTax + totalMarkup;
+            const salesTaxAmount = estimateSubtotal * (projectSettings.salesTax / 100);
+            const grandTotal = estimateSubtotal + salesTaxAmount;
+
+            let reportContent = `CONSTRUCTION ESTIMATE REPORT\n`;
+            reportContent += `============================\n\n`;
+            reportContent += `Project: ${projectSettings.projectName}\n`;
+            reportContent += `Project Type: ${projectSettings.projectType}\n`;
+            reportContent += `Location: ${projectSettings.projectState}\n`;
+            reportContent += `Date: ${new Date().toLocaleDateString()}\n\n`;
+
+            reportContent += `EXECUTIVE SUMMARY:\n`;
+            reportContent += `-------------------------------------------------\n`;
+            reportContent += `Total Project Cost (Line Items): $${totalProjectSubtotal.toFixed(2)}\n`;
+            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): $${totalMiscCost.toFixed(2)}\n`;
+            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): $${totalMarkup.toFixed(2)}\n`;
+            reportContent += `Estimate Subtotal: $${estimateSubtotal.toFixed(2)}\n`;
+            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): $${salesTaxAmount.toFixed(2)}\n`;
+            reportContent += `GRAND TOTAL: $${grandTotal.toFixed(2)}\n\n`;
+
+            reportContent += `LABOR BREAKDOWN:\n`;
+            reportContent += `-------------------------------------------------\n`;
+            for (const role in laborBreakdownReport) {
+                reportContent += `${role}: $${laborBreakdownReport[role].toFixed(2)}\n`;
+            }
+            reportContent += `Total Labor Hours: ${totalLaborHoursReport.toFixed(2)}\n\n`;
+
+            reportContent += `PROJECT COST BREAKDOWN:\n`;
+            reportContent += `-------------------------------------------------\n`;
+            reportContent += `Labor Total: $${totalLaborCost.toFixed(2)}\n`;
+            reportContent += `Material Total: $${totalMaterialCost.toFixed(2)}\n`;
+            reportContent += `Travel Total: $${projectSettings.travelCost.toFixed(2)}\n`;
+            reportContent += `Equipment Total: $${projectSettings.equipmentCost.toFixed(2)}\n`;
+            reportContent += `Fixed Total: $${projectSettings.fixedCost.toFixed(2)}\n`;
+            reportContent += `Sub-contractor Total: $${projectSettings.subcontractorCost.toFixed(2)}\n`;
+            reportContent += `Allowance Total: $${projectSettings.allowanceCost.toFixed(2)}\n`;
+            reportContent += `Total Other Costs (Aggregated): $${totalOtherCostsAggregated.toFixed(2)}\n\n`;
+
+
+            reportContent += `ESTIMATE LINE ITEMS:\n`;
+            reportContent += `====================\n`;
+
+            estimateItems.forEach((item, index) => {
+                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
+                const laborTotal = item.hours * effectiveLaborRate;
+                const lineTotal = laborTotal + item.materials + item.otherCosts;
+
+                reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
+                reportContent += `  Description: ${item.description || 'No description'}\n`;
+                reportContent += `  Hours: ${item.hours.toFixed(2)}\n`;
+                reportContent += `  Rate: ${item.rateRole} ($${laborRate.toFixed(2)}/hr)\n`;
+                reportContent += `  OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
+                reportContent += `  Effective Labor Rate: $${effectiveLaborRate.toFixed(2)}/hr\n`;
+                reportContent += `  Labor Cost: $${laborTotal.toFixed(2)}\n`;
+                reportContent += `  Materials: $${item.materials.toFixed(2)}\n`;
+                reportContent += `  Other Costs (Line Item Specific): $${item.otherCosts.toFixed(2)}\n`;
+                reportContent += `  Line Total: $${lineTotal.toFixed(2)}\n`;
             });
 
-            const miscCost = totalProject * (projectSettings.miscPercent / 100);
-            const profit = (totalProject + miscCost) * (projectSettings.profitMargin / 100);
-            const tax = (totalProject + miscCost + profit) * (projectSettings.salesTax / 100);
-            const grandTotal = totalProject + miscCost + profit + tax;
-
-            reportData += `\n\nFINANCIAL SUMMARY:\n`;
-            reportData += `================\n`;
-            reportData += `Project Subtotal: ${totalProject.toLocaleString()}\n`;
-            reportData += `Miscellaneous (${projectSettings.miscPercent}%): ${miscCost.toLocaleString()}\n`;
-            reportData += `Profit (${projectSettings.profitMargin}%): ${profit.toLocaleString()}\n`;
-            reportData += `Sales Tax (${projectSettings.salesTax}%): ${tax.toLocaleString()}\n`;
-            reportData += `\nGRAND TOTAL: ${grandTotal.toLocaleString()}\n`;
+            reportContent += `\nEnd of Report\n`;
 
             // Download report
-            const blob = new Blob([reportData], { type: 'text/plain' });
+            const blob = new Blob([reportContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `estimate_${projectSettings.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            a.download = `${projectSettings.projectName.replace(/\s/g, '_')}_Estimate_Report.txt`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
-
-        // Initialize
-        updateWizardDisplay();
     </script>
 </body>
 </html>
