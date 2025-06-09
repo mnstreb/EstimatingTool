@@ -414,11 +414,11 @@
             color: #94a3b8; /* Gray for X */
         }
         /* Styles for dynamic labor rate inputs in wizard */
-        .trade-labor-rates-group {
+        .trade-labor-rates-group { 
             border: 1px solid #e5e7eb;
             border-radius: 10px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Space between trade groups */
             background-color: #fcfcfc;
         }
         .trade-labor-rates-group h3 {
@@ -426,6 +426,110 @@
             margin-bottom: 15px;
             font-size: 1.25rem;
             color: #1f2937;
+            padding-bottom: 10px; /* Space below header */
+            border-bottom: 1px solid #e5e7eb; /* Separator for trade header */
+        }
+
+        .skill-level-row {
+            display: flex;
+            align-items: center; /* Align to the center of the content in the row */
+            margin-bottom: 15px;
+            gap: 15px; /* Increased space between skill name and rate input */
+            padding-bottom: 10px; /* Add some padding below each row */
+            border-bottom: 1px dashed #e5e7eb; /* Subtle separator for skill rows */
+            justify-content: space-between; /* Pushes skill name to left, rate input to right */
+        }
+        .skill-level-row:last-child {
+            margin-bottom: 0;
+            border-bottom: none; /* No border for the last one */
+            padding-bottom: 0;
+        }
+
+        .skill-name-display { /* New class for plain text skill name */
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 15px;
+            flex-shrink: 0; /* Prevent shrinking if content is long */
+            width: 150px; /* Give it a fixed width for alignment */
+        }
+
+        /* Adjustments for the rate input to align with the design */
+        .rate-input-group { /* Combined rate label, input, and delete button */
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between rate label, input, and delete button */
+            flex-grow: 1; /* Allow to grow and take remaining space */
+            justify-content: flex-end; /* Push rate input to the right within its group */
+        }
+        .rate-label {
+            white-space: nowrap; /* Prevent label from wrapping */
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 15px;
+            margin-right: 0; /* Remove previous margin-right */
+        }
+        .rate-input { /* Specific class for the rate input field */
+            width: 100px; /* Fixed width for rate input for consistent alignment */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        /* Style for editable skill name input */
+        .skill-name-input.editable {
+            width: 150px; /* Match width of skill-name-display */
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            box-sizing: border-box; /* Include padding and border in the width */
+        }
+        .skill-name-input.editable:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+        }
+
+
+        /* Smaller, aligned remove button */
+        .remove-skill-btn {
+            background-color: #ef4444; /* Red */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px; /* Smaller width */
+            height: 24px; /* Smaller height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px; /* Smaller font for minus/X */
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0; /* Don't shrink the button */
+            transition: background-color 0.2s ease;
+            margin-bottom: 0; /* No bottom margin needed */
+            margin-left: 0; /* No explicit margin-left needed, gap handles it */
+            position: static; /* Remove relative positioning */
+            top: auto; /* Remove top adjustment */
+        }
+        .remove-skill-btn:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+
+        .advanced-link-wrapper {
+            width: 100%;
+            text-align: left; /* Align to the left */
+            margin-top: 20px; /* Space above the button bar */
+        }
+        .advanced-link {
+            color: #2563eb; /* Primary blue color for the link */
+            text-decoration: underline;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .advanced-link:hover {
+            color: #1D4ED8; /* Darker blue on hover */
         }
     </style>
 </head>
@@ -614,10 +718,31 @@
             <div id="wizardStep2" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Labor Rates Configuration</h2>
                 <p class="text-gray-600 mb-4">Enter the hourly rates for each skill level within the selected trades.</p>
-                <div id="dynamicLaborRateInputs" class="grid gap-4"> <!-- Adjusted to just 'grid gap-4' -->
-                    <!-- Dynamic labor rate input fields will be injected here -->
+                
+                <!-- Container for dynamic labor rate inputs (now a simple list) -->
+                <div id="dynamicLaborRateInputs" class="grid gap-4"> 
+                    <!-- Dynamic labor rate items will be injected here -->
+                </div>
+
+                <!-- Advanced link at the bottom-left -->
+                <div class="advanced-link-wrapper">
+                    <a href="#" class="advanced-link" id="advancedLink" onclick="toggleAdvancedRates(event)">Show Advanced Options</a>
                 </div>
                 
+                <!-- Advanced section for adding new skill levels - hidden by default -->
+                <div id="advancedSkillLevelControls" class="hidden mt-6 pt-4 border-t border-gray-200">
+                    <h4 class="font-semibold text-lg mb-3">Add Custom Skill Level</h4>
+                    <div class="form-group">
+                        <label for="newSkillTitle" class="label">New Skill Title:</label>
+                        <input type="text" id="newSkillTitle" class="input-field" placeholder="e.g., Lead Journeyman">
+                    </div>
+                    <div class="form-group">
+                        <label for="newSkillRate" class="label">New Skill Rate ($/hr):</label>
+                        <input type="number" id="newSkillRate" class="input-field" value="0">
+                    </div>
+                    <button class="btn btn-primary w-full mt-2" onclick="addSkillLevelFromAdvanced()">Add Skill Level</button>
+                </div>
+
                 <div class="flex justify-between gap-3 mt-8">
                     <button class="btn btn-primary" onclick="prevStep(2)">Previous</button>
                     <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
@@ -740,7 +865,12 @@
             document.getElementById('step3')
         ];
         const estimateTableBody = document.getElementById('estimateTableBody');
-        const dynamicLaborRateInputs = document.getElementById('dynamicLaborRateInputs'); // NEW: Reference for Step 2 dynamic rates display
+        const dynamicLaborRateInputs = document.getElementById('dynamicLaborRateInputs'); // Reverted to this ID
+        const advancedLink = document.getElementById('advancedLink'); // Reference to the Advanced link
+        const advancedSkillLevelControls = document.getElementById('advancedSkillLevelControls'); // Advanced section container
+
+        // State for advanced mode in Step 2
+        let isAdvancedModeActive = false; // Initial state: Advanced section is hidden
 
         // Top-level summary elements
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
@@ -815,7 +945,11 @@
 
             // Populate Step 2 dynamically when it's shown
             if (stepNumber === 2) {
-                populateWizardStep2LaborRates();
+                // Ensure advanced mode is reset when entering Step 2
+                isAdvancedModeActive = false; // Reset to default (hidden advanced options)
+                advancedLink.textContent = 'Show Advanced Options';
+                advancedSkillLevelControls.classList.add('hidden');
+                populateWizardStep2LaborRates(); // Renders fields based on initial state
             }
         }
 
@@ -828,7 +962,16 @@
                 // Active trades are updated via event listener on checkboxes
                 updateSalesTaxForState(projectSettings.projectState);
             } else if (stepNumber === 2) {
-                // No explicit save needed here as input changes update projectSettings directly
+                // Validation for labor rates and skill titles before moving to next step
+                for (const trade of projectSettings.activeTrades) {
+                    for (const role in projectSettings.allTradeLaborRates[trade]) {
+                        const rate = projectSettings.allTradeLaborRates[trade][role];
+                        if (isNaN(rate) || rate < 0) {
+                            renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid (${rate}). Please ensure all rates are non-negative numbers.`);
+                            return; // Stop and keep user on this step
+                        }
+                    }
+                }
             }
             showStep(stepNumber + 1);
         }
@@ -852,16 +995,16 @@
                 renderMessageBox("Please select at least one trade involved in the project before starting the estimate.");
                 return; // Stop function execution
             }
-            // Ensure activeTrades have labor rates configured
-            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            // Ensure activeTrades have labor rates and valid titles
             for (const trade of projectSettings.activeTrades) {
                 if (!projectSettings.allTradeLaborRates[trade]) {
                     renderMessageBox(`Labor rates for trade "${trade}" are not defined. Please define them or deselect this trade.`);
                     return;
                 }
-                for (const role of allRoles) {
-                    if (projectSettings.allTradeLaborRates[trade][role] === undefined || projectSettings.allTradeLaborRates[trade][role] < 0) {
-                        renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid. Please ensure all rates are non-negative numbers.`);
+                for (const role in projectSettings.allTradeLaborRates[trade]) { // Iterate through all defined roles for this trade
+                    const rate = projectSettings.allTradeLaborRates[trade][role];
+                    if (isNaN(rate) || rate < 0) {
+                        renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid (${rate}). Please ensure all rates are non-negative numbers.`);
                         return;
                     }
                 }
@@ -926,49 +1069,62 @@
             updateSalesTaxForState(event.target.value);
         });
 
-        // NEW: Function to dynamically populate labor rates in Step 2 of the wizard for input
+        // Function to dynamically populate labor rates in Step 2 of the wizard for input
         function populateWizardStep2LaborRates() {
             dynamicLaborRateInputs.innerHTML = ''; // Clear existing content
 
-            // Dynamically set grid columns based on number of active trades
-            dynamicLaborRateInputs.classList.remove('md:grid-cols-2'); // Remove existing
-            if (projectSettings.activeTrades.length === 1) {
-                dynamicLaborRateInputs.classList.add('grid-cols-1'); // Single column
-            } else if (projectSettings.activeTrades.length > 1) {
-                dynamicLaborRateInputs.classList.add('grid-cols-1', 'md:grid-cols-2'); // Two columns on medium+
-            } else {
+            if (projectSettings.activeTrades.length === 0) {
                 dynamicLaborRateInputs.innerHTML = `<p class="text-gray-600">Please select trades in Step 1 to configure their labor rates here.</p>`;
                 return;
             }
 
-            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
 
             projectSettings.activeTrades.forEach(trade => {
-                let tradeRatesHtml = `
-                    <div class="trade-labor-rates-group">
-                        <h3>${trade} Labor Rates</h3>`;
-                
-                allRoles.forEach(role => {
-                    // Ensure the trade and role exist in allTradeLaborRates, provide default if not
-                    if (!projectSettings.allTradeLaborRates[trade]) {
-                        projectSettings.allTradeLaborRates[trade] = {};
-                    }
-                    if (projectSettings.allTradeLaborRates[trade][role] === undefined) {
-                        // Use a reasonable default if a role rate isn't set for a new trade
-                        projectSettings.allTradeLaborRates[trade][role] = 75; // Default for new roles/trades
-                    }
+                // Create a div for each trade's rates group
+                const tradeGroupDiv = document.createElement('div');
+                tradeGroupDiv.className = 'trade-labor-rates-group';
+                tradeGroupDiv.innerHTML = `<h3>${trade} Labor Rates</h3>`;
 
-                    const inputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
-                    tradeRatesHtml += `
-                        <div class="form-group">
-                            <label for="${inputId}" class="label">${role} ($/hr):</label>
-                            <input type="number" id="${inputId}" class="input-field" value="${projectSettings.allTradeLaborRates[trade][role]}"
-                                onchange="updateLaborRate('${trade}', '${role}', this.value)">
+                let skillLevelsHtml = '';
+                // Sort roles to maintain a consistent order (default first, then custom alphabetically)
+                const sortedRoles = Object.keys(projectSettings.allTradeLaborRates[trade] || {}).sort((a, b) => {
+                    const aIsDefault = defaultRoles.includes(a);
+                    const bIsDefault = defaultRoles.includes(b);
+
+                    if (aIsDefault && !bIsDefault) return -1;
+                    if (!aIsDefault && bIsDefault) return 1;
+                    return a.localeCompare(b); // Alphabetical for same type (default/custom)
+                });
+
+                sortedRoles.forEach(role => {
+                    const rateInputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
+                    // Unique ID for the skill name element (either span or input)
+                    const skillNameElementId = `skillname-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
+
+                    skillLevelsHtml += `
+                        <div class="skill-level-row">
+                            ${isAdvancedModeActive ? `
+                                <input type="text" id="${skillNameElementId}" class="skill-name-input editable" value="${role}"
+                                    onchange="updateSkillTitle('${trade}', '${role}', this.value)">
+                            ` : `
+                                <span id="${skillNameElementId}" class="skill-name-display">${role}</span>
+                            `}
+                            <div class="rate-input-group">
+                                <label for="${rateInputId}" class="rate-label">Rate ($/hr):</label>
+                                <input type="number" id="${rateInputId}" class="input-field rate-input" value="${projectSettings.allTradeLaborRates[trade][role]}"
+                                    onchange="updateLaborRate('${trade}', '${role}', this.value)">
+                                ${isAdvancedModeActive ? `
+                                    <button class="remove-skill-btn" onclick="confirmRemoveSkillLevel('${trade}', '${role}')">
+                                        &minus;
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                     `;
                 });
-                tradeRatesHtml += `</div>`;
-                dynamicLaborRateInputs.innerHTML += tradeRatesHtml;
+                tradeGroupDiv.innerHTML += skillLevelsHtml; // Append skill levels to the trade group
+                dynamicLaborRateInputs.appendChild(tradeGroupDiv); // Add trade group to the main container
             });
         }
 
@@ -978,30 +1134,202 @@
             if (!isNaN(parsedValue) && parsedValue >= 0) {
                 projectSettings.allTradeLaborRates[trade][role] = parsedValue;
             } else {
-                // Optionally provide feedback if input is invalid
                 console.error(`Invalid input for ${trade} ${role} rate: ${value}`);
-                // Revert to old value or set to 0 if invalid
+                // Revert to old value if invalid, or a default
                 const inputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
-                document.getElementById(inputId).value = projectSettings.allTradeLaborRates[trade][role];
+                document.getElementById(inputId).value = projectSettings.allTradeLaborRates[trade][role] || 0; // Fallback to 0 if previously undefined
             }
-            // No need to call renderItems here immediately, it will be called on startEstimating or next steps.
+        }
+
+        // Function to update skill level title (now handles renaming)
+        function updateSkillTitle(trade, oldRole, newRole) {
+            const trimmedNewRole = newRole.trim();
+            console.log(`Attempting to update skill title for trade: ${trade}, oldRole: ${oldRole}, newRole: ${trimmedNewRole}`);
+
+            if (trimmedNewRole === oldRole) {
+                console.log('New role is same as old role. No update needed.');
+                return;
+            }
+            if (!trimmedNewRole) {
+                renderMessageBox("Skill level title cannot be empty. Reverting to original name.");
+                // Revert the input field if the new name is empty
+                document.getElementById(`skillname-${trade.replace(/\s/g, '')}-${oldRole.replace(/\s/g, '')}`).value = oldRole;
+                return;
+            }
+            // Check if the new role name already exists for this trade (case-insensitive)
+            const existingRoles = Object.keys(projectSettings.allTradeLaborRates[trade]).map(r => r.toLowerCase());
+            if (existingRoles.includes(trimmedNewRole.toLowerCase()) && trimmedNewRole.toLowerCase() !== oldRole.toLowerCase()) {
+                renderMessageBox(`Skill level "${trimmedNewRole}" already exists for ${trade}. Please choose a different name.`);
+                // Revert the input field
+                document.getElementById(`skillname-${trade.replace(/\s/g, '')}-${oldRole.replace(/\s/g, '')}`).value = oldRole;
+                return;
+            }
+
+            if (projectSettings.allTradeLaborRates[trade] && projectSettings.allTradeLaborRates[trade][oldRole] !== undefined) {
+                const rate = projectSettings.allTradeLaborRates[trade][oldRole];
+                // Delete old role and add new role
+                delete projectSettings.allTradeLaborRates[trade][oldRole];
+                projectSettings.allTradeLaborRates[trade][trimmedNewRole] = rate;
+                console.log(`Successfully updated skill title for trade: ${trade}, from ${oldRole} to ${trimmedNewRole}.`);
+
+                // Update any line items that were using the old role name
+                estimateItems.forEach(item => {
+                    if (item.trade === trade && item.rateRole === oldRole) {
+                        item.rateRole = trimmedNewRole;
+                    }
+                });
+                populateWizardStep2LaborRates(); // Re-render to reflect the name change in wizard
+                renderItems(); // Re-render main table for updated dropdowns
+            } else {
+                console.warn(`Could not find old role "${oldRole}" in trade "${trade}" for update.`);
+            }
         }
 
 
+        // Function to toggle advanced mode for labor rates
+        function toggleAdvancedRates(event) {
+            event.preventDefault(); // Prevent page scroll for the link
+            isAdvancedModeActive = !isAdvancedModeActive;
+            if (isAdvancedModeActive) {
+                advancedLink.textContent = 'Hide Advanced Options';
+                advancedSkillLevelControls.classList.remove('hidden');
+            } else {
+                advancedLink.textContent = 'Show Advanced Options';
+                advancedSkillLevelControls.classList.add('hidden');
+            }
+            populateWizardStep2LaborRates(); // Re-render to show/hide input fields and minus buttons
+        }
+
+        // Function to add a custom skill level (now called from advanced section)
+        function addSkillLevelFromAdvanced() {
+            if (projectSettings.activeTrades.length === 0) {
+                renderMessageBox("Please select at least one trade in Step 1 before adding new skill levels.");
+                return;
+            }
+            
+            // Get inputs from the advanced section (which are now global, not per-trade)
+            const newSkillTitleInput = document.getElementById('newSkillTitle');
+            const newSkillRateInput = document.getElementById('newSkillRate');
+
+            const newTitle = newSkillTitleInput.value.trim();
+            const newRate = parseFloat(newSkillRateInput.value);
+            console.log(`Attempting to add new skill: ${newTitle} with rate ${newRate}`);
+
+            if (!newTitle) {
+                renderMessageBox("Please enter a title for the new skill level.");
+                return;
+            }
+            if (isNaN(newRate) || newRate < 0) {
+                renderMessageBox("Please enter a valid non-negative number for the new skill rate.");
+                return;
+            }
+
+            // Add this new skill level to ALL active trades
+            let newSkillAdded = false;
+            let alreadyExistsForSome = false;
+            projectSettings.activeTrades.forEach(trade => {
+                if (!projectSettings.allTradeLaborRates[trade]) {
+                    projectSettings.allTradeLaborRates[trade] = {}; // Initialize trade if not present
+                }
+                // Check if the new skill title already exists for this trade (case-insensitive)
+                const existingRolesForTrade = Object.keys(projectSettings.allTradeLaborRates[trade]).map(r => r.toLowerCase());
+                if (!existingRolesForTrade.includes(newTitle.toLowerCase())) {
+                    projectSettings.allTradeLaborRates[trade][newTitle] = newRate;
+                    newSkillAdded = true;
+                    console.log(`Added skill "${newTitle}" to trade "${trade}".`);
+                } else {
+                    alreadyExistsForSome = true;
+                    console.warn(`Skill level "${newTitle}" already exists for ${trade}, skipping.`);
+                }
+            });
+
+            if (newSkillAdded) {
+                // Clear inputs and re-render
+                newSkillTitleInput.value = '';
+                newSkillRateInput.value = '0';
+                populateWizardStep2LaborRates(); // Re-render to show the new skill level
+            } else if (alreadyExistsForSome) {
+                renderMessageBox(`Skill level "${newTitle}" already exists for some or all selected trades. It was not added where it already existed.`);
+            } else {
+                 renderMessageBox(`Skill level "${newTitle}" already exists for all selected trades or no trades are selected.`);
+            }
+        }
+
+
+        // Function to confirm and remove a skill level
+        function confirmRemoveSkillLevel(trade, role) {
+            console.log(`Confirming removal of skill: ${role} from trade: ${trade}`);
+            renderMessageBox(`Are you sure you want to remove the skill level "${role}" from ${trade}? This will remove it from all line items using it.`,
+                () => { // Pass the anonymous function directly as callback
+                    removeSkillLevel(trade, role);
+                    closeMessageBox(); // Close after action is taken
+                },
+                true // Is a confirmation message
+            );
+        }
+
+        // Function to remove a skill level
+        function removeSkillLevel(trade, role) {
+            console.log(`Attempting to remove skill: ${role} from trade: ${trade}`);
+            const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            if (defaultRoles.includes(role)) {
+                renderMessageBox(`"${role}" is a default skill level and cannot be removed.`);
+                console.log(`Cannot remove default skill: ${role}`);
+                return;
+            }
+
+            if (projectSettings.allTradeLaborRates[trade] && projectSettings.allTradeLaborRates[trade][role] !== undefined) {
+                delete projectSettings.allTradeLaborRates[trade][role];
+                console.log(`Successfully removed skill: ${role} from trade: ${trade}`);
+
+                // Update any line items that were using this role to a default or first available
+                estimateItems.forEach(item => {
+                    if (item.trade === trade && item.rateRole === role) {
+                        const availableRoles = Object.keys(projectSettings.allTradeLaborRates[item.trade] || {});
+                        item.rateRole = availableRoles.length > 0 ? availableRoles[0] : "Journeyman"; // Fallback to Journeyman or first available
+                        console.log(`Updated line item rate role from ${role} to ${item.rateRole}`);
+                    }
+                });
+
+                populateWizardStep2LaborRates(); // Re-render the wizard step
+                renderItems(); // Re-render the main table to reflect changes
+            } else {
+                console.warn(`Could not find skill "${role}" in trade "${trade}" for removal.`);
+            }
+        }
+
         // --- Custom Message Box (instead of alert) ---
-        function renderMessageBox(message) {
+        // Modified to support confirmation dialogs
+        function renderMessageBox(message, onConfirmCallback = null, isConfirm = false) {
             const messageBoxOverlay = document.createElement('div');
             messageBoxOverlay.id = 'messageBoxOverlay';
             messageBoxOverlay.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[1001] backdrop-filter backdrop-blur-sm';
             
             const messageBox = document.createElement('div');
             messageBox.className = 'bg-white rounded-xl p-8 shadow-2xl max-w-sm mx-auto text-center';
+            
+            let buttonsHtml = `<button class="btn btn-primary" onclick="closeMessageBox()">OK</button>`;
+            if (isConfirm) {
+                // Direct call to onConfirmCallback if provided, then close
+                buttonsHtml = `
+                    <button class="btn btn-red mr-3" id="confirmYesBtn">Yes</button>
+                    <button class="btn btn-primary" onclick="closeMessageBox()">No</button>
+                `;
+            }
+
             messageBox.innerHTML = `
                 <p class="text-lg font-semibold text-gray-800 mb-6">${message}</p>
-                <button class="btn btn-primary" onclick="closeMessageBox()">OK</button>
+                <div class="flex justify-center gap-3">
+                    ${buttonsHtml}
+                </div>
             `;
             messageBoxOverlay.appendChild(messageBox);
             document.body.appendChild(messageBoxOverlay);
+
+            // Attach event listener directly if it's a confirmation
+            if (isConfirm && onConfirmCallback) {
+                document.getElementById('confirmYesBtn').addEventListener('click', onConfirmCallback);
+            }
         }
 
         function closeMessageBox() {
@@ -1035,7 +1363,7 @@
             if (checkbox.checked) {
                 if (!projectSettings.activeTrades.includes(trade)) {
                     projectSettings.activeTrades.push(trade);
-                    // If a new trade is selected, ensure it has default labor rates initialized
+                    // If a new trade is selected, ensure it has default labor rates initialized if it doesn't already
                     if (!projectSettings.allTradeLaborRates[trade]) {
                         projectSettings.allTradeLaborRates[trade] = {
                             "Project Manager": 120, "Superintendent": 100, "General Foreman": 90,
@@ -1146,7 +1474,12 @@
                 if (!projectSettings.activeTrades.includes(item.trade)) {
                     item.trade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
                 }
-                
+                // Ensure the item's role is still defined for its trade, default to Journeyman or first available
+                if (!projectSettings.allTradeLaborRates[item.trade] || !projectSettings.allTradeLaborRates[item.trade][item.rateRole]) {
+                     const availableRoles = Object.keys(projectSettings.allTradeLaborRates[item.trade] || {});
+                     item.rateRole = availableRoles.length > 0 ? availableRoles[0] : "Journeyman";
+                }
+
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
@@ -1227,9 +1560,8 @@
 
             let laborBreakdown = {}; // To store labor cost per role
             // Initialize labor breakdown totals across all trades
-            // Only consider roles that are actually present in any active trade
             const allPossibleRoles = new Set();
-            projectSettings.activeTrades.forEach(trade => {
+            Object.keys(projectSettings.allTradeLaborRates).forEach(trade => { // Iterate through ALL defined trades
                 if (projectSettings.allTradeLaborRates[trade]) {
                     Object.keys(projectSettings.allTradeLaborRates[trade]).forEach(role => allPossibleRoles.add(role));
                 }
@@ -1297,12 +1629,22 @@
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
 
             // Update Labor Breakdown (middle card)
-            laborPMTotal.textContent = formatCurrency(laborBreakdown["Project Manager"] || 0);
-            laborSuperintendentTotal.textContent = formatCurrency(laborBreakdown["Superintendent"] || 0);
-            laborGeneralForemanTotal.textContent = formatCurrency(laborBreakdown["General Foreman"] || 0);
-            laborForemanTotal.textContent = formatCurrency(laborBreakdown["Foreman"] || 0);
-            laborJourneymanTotal.textContent = formatCurrency(laborBreakdown["Journeyman"] || 0);
-            laborApprenticeTotal.textContent = formatCurrency(laborBreakdown["Apprentice"] || 0);
+            const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            const laborBreakdownContainer = document.querySelector('.summary-block:nth-child(2)'); // Assuming it's the second summary block
+            let currentHtml = `<h4>Labor Breakdown</h4>`;
+                                
+            // Display default roles first
+            defaultRoles.forEach(role => {
+                currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatCurrency(laborBreakdown[role] || 0)}</strong></div>`;
+            });
+            // Then display custom roles
+            Object.keys(laborBreakdown).sort().forEach(role => {
+                if (!defaultRoles.includes(role)) { // If it's a custom role
+                    currentHtml += `<div class="summary-item"><span>${role}:</span> <strong>${formatCurrency(laborBreakdown[role] || 0)}</strong></div>`;
+                }
+            });
+            laborBreakdownContainer.innerHTML = currentHtml;
+
 
             // Update Project Cost Breakdown (right card)
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
@@ -1397,7 +1739,7 @@
 
             // Initialize labor breakdown totals across all trades
             const allPossibleRolesReport = new Set();
-            projectSettings.activeTrades.forEach(trade => {
+            Object.keys(projectSettings.allTradeLaborRates).forEach(trade => {
                 if (projectSettings.allTradeLaborRates[trade]) {
                     Object.keys(projectSettings.allTradeLaborRates[trade]).forEach(role => allPossibleRolesReport.add(role));
                 }
@@ -1463,7 +1805,7 @@
 
 
             reportContent += `EXECUTIVE SUMMARY DETAILS:\n`;
-            reportContent += `-------------------------------------------------\n`;
+            report += `-------------------------------------------------\n`;
             reportContent += `Total Project Cost (Line Items Base): ${formatCurrency(totalProjectSubtotal)}\n`;
             reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmount)}\n`;
             reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`;
@@ -1473,9 +1815,17 @@
 
             reportContent += `LABOR BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
-            for (const role in laborBreakdownReport) {
-                reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role])}\n`;
-            }
+            const defaultRolesReport = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            // Display default roles first
+            defaultRolesReport.forEach(role => {
+                reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role] || 0)}\n`;
+            });
+            // Then display custom roles
+            Object.keys(laborBreakdownReport).sort().forEach(role => {
+                if (!defaultRolesReport.includes(role)) { // If it's a custom role
+                    reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role])}\n`;
+                }
+            });
             reportContent += `\n`; // Add extra newline for readability
 
             reportContent += `PROJECT COST BREAKDOWN:\n`;
