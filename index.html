@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -614,7 +614,7 @@
             <div id="wizardStep2" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Labor Rates Configuration</h2>
                 <p class="text-gray-600 mb-4">Enter the hourly rates for each skill level within the selected trades.</p>
-                <div id="dynamicLaborRateInputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="dynamicLaborRateInputs" class="grid gap-4"> <!-- Adjusted to just 'grid gap-4' -->
                     <!-- Dynamic labor rate input fields will be injected here -->
                 </div>
                 
@@ -930,12 +930,18 @@
         function populateWizardStep2LaborRates() {
             dynamicLaborRateInputs.innerHTML = ''; // Clear existing content
 
-            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
-
-            if (projectSettings.activeTrades.length === 0) {
+            // Dynamically set grid columns based on number of active trades
+            dynamicLaborRateInputs.classList.remove('md:grid-cols-2'); // Remove existing
+            if (projectSettings.activeTrades.length === 1) {
+                dynamicLaborRateInputs.classList.add('grid-cols-1'); // Single column
+            } else if (projectSettings.activeTrades.length > 1) {
+                dynamicLaborRateInputs.classList.add('grid-cols-1', 'md:grid-cols-2'); // Two columns on medium+
+            } else {
                 dynamicLaborRateInputs.innerHTML = `<p class="text-gray-600">Please select trades in Step 1 to configure their labor rates here.</p>`;
                 return;
             }
+
+            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
 
             projectSettings.activeTrades.forEach(trade => {
                 let tradeRatesHtml = `
@@ -966,7 +972,7 @@
             });
         }
 
-        // NEW: Function to update labor rates in projectSettings from wizard inputs
+        // Function to update labor rates in projectSettings from wizard inputs
         function updateLaborRate(trade, role, value) {
             const parsedValue = parseFloat(value);
             if (!isNaN(parsedValue) && parsedValue >= 0) {
