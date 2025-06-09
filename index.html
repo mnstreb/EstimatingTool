@@ -82,14 +82,7 @@
             box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
             transform: translateY(-1px);
         }
-        .total-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            text-align: center;
-            padding: 40px; /* More padding */
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(29, 78, 216, 0.3); /* Deeper shadow */
-        }
+
         table {
             width: 100%;
             border-collapse: separate; /* Allows border-radius on cells */
@@ -230,17 +223,61 @@
             margin-top: 10px; /* Add margin for small screens */
         }
 
-        /* Executive Summary specific styles */
-        .executive-summary-grid {
+        /* NEW: Top Summary Row Styles (now 3 columns) */
+        .top-summary-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for summary */
+            grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .summary-overall-metric-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); /* Blue gradient */
+            color: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(29, 78, 216, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px; /* Ensure some height */
+        }
+        .summary-overall-metric-card .label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.9);
+        }
+        .summary-overall-metric-card .value {
+            font-size: 3rem; /* Larger font for main value */
+            font-weight: 800;
+            line-height: 1;
+        }
+         /* Pie Chart specific styles (now in top row, also a card) */
+        .chart-container.card { /* Make it a card for consistent styling */
+            padding: 20px; /* Adjust padding for visual balance */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px; /* Match height of other top cards if possible */
+        }
+        .chart-canvas {
+            max-width: 100%; /* Make chart responsive */
+            max-height: 200px; /* Adjust max height for top row display */
+            height: auto;
+            width: auto; /* Allow chart.js to manage width within limits */
+        }
+
+        /* Executive Summary Grid (now 3 columns) specific styles */
+        .executive-summary-grid-3col { /* Renamed class for clarity */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Explicitly 3 columns on large screens */
             gap: 20px;
         }
-        .summary-block {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid #e2e8f0;
+        .executive-summary-grid-3col .card { /* Ensure cards within this grid don't have extra bottom margin */
+            margin-bottom: 0;
         }
         .summary-block h4 {
             font-size: 1.1rem;
@@ -267,25 +304,17 @@
             padding-top: 8px;
         }
 
-        /* Pie Chart specific styles */
-        .chart-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
-            margin-bottom: 25px; /* Spacing between chart and other cards */
-        }
-        .chart-canvas {
-            max-width: 400px; /* Control max width of chart */
-            max-height: 400px;
-            width: 100%;
-            height: auto;
-        }
 
         /* Responsive adjustments */
+        @media (max-width: 1024px) { /* Adjust grid for medium screens */
+            .top-summary-row {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+            }
+            .executive-summary-grid-3col { /* Renamed class */
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+            }
+        }
+
         @media (max-width: 768px) {
             .card, .wizard-content {
                 padding: 20px;
@@ -305,17 +334,20 @@
                 padding: 10px;
                 font-size: 14px;
             }
-            .total-card { /* This will be replaced by executive summary, but keeping for reference if needed */
-                padding: 25px;
+            .summary-overall-metric-card {
+                padding: 20px;
             }
-            #grandTotal {
-                font-size: 36px;
+            .summary-overall-metric-card .label {
+                font-size: 1.2rem;
             }
-            #totalBreakdown {
-                font-size: 14px;
+            .summary-overall-metric-card .value {
+                font-size: 2.5rem;
             }
-            .executive-summary-grid {
+            .top-summary-row, .executive-summary-grid-3col { /* Renamed class */
                 grid-template-columns: 1fr; /* Stack columns on small screens */
+            }
+            .chart-container.card h4 {
+                font-size: 1rem; /* Smaller title for chart on mobile */
             }
         }
     </style>
@@ -342,10 +374,27 @@
             </div>
         </div>
 
-        <!-- Executive Summary & Pie Chart -->
+        <!-- NEW: Top-level summary boxes with Pie Chart -->
+        <div class="top-summary-row mb-6">
+            <div class="summary-overall-metric-card">
+                <span class="label">Total Proposal</span>
+                <span class="value" id="summaryTotalProposal">$0.00</span>
+            </div>
+            <div class="summary-overall-metric-card">
+                <span class="label">Total Labor Hours</span>
+                <span class="value" id="summaryOverallLaborHours">0</span>
+            </div>
+            <!-- Pie Chart Container moved here -->
+            <div class="chart-container card">
+                <h4 style="margin-top:0;">Labor vs. Material Cost Distribution</h4>
+                <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Executive Summary Grid (now 3 columns) -->
         <div class="executive-summary-section mb-6">
-            <div class="executive-summary-grid">
-                <div class="card">
+            <div class="executive-summary-grid-3col"> <!-- Class name changed -->
+                <div class="card summary-block">
                     <h4>Executive Summary</h4>
                     <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
                     <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
@@ -354,10 +403,9 @@
                     <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">15.00%</strong></div>
                     <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">8.25%</strong></div>
                     <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">5.00%</strong></div>
-                    <div class="summary-item total"><span>GRAND TOTAL:</span> <strong id="summaryGrandTotal">$0.00</strong></div>
                 </div>
 
-                <div class="card">
+                <div class="card summary-block">
                     <h4>Labor Breakdown</h4>
                     <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">$0.00</strong></div>
@@ -365,10 +413,9 @@
                     <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">$0.00</strong></div>
-                    <div class="summary-item total"><span>Total Labor Hours:</span> <strong id="totalLaborHours">0</strong></div>
                 </div>
 
-                <div class="card">
+                <div class="card summary-block">
                     <h4>Project Cost Breakdown</h4>
                     <div class="summary-item"><span>Labor Total:</span> <strong id="breakdownLaborTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Material Total:</span> <strong id="breakdownMaterialTotal">$0.00</strong></div>
@@ -379,10 +426,6 @@
                     <div class="summary-item"><span>Allowance Total:</span> <strong id="breakdownAllowanceTotal">$0.00</strong></div>
                     <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
                 </div>
-            </div>
-            <!-- Pie Chart Container -->
-            <div class="chart-container">
-                <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
             </div>
         </div>
 
@@ -398,8 +441,7 @@
                         <th>Description</th>
                         <th>Hours</th>
                         <th>Rate ($/hr)</th>
-                        <th>OT/DT</th> <!-- New Column Header -->
-                        <th>Labor Total</th>
+                        <th>OT/DT</th> <th>Labor Total</th>
                         <th>Materials</th>
                         <th>Other Costs</th>
                         <th>Line Total</th>
@@ -407,13 +449,11 @@
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
-                    <!-- Dynamic rows will be inserted here -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Project Setup Wizard -->
     <div id="setupWizard" class="setup-wizard">
         <div class="wizard-content">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -430,7 +470,6 @@
                 <div id="step3" class="step inactive">3</div>
             </div>
 
-            <!-- Step 1: Project Information -->
             <div id="wizardStep1">
                 <h2 class="text-xl font-semibold mb-6">Project Information</h2>
                 <div class="form-group">
@@ -463,7 +502,6 @@
                 </div>
             </div>
 
-            <!-- Step 2: Labor Rates Configuration -->
             <div id="wizardStep2" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Labor Rates Configuration</h2>
                 <div class="form-group">
@@ -496,7 +534,6 @@
                 </div>
             </div>
 
-            <!-- Step 3: Project Settings -->
             <div id="wizardStep3" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Project Settings</h2>
                 <div class="form-group">
@@ -536,12 +573,12 @@
                 "Journeyman": 75,
                 "Apprentice": 50
             },
-            // New breakdown categories
-            travelCost: 0,
-            equipmentCost: 0,
-            fixedCost: 0,
-            subcontractorCost: 0,
-            allowanceCost: 0
+            // New breakdown categories - kept as placeholders for now
+            travelCost: 1000,
+            equipmentCost: 2000,
+            fixedCost: 500,
+            subcontractorCost: 3000,
+            allowanceCost: 1500
         };
 
         // Estimate data structure
@@ -562,6 +599,10 @@
         ];
         const estimateTableBody = document.getElementById('estimateTableBody');
 
+        // NEW: Top-level summary elements
+        const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
+        const summaryOverallLaborHoursElem = document.getElementById('summaryOverallLaborHours');
+
         // Executive Summary elements
         const summaryProjectCost = document.getElementById('summaryProjectCost');
         const summaryMiscCost = document.getElementById('summaryMiscCost');
@@ -570,7 +611,6 @@
         const summaryProfitMargin = document.getElementById('summaryProfitMargin');
         const summarySalesTax = document.getElementById('summarySalesTax');
         const summaryMiscPercent = document.getElementById('summaryMiscPercent');
-        const summaryGrandTotal = document.getElementById('summaryGrandTotal');
 
         const laborPMTotal = document.getElementById('laborPMTotal');
         const laborSuperintendentTotal = document.getElementById('laborSuperintendentTotal');
@@ -578,7 +618,6 @@
         const laborForemanTotal = document.getElementById('laborForemanTotal');
         const laborJourneymanTotal = document.getElementById('laborJourneymanTotal');
         const laborApprenticeTotal = document.getElementById('laborApprenticeTotal');
-        const totalLaborHours = document.getElementById('totalLaborHours');
 
         const breakdownLaborTotal = document.getElementById('breakdownLaborTotal');
         const breakdownMaterialTotal = document.getElementById('breakdownMaterialTotal');
@@ -749,9 +788,12 @@
         function updateItem(id, field, value) {
             const item = estimateItems.find(item => item.id === id);
             if (item) {
-                if (['hours', 'materials', 'otherCosts', 'otDtMultiplier'].includes(field)) {
+                if (['hours', 'materials', 'otherCosts'].includes(field)) {
                     item[field] = parseFloat(value) || 0;
-                } else { // For text fields like taskName, description, rateRole
+                } else if (field === 'otDtMultiplier') {
+                    item[field] = parseFloat(value) || 1.0; // Ensure multiplier is a number
+                }
+                else { // For text fields like taskName, description, rateRole
                     item[field] = value;
                 }
                 renderItems(); // Re-render to update calculations
@@ -760,7 +802,7 @@
 
         function renderItems() {
             estimateTableBody.innerHTML = ''; // Clear existing rows
-            let totalLaborHoursVal = 0; // To accumulate total labor hours
+            let totalLaborHoursVal = 0; // To accumulate total labor hours for the overall metric
 
             estimateItems.forEach(item => {
                 const laborRate = projectSettings.laborRates[item.rateRole] || 0;
@@ -799,7 +841,7 @@
                 `;
                 estimateTableBody.appendChild(row);
             });
-            totalLaborHours.textContent = totalLaborHoursVal; // Update total labor hours in summary
+            summaryOverallLaborHoursElem.textContent = totalLaborHoursVal.toFixed(2); // Update overall labor hours
             calculateTotals(); // Recalculate and update executive summary
         }
 
@@ -809,7 +851,7 @@
             let totalProjectSubtotal = 0; // Sum of all line item totals
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalOtherCosts = 0; // This aggregates the 'otherCosts' from line items
+            let totalLineItemOtherCosts = 0; // This aggregates the 'otherCosts' from line items
             let laborBreakdown = {}; // To store labor cost per role
             let totalHoursByRole = {}; // To store total hours per role
 
@@ -828,48 +870,46 @@
                 totalProjectSubtotal += lineTotal;
                 totalLaborCost += laborTotal;
                 totalMaterialCost += item.materials;
-                totalOtherCosts += item.otherCosts;
+                totalLineItemOtherCosts += item.otherCosts;
 
                 laborBreakdown[item.rateRole] += laborTotal;
                 totalHoursByRole[item.rateRole] += item.hours;
             });
 
-            // For the global cost categories (Travel, Equipment, Fixed, Subcontractor, Allowance)
-            // Assuming these are separate from line-item 'otherCosts' for now based on screenshot
-            // For now, these are manually set in projectSettings.
-            // In a real app, you might have separate input fields for these global costs.
-            // For the purpose of this example, I'll add them to the totalOtherCosts for the breakdown.
-            projectSettings.travelCost = 1000; // Example placeholder
-            projectSettings.equipmentCost = 2000; // Example placeholder
-            projectSettings.fixedCost = 500; // Example placeholder
-            projectSettings.subcontractorCost = 3000; // Example placeholder
-            projectSettings.allowanceCost = 1500; // Example placeholder
-
-            totalOtherCosts += projectSettings.travelCost + projectSettings.equipmentCost +
-                               projectSettings.fixedCost + projectSettings.subcontractorCost +
-                               projectSettings.allowanceCost;
+            // Sum up the global cost categories from projectSettings
+            const globalOtherCosts = projectSettings.travelCost + projectSettings.equipmentCost +
+                                     projectSettings.fixedCost + projectSettings.subcontractorCost +
+                                     projectSettings.allowanceCost;
+            
+            // Total other costs for breakdown includes both line item specific and global
+            const breakdownTotalOtherCosts = totalLineItemOtherCosts + globalOtherCosts;
 
 
-            // Calculate main totals
-            const totalMiscCost = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
-            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCost;
-            const totalMarkup = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100); // Markup is essentially profit here
-            const estimateSubtotal = subtotalBeforeProfitTax + totalMarkup; // This term matches screenshot's 'Estimate Subtotal'
+            // Calculate main totals based on the screenshot's flow
+            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
+            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount; // "Project Cost" in summary + "Total Misc Cost"
+            const totalMarkupAmount = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
+            const estimateSubtotalAmount = subtotalBeforeProfitTax + totalMarkupAmount; // "Estimate Subtotal" in summary
 
-            const salesTaxAmount = estimateSubtotal * (projectSettings.salesTax / 100);
-            const grandTotal = estimateSubtotal + salesTaxAmount;
+            const salesTaxAmount = estimateSubtotalAmount * (projectSettings.salesTax / 100);
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount; // "Total Proposal"
 
-            // Update Executive Summary UI
+
+            // Update NEW Top-level Summary UI
+            summaryTotalProposalElem.textContent = `$${grandTotal.toFixed(2)}`;
+            summaryOverallLaborHoursElem.textContent = estimateItems.reduce((acc, item) => acc + item.hours, 0).toFixed(2);
+
+
+            // Update Executive Summary UI (left card)
             summaryProjectCost.textContent = `$${totalProjectSubtotal.toFixed(2)}`;
-            summaryMiscCost.textContent = `$${totalMiscCost.toFixed(2)}`;
-            summaryMarkup.textContent = `$${totalMarkup.toFixed(2)}`;
-            summaryEstimateSubtotal.textContent = `$${estimateSubtotal.toFixed(2)}`;
+            summaryMiscCost.textContent = `$${totalMiscCostAmount.toFixed(2)}`;
+            summaryMarkup.textContent = `$${totalMarkupAmount.toFixed(2)}`;
+            summaryEstimateSubtotal.textContent = `$${estimateSubtotalAmount.toFixed(2)}`;
             summaryProfitMargin.textContent = `${projectSettings.profitMargin.toFixed(2)}%`;
             summarySalesTax.textContent = `${projectSettings.salesTax.toFixed(2)}%`;
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
-            summaryGrandTotal.textContent = `$${grandTotal.toFixed(2)}`;
 
-            // Update Labor Breakdown
+            // Update Labor Breakdown (middle card)
             laborPMTotal.textContent = `$${laborBreakdown["Project Manager"].toFixed(2)}`;
             laborSuperintendentTotal.textContent = `$${laborBreakdown["Superintendent"].toFixed(2)}`;
             laborGeneralForemanTotal.textContent = `$${laborBreakdown["General Foreman"].toFixed(2)}`;
@@ -877,7 +917,7 @@
             laborJourneymanTotal.textContent = `$${laborBreakdown["Journeyman"].toFixed(2)}`;
             laborApprenticeTotal.textContent = `$${laborBreakdown["Apprentice"].toFixed(2)}`;
 
-            // Update Project Cost Breakdown
+            // Update Project Cost Breakdown (right card)
             breakdownLaborTotal.textContent = `$${totalLaborCost.toFixed(2)}`;
             breakdownMaterialTotal.textContent = `$${totalMaterialCost.toFixed(2)}`;
             breakdownTravelTotal.textContent = `$${projectSettings.travelCost.toFixed(2)}`;
@@ -885,7 +925,7 @@
             breakdownFixedTotal.textContent = `$${projectSettings.fixedCost.toFixed(2)}`;
             breakdownSubcontractorTotal.textContent = `$${projectSettings.subcontractorCost.toFixed(2)}`;
             breakdownAllowanceTotal.textContent = `$${projectSettings.allowanceCost.toFixed(2)}`;
-            breakdownOtherTotal.textContent = `$${totalOtherCosts.toFixed(2)}`; // Updated sum including new global costs
+            breakdownOtherTotal.textContent = `$${breakdownTotalOtherCosts.toFixed(2)}`; // Updated sum including new global costs
 
             // Render Pie Chart
             renderPieChart(totalLaborCost, totalMaterialCost);
@@ -960,7 +1000,7 @@
             let totalProjectSubtotal = 0;
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalOtherCostsAggregated = 0; // Sum of all other costs from line items
+            let totalLineItemOtherCosts = 0;
             let laborBreakdownReport = {};
             let totalLaborHoursReport = 0;
 
@@ -977,24 +1017,27 @@
                 totalProjectSubtotal += lineTotal;
                 totalLaborCost += laborTotal;
                 totalMaterialCost += item.materials;
-                totalOtherCostsAggregated += item.otherCosts;
+                totalLineItemOtherCosts += item.otherCosts;
                 totalLaborHoursReport += item.hours;
 
                 laborBreakdownReport[item.rateRole] += laborTotal;
             });
 
             // Add global costs to totalOtherCostsAggregated for report
-            totalOtherCostsAggregated += projectSettings.travelCost + projectSettings.equipmentCost +
+            const globalOtherCosts = projectSettings.travelCost + projectSettings.equipmentCost +
                                          projectSettings.fixedCost + projectSettings.subcontractorCost +
                                          projectSettings.allowanceCost;
+            
+            const breakdownTotalOtherCosts = totalLineItemOtherCosts + globalOtherCosts;
 
 
-            const totalMiscCost = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
-            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCost;
-            const totalMarkup = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
-            const estimateSubtotal = subtotalBeforeProfitTax + totalMarkup;
-            const salesTaxAmount = estimateSubtotal * (projectSettings.salesTax / 100);
-            const grandTotal = estimateSubtotal + salesTaxAmount;
+            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
+            const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount;
+            const totalMarkupAmount = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
+            const estimateSubtotalAmount = subtotalBeforeProfitTax + totalMarkupAmount;
+
+            const salesTaxAmount = estimateSubtotalAmount * (projectSettings.salesTax / 100);
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount;
 
             let reportContent = `CONSTRUCTION ESTIMATE REPORT\n`;
             reportContent += `============================\n\n`;
@@ -1003,21 +1046,27 @@
             reportContent += `Location: ${projectSettings.projectState}\n`;
             reportContent += `Date: ${new Date().toLocaleDateString()}\n\n`;
 
-            reportContent += `EXECUTIVE SUMMARY:\n`;
+            reportContent += `OVERALL SUMMARY:\n`;
             reportContent += `-------------------------------------------------\n`;
-            reportContent += `Total Project Cost (Line Items): $${totalProjectSubtotal.toFixed(2)}\n`;
-            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): $${totalMiscCost.toFixed(2)}\n`;
-            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): $${totalMarkup.toFixed(2)}\n`;
-            reportContent += `Estimate Subtotal: $${estimateSubtotal.toFixed(2)}\n`;
-            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): $${salesTaxAmount.toFixed(2)}\n`;
-            reportContent += `GRAND TOTAL: $${grandTotal.toFixed(2)}\n\n`;
+            reportContent += `Total Proposal: $${grandTotal.toFixed(2)}\n`;
+            reportContent += `Total Labor Hours: ${totalLaborHoursReport.toFixed(2)}\n\n`;
+
+
+            reportContent += `EXECUTIVE SUMMARY DETAILS:\n`;
+            reportContent += `-------------------------------------------------\n`;
+            reportContent += `Total Project Cost (Line Items Base): $${totalProjectSubtotal.toFixed(2)}\n`;
+            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): $${totalMiscCostAmount.toFixed(2)}\n`;
+            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): $${totalMarkupAmount.toFixed(2)}\n`;
+            reportContent += `Estimate Subtotal (before sales tax): $${estimateSubtotalAmount.toFixed(2)}\n`;
+            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): $${salesTaxAmount.toFixed(2)}\n\n`;
+
 
             reportContent += `LABOR BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
             for (const role in laborBreakdownReport) {
                 reportContent += `${role}: $${laborBreakdownReport[role].toFixed(2)}\n`;
             }
-            reportContent += `Total Labor Hours: ${totalLaborHoursReport.toFixed(2)}\n\n`;
+            reportContent += `\n`; // Add extra newline for readability
 
             reportContent += `PROJECT COST BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
@@ -1028,7 +1077,7 @@
             reportContent += `Fixed Total: $${projectSettings.fixedCost.toFixed(2)}\n`;
             reportContent += `Sub-contractor Total: $${projectSettings.subcontractorCost.toFixed(2)}\n`;
             reportContent += `Allowance Total: $${projectSettings.allowanceCost.toFixed(2)}\n`;
-            reportContent += `Total Other Costs (Aggregated): $${totalOtherCostsAggregated.toFixed(2)}\n\n`;
+            reportContent += `Total Other Costs (Aggregated): $${breakdownTotalOtherCosts.toFixed(2)}\n\n`;
 
 
             reportContent += `ESTIMATE LINE ITEMS:\n`;
