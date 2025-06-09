@@ -53,32 +53,32 @@
             font-size: 15px;
         }
         .btn-primary {
-            background: #3b82f6;
+            background: #2563eb; /* Deeper blue (Tailwind blue-600) */
             color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
         .btn-primary:hover {
-            background: #2563eb;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+            background: #1D4ED8; /* Even deeper blue (Tailwind blue-700) */
+            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.3);
             transform: translateY(-1px); /* Slight lift */
         }
         .btn-green {
-            background: #10b981; /* Brighter green */
+            background: #10b981; /* Brighter green (Tailwind emerald-500) */
             color: white;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
         .btn-green:hover {
-            background: #059669;
+            background: #059669; /* Deeper green (Tailwind emerald-600) */
             box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);
             transform: translateY(-1px);
         }
         .btn-red {
-            background: #ef4444; /* Brighter red */
+            background: #ef4444; /* Brighter red (Tailwind red-500) */
             color: white;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
         }
         .btn-red:hover {
-            background: #dc2626;
+            background: #dc2626; /* Deeper red (Tailwind red-600) */
             box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
             transform: translateY(-1px);
         }
@@ -223,7 +223,7 @@
             margin-top: 10px; /* Add margin for small screens */
         }
 
-        /* NEW: Top Summary Row Styles (now 3 columns) */
+        /* NEW: Top Summary Row Styles (now 3 columns for Proposal, Hours, Chart) */
         .top-summary-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
@@ -231,7 +231,7 @@
             margin-bottom: 25px;
         }
         .summary-overall-metric-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); /* Blue gradient */
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); /* Deeper blue gradient for prominence */
             color: white;
             text-align: center;
             padding: 30px;
@@ -269,6 +269,14 @@
             height: auto;
             width: auto; /* Allow chart.js to manage width within limits */
         }
+        .chart-container.card h4 { /* Style the title of the chart in the new layout */
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
 
         /* Executive Summary Grid (now 3 columns) specific styles */
         .executive-summary-grid-3col { /* Renamed class for clarity */
@@ -374,7 +382,7 @@
             </div>
         </div>
 
-        <!-- NEW: Top-level summary boxes with Pie Chart -->
+        <!-- NEW: Top-level summary boxes with Pie Chart (3 columns) -->
         <div class="top-summary-row mb-6">
             <div class="summary-overall-metric-card">
                 <span class="label">Total Proposal</span>
@@ -557,6 +565,16 @@
     </div>
 
     <script>
+        // Helper function for currency formatting
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
         // Global variables for project settings
         let projectSettings = {
             projectName: "Commercial Construction Project",
@@ -821,7 +839,7 @@
                         <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
                             ${Object.keys(projectSettings.laborRates).map(role => `
                                 <option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
-                                    ${role} ($${projectSettings.laborRates[role].toFixed(2)}/hr)
+                                    ${role} (${formatCurrency(projectSettings.laborRates[role])}/hr)
                                 </option>
                             `).join('')}
                         </select>
@@ -833,10 +851,10 @@
                             <option value="2.0" ${item.otDtMultiplier === 2.0 ? 'selected' : ''}>2.0</option>
                         </select>
                     </td>
-                    <td>$${laborTotal.toFixed(2)}</td>
+                    <td>${formatCurrency(laborTotal)}</td>
                     <td><input type="number" value="${item.materials}" onchange="updateItem(${item.id}, 'materials', this.value)" class="input-field"></td>
                     <td><input type="number" value="${item.otherCosts}" onchange="updateItem(${item.id}, 'otherCosts', this.value)" class="input-field"></td>
-                    <td class="font-bold text-gray-900">$${lineTotal.toFixed(2)}</td>
+                    <td class="font-bold text-gray-900">${formatCurrency(lineTotal)}</td>
                     <td><button class="btn btn-red btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
                 `;
                 estimateTableBody.appendChild(row);
@@ -896,36 +914,36 @@
 
 
             // Update NEW Top-level Summary UI
-            summaryTotalProposalElem.textContent = `$${grandTotal.toFixed(2)}`;
+            summaryTotalProposalElem.textContent = formatCurrency(grandTotal);
             summaryOverallLaborHoursElem.textContent = estimateItems.reduce((acc, item) => acc + item.hours, 0).toFixed(2);
 
 
             // Update Executive Summary UI (left card)
-            summaryProjectCost.textContent = `$${totalProjectSubtotal.toFixed(2)}`;
-            summaryMiscCost.textContent = `$${totalMiscCostAmount.toFixed(2)}`;
-            summaryMarkup.textContent = `$${totalMarkupAmount.toFixed(2)}`;
-            summaryEstimateSubtotal.textContent = `$${estimateSubtotalAmount.toFixed(2)}`;
+            summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal);
+            summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
+            summaryMarkup.textContent = formatCurrency(totalMarkupAmount);
+            summaryEstimateSubtotal.textContent = formatCurrency(estimateSubtotalAmount);
             summaryProfitMargin.textContent = `${projectSettings.profitMargin.toFixed(2)}%`;
             summarySalesTax.textContent = `${projectSettings.salesTax.toFixed(2)}%`;
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
 
             // Update Labor Breakdown (middle card)
-            laborPMTotal.textContent = `$${laborBreakdown["Project Manager"].toFixed(2)}`;
-            laborSuperintendentTotal.textContent = `$${laborBreakdown["Superintendent"].toFixed(2)}`;
-            laborGeneralForemanTotal.textContent = `$${laborBreakdown["General Foreman"].toFixed(2)}`;
-            laborForemanTotal.textContent = `$${laborBreakdown["Foreman"].toFixed(2)}`;
-            laborJourneymanTotal.textContent = `$${laborBreakdown["Journeyman"].toFixed(2)}`;
-            laborApprenticeTotal.textContent = `$${laborBreakdown["Apprentice"].toFixed(2)}`;
+            laborPMTotal.textContent = formatCurrency(laborBreakdown["Project Manager"]);
+            laborSuperintendentTotal.textContent = formatCurrency(laborBreakdown["Superintendent"]);
+            laborGeneralForemanTotal.textContent = formatCurrency(laborBreakdown["General Foreman"]);
+            laborForemanTotal.textContent = formatCurrency(laborBreakdown["Foreman"]);
+            laborJourneymanTotal.textContent = formatCurrency(laborBreakdown["Journeyman"]);
+            laborApprenticeTotal.textContent = formatCurrency(laborBreakdown["Apprentice"]);
 
             // Update Project Cost Breakdown (right card)
-            breakdownLaborTotal.textContent = `$${totalLaborCost.toFixed(2)}`;
-            breakdownMaterialTotal.textContent = `$${totalMaterialCost.toFixed(2)}`;
-            breakdownTravelTotal.textContent = `$${projectSettings.travelCost.toFixed(2)}`;
-            breakdownEquipmentTotal.textContent = `$${projectSettings.equipmentCost.toFixed(2)}`;
-            breakdownFixedTotal.textContent = `$${projectSettings.fixedCost.toFixed(2)}`;
-            breakdownSubcontractorTotal.textContent = `$${projectSettings.subcontractorCost.toFixed(2)}`;
-            breakdownAllowanceTotal.textContent = `$${projectSettings.allowanceCost.toFixed(2)}`;
-            breakdownOtherTotal.textContent = `$${breakdownTotalOtherCosts.toFixed(2)}`; // Updated sum including new global costs
+            breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
+            breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
+            breakdownTravelTotal.textContent = formatCurrency(projectSettings.travelCost);
+            breakdownEquipmentTotal.textContent = formatCurrency(projectSettings.equipmentCost);
+            breakdownFixedTotal.textContent = formatCurrency(projectSettings.fixedCost);
+            breakdownSubcontractorTotal.textContent = formatCurrency(projectSettings.subcontractorCost);
+            breakdownAllowanceTotal.textContent = formatCurrency(projectSettings.allowanceCost);
+            breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts); // Updated sum including new global costs
 
             // Render Pie Chart
             renderPieChart(totalLaborCost, totalMaterialCost);
@@ -975,14 +993,15 @@
                                         label += ': ';
                                     }
                                     if (context.parsed !== null) {
-                                        label += '$' + context.parsed.toFixed(2).toLocaleString();
+                                        // Use formatCurrency for tooltip values
+                                        label += formatCurrency(context.parsed);
                                     }
                                     return label;
                                 }
                             }
                         },
                         title: {
-                            display: true,
+                            display: false, /* Moved title to H4 tag in HTML */
                             text: 'Labor vs. Material Cost Distribution',
                             font: {
                                 size: 16
@@ -1048,36 +1067,36 @@
 
             reportContent += `OVERALL SUMMARY:\n`;
             reportContent += `-------------------------------------------------\n`;
-            reportContent += `Total Proposal: $${grandTotal.toFixed(2)}\n`;
+            reportContent += `Total Proposal: ${formatCurrency(grandTotal)}\n`;
             reportContent += `Total Labor Hours: ${totalLaborHoursReport.toFixed(2)}\n\n`;
 
 
             reportContent += `EXECUTIVE SUMMARY DETAILS:\n`;
             reportContent += `-------------------------------------------------\n`;
-            reportContent += `Total Project Cost (Line Items Base): $${totalProjectSubtotal.toFixed(2)}\n`;
-            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): $${totalMiscCostAmount.toFixed(2)}\n`;
-            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): $${totalMarkupAmount.toFixed(2)}\n`;
-            reportContent += `Estimate Subtotal (before sales tax): $${estimateSubtotalAmount.toFixed(2)}\n`;
-            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): $${salesTaxAmount.toFixed(2)}\n\n`;
+            reportContent += `Total Project Cost (Line Items Base): ${formatCurrency(totalProjectSubtotal)}\n`;
+            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmount)}\n`;
+            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`;
+            reportContent += `Estimate Subtotal (before sales tax): ${formatCurrency(estimateSubtotalAmount)}\n`;
+            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): ${formatCurrency(salesTaxAmount)}\n\n`;
 
 
             reportContent += `LABOR BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
             for (const role in laborBreakdownReport) {
-                reportContent += `${role}: $${laborBreakdownReport[role].toFixed(2)}\n`;
+                reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role])}\n`;
             }
             reportContent += `\n`; // Add extra newline for readability
 
             reportContent += `PROJECT COST BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
-            reportContent += `Labor Total: $${totalLaborCost.toFixed(2)}\n`;
-            reportContent += `Material Total: $${totalMaterialCost.toFixed(2)}\n`;
-            reportContent += `Travel Total: $${projectSettings.travelCost.toFixed(2)}\n`;
-            reportContent += `Equipment Total: $${projectSettings.equipmentCost.toFixed(2)}\n`;
-            reportContent += `Fixed Total: $${projectSettings.fixedCost.toFixed(2)}\n`;
-            reportContent += `Sub-contractor Total: $${projectSettings.subcontractorCost.toFixed(2)}\n`;
-            reportContent += `Allowance Total: $${projectSettings.allowanceCost.toFixed(2)}\n`;
-            reportContent += `Total Other Costs (Aggregated): $${breakdownTotalOtherCosts.toFixed(2)}\n\n`;
+            reportContent += `Labor Total: ${formatCurrency(totalLaborCost)}\n`;
+            reportContent += `Material Total: ${formatCurrency(totalMaterialCost)}\n`;
+            reportContent += `Travel Total: ${formatCurrency(projectSettings.travelCost)}\n`;
+            reportContent += `Equipment Total: ${formatCurrency(projectSettings.equipmentCost)}\n`;
+            reportContent += `Fixed Total: ${formatCurrency(projectSettings.fixedCost)}\n`;
+            reportContent += `Sub-contractor Total: ${formatCurrency(projectSettings.subcontractorCost)}\n`;
+            reportContent += `Allowance Total: ${formatCurrency(projectSettings.allowanceCost)}\n`;
+            reportContent += `Total Other Costs (Aggregated): ${formatCurrency(breakdownTotalOtherCosts)}\n\n`;
 
 
             reportContent += `ESTIMATE LINE ITEMS:\n`;
@@ -1092,13 +1111,13 @@
                 reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
                 reportContent += `  Description: ${item.description || 'No description'}\n`;
                 reportContent += `  Hours: ${item.hours.toFixed(2)}\n`;
-                reportContent += `  Rate: ${item.rateRole} ($${laborRate.toFixed(2)}/hr)\n`;
+                reportContent += `  Rate: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
                 reportContent += `  OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
-                reportContent += `  Effective Labor Rate: $${effectiveLaborRate.toFixed(2)}/hr\n`;
-                reportContent += `  Labor Cost: $${laborTotal.toFixed(2)}\n`;
-                reportContent += `  Materials: $${item.materials.toFixed(2)}\n`;
-                reportContent += `  Other Costs (Line Item Specific): $${item.otherCosts.toFixed(2)}\n`;
-                reportContent += `  Line Total: $${lineTotal.toFixed(2)}\n`;
+                reportContent += `  Effective Labor Rate: ${formatCurrency(effectiveLaborRate)}/hr\n`;
+                reportContent += `  Labor Cost: ${formatCurrency(laborTotal)}\n`;
+                reportContent += `  Materials: ${formatCurrency(item.materials)}\n`;
+                reportContent += `  Other Costs (Line Item Specific): ${formatCurrency(item.otherCosts)}\n`;
+                reportContent += `  Line Total: ${formatCurrency(lineTotal)}\n`;
             });
 
             reportContent += `\nEnd of Report\n`;
