@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -103,7 +103,7 @@
         }
         /* Rounded corners for table header */
         th:first-child { border-top-left-radius: 10px; }
-        th:last-child { border-top-right-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; } /* This might apply to the last TH of the whole table. Need to be mindful of multi-colspan headers. */
 
         tr:nth-child(even) {
             background: #f8fafc; /* Subtle zebra striping */
@@ -223,7 +223,7 @@
             margin-top: 10px; /* Add margin for small screens */
         }
 
-        /* NEW: Top Summary Row Styles (now 3 columns for Proposal, Hours, Chart) */
+        /* Top Summary Row Styles (3 columns: Proposal, Hours, Chart) */
         .top-summary-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
@@ -358,6 +358,75 @@
                 font-size: 1rem; /* Smaller title for chart on mobile */
             }
         }
+
+        /* Specific styles for multi-select dropdown */
+        .multi-select-container {
+            position: relative;
+        }
+        .multi-select-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: white;
+            position: absolute;
+            width: 100%;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .multi-select-dropdown label {
+            display: block;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+        .multi-select-dropdown label:hover {
+            background-color: #f3f4f6;
+        }
+        .multi-select-dropdown input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .selected-trades-display {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            min-height: 40px;
+            cursor: pointer;
+            background-color: white;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        .selected-trade-tag {
+            background-color: #e0f2fe; /* Light blue tag */
+            color: #1e40af; /* Dark blue text */
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .selected-trade-tag .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            color: #94a3b8; /* Gray for X */
+        }
+        /* Styles for dynamic labor rate inputs in wizard */
+        .trade-labor-rates-group {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fcfcfc;
+        }
+        .trade-labor-rates-group h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            color: #1f2937;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -445,15 +514,34 @@
             <table class="min-w-full">
                 <thead>
                     <tr>
-                        <th>Task Name</th>
-                        <th>Description</th>
+                        <th rowspan="2">Task Name</th>
+                        <th rowspan="2">Description</th>
+                        <th colspan="3" class="text-center">BURDENED LABOR</th> <!-- Reduced from 4 due to Rate being displayed, not input -->
+                        <th colspan="2" class="text-center">MATERIALS</th>
+                        <th colspan="4" class="text-center">OTHER</th>
+                        <th colspan="2" class="text-center">UNDEFINED SCOPE</th>
+                        <th colspan="2" class="text-center">MARKUP</th>
+                        <th colspan="2" class="text-center">ESTIMATED TOTAL</th>
+                        <th rowspan="2">Actions</th>
+                    </tr>
+                    <tr>
+                        <th>Trade</th>
                         <th>Hours</th>
-                        <th>Rate ($/hr)</th>
-                        <th>OT/DT</th> <th>Labor Total</th>
-                        <th>Materials</th>
-                        <th>Other Costs</th>
-                        <th>Line Total</th>
-                        <th>Actions</th>
+                        <th>Skill Level / HR</th> <!-- Now displays the rate -->
+                        <th>OT/DT</th>
+                        <th>Labor Total</th>
+                        <th>Materials $/Unit</th>
+                        <th>Materials Total</th>
+                        <th>Equipment/Travel</th>
+                        <th>Fixed</th>
+                        <th>Sub-contractor</th>
+                        <th>Other Total</th>
+                        <th>Allowances</th>
+                        <th>Allowance Total</th>
+                        <th>Est. Allowance %</th>
+                        <th>Allowance $</th>
+                        <th>Total</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -505,6 +593,19 @@
                         <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="tradesInvolved" class="label">Trades Involved (Select multiple):</label>
+                    <div class="multi-select-container">
+                        <div id="selectedTradesDisplay" class="selected-trades-display" onclick="toggleTradeDropdown()">
+                            Click to select trades...
+                        </div>
+                        <div id="tradesDropdown" class="multi-select-dropdown hidden">
+                            <!-- Checkboxes will be populated here by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex justify-end gap-3 mt-8">
                     <button class="btn btn-primary" onclick="nextStep(1)">Next</button>
                 </div>
@@ -512,30 +613,11 @@
 
             <div id="wizardStep2" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Labor Rates Configuration</h2>
-                <div class="form-group">
-                    <label for="ratePM" class="label">Project Manager ($/hr):</label>
-                    <input type="number" id="ratePM" class="input-field" value="120">
+                <p class="text-gray-600 mb-4">Enter the hourly rates for each skill level within the selected trades.</p>
+                <div id="dynamicLaborRateInputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic labor rate input fields will be injected here -->
                 </div>
-                <div class="form-group">
-                    <label for="rateSuperintendent" class="label">Superintendent ($/hr):</label>
-                    <input type="number" id="rateSuperintendent" class="input-field" value="100">
-                </div>
-                <div class="form-group">
-                    <label for="rateGeneralForeman" class="label">General Foreman ($/hr):</label>
-                    <input type="number" id="rateGeneralForeman" class="input-field" value="90">
-                </div>
-                <div class="form-group">
-                    <label for="rateForeman" class="label">Foreman ($/hr):</label>
-                    <input type="number" id="rateForeman" class="input-field" value="85">
-                </div>
-                <div class="form-group">
-                    <label for="rateJourneyman" class="label">Journeyman ($/hr):</label>
-                    <input type="number" id="rateJourneyman" class="input-field" value="75">
-                </div>
-                <div class="form-group">
-                    <label for="rateApprentice" class="label">Apprentice ($/hr):</label>
-                    <input type="number" id="rateApprentice" class="input-field" value="50">
-                </div>
+                
                 <div class="flex justify-between gap-3 mt-8">
                     <button class="btn btn-primary" onclick="prevStep(2)">Previous</button>
                     <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
@@ -583,15 +665,57 @@
             profitMargin: 15,
             salesTax: 8.25,
             miscellaneous: 5,
-            laborRates: {
-                "Project Manager": 120,
-                "Superintendent": 100,
-                "General Foreman": 90,
-                "Foreman": 85,
-                "Journeyman": 75,
-                "Apprentice": 50
+            // Define labor rates nested by trade
+            allTradeLaborRates: {
+                "General": {
+                    "Project Manager": 120,
+                    "Superintendent": 100,
+                    "General Foreman": 90,
+                    "Foreman": 85,
+                    "Journeyman": 75,
+                    "Apprentice": 50
+                },
+                "Electrical": {
+                    "Project Manager": 135,
+                    "Superintendent": 110,
+                    "General Foreman": 100,
+                    "Foreman": 95,
+                    "Journeyman": 80,
+                    "Apprentice": 55
+                },
+                "Plumbing": {
+                    "Project Manager": 125,
+                    "Superintendent": 105,
+                    "General Foreman": 95,
+                    "Foreman": 90,
+                    "Journeyman": 78,
+                    "Apprentice": 52
+                },
+                "HVAC": {
+                    "Project Manager": 130,
+                    "Superintendent": 108,
+                    "General Foreman": 98,
+                    "Foreman": 92,
+                    "Journeyman": 77,
+                    "Apprentice": 53
+                },
+                "Carpentry": {
+                    "Project Manager": 115,
+                    "Superintendent": 95,
+                    "General Foreman": 85,
+                    "Foreman": 80,
+                    "Journeyman": 70,
+                    "Apprentice": 48
+                },
+                "Concrete": { "Project Manager": 110, "Superintendent": 90, "General Foreman": 80, "Foreman": 75, "Journeyman": 68, "Apprentice": 45 },
+                "Roofing": { "Project Manager": 120, "Superintendent": 98, "General Foreman": 88, "Foreman": 83, "Journeyman": 73, "Apprentice": 47 },
+                "Painting": { "Project Manager": 105, "Superintendent": 88, "General Foreman": 78, "Foreman": 73, "Journeyman": 65, "Apprentice": 42 },
+                "Drywall": { "Project Manager": 112, "Superintendent": 92, "General Foreman": 82, "Foreman": 77, "Journeyman": 69, "Apprentice": 44 },
+                "Masonry": { "Project Manager": 128, "Superintendent": 102, "General Foreman": 93, "Foreman": 88, "Journeyman": 76, "Apprentice": 51 },
+                "Landscaping": { "Project Manager": 100, "Superintendent": 85, "General Foreman": 75, "Foreman": 70, "Journeyman": 60, "Apprentice": 40 }
             },
-            // New breakdown categories - kept as placeholders for now
+            activeTrades: ["General"], // Array to store selected trades
+            // Placeholder global costs (as discussed, could be inputs later)
             travelCost: 1000,
             equipmentCost: 2000,
             fixedCost: 500,
@@ -616,8 +740,9 @@
             document.getElementById('step3')
         ];
         const estimateTableBody = document.getElementById('estimateTableBody');
+        const dynamicLaborRateInputs = document.getElementById('dynamicLaborRateInputs'); // NEW: Reference for Step 2 dynamic rates display
 
-        // NEW: Top-level summary elements
+        // Top-level summary elements
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
         const summaryOverallLaborHoursElem = document.getElementById('summaryOverallLaborHours');
 
@@ -650,13 +775,20 @@
         const laborMaterialPieChartCanvas = document.getElementById('laborMaterialPieChart');
         let laborMaterialPieChart; // To store the Chart.js instance
 
+        // Trade multi-select elements
+        const tradesDropdown = document.getElementById('tradesDropdown');
+        const selectedTradesDisplay = document.getElementById('selectedTradesDisplay');
+
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             showSetup();
-            // Populate initial rates for the first time
-            populateLaborRatesToUI();
             // Set initial state tax
             updateSalesTaxForState(projectSettings.projectState);
+
+            // Populate trades dropdown and display
+            populateTradesDropdown();
+            updateSelectedTradesDisplay();
+            // populateWizardStep2LaborRates() called in showStep(2)
         });
 
         // --- Wizard Navigation ---
@@ -680,19 +812,23 @@
                 }
             });
             currentStep = stepNumber;
+
+            // Populate Step 2 dynamically when it's shown
+            if (stepNumber === 2) {
+                populateWizardStep2LaborRates();
+            }
         }
 
         function nextStep(stepNumber) {
             if (stepNumber === 1) {
-                // Save Project Info
+                // Save Project Info & Active Trades
                 projectSettings.projectName = document.getElementById('projectName').value;
                 projectSettings.projectType = document.getElementById('projectType').value;
                 projectSettings.projectState = document.getElementById('projectState').value;
+                // Active trades are updated via event listener on checkboxes
                 updateSalesTaxForState(projectSettings.projectState);
-                populateLaborRatesToUI(); // Ensure step 2 fields are populated
             } else if (stepNumber === 2) {
-                // Save Labor Rates
-                saveLaborRatesFromUI();
+                // No explicit save needed here as input changes update projectSettings directly
             }
             showStep(stepNumber + 1);
         }
@@ -706,14 +842,37 @@
             mainApp.classList.add('hidden');
             showStep(1); // Always start from step 1 when reconfiguring
             populateWizardInputs(); // Load current settings into wizard inputs
+            populateTradesDropdown(); // Re-populate and sync trades checkboxes
+            updateSelectedTradesDisplay(); // Update trade display
         }
 
         function startEstimating() {
+            // Ensure at least one trade is selected
+            if (projectSettings.activeTrades.length === 0) {
+                renderMessageBox("Please select at least one trade involved in the project before starting the estimate.");
+                return; // Stop function execution
+            }
+            // Ensure activeTrades have labor rates configured
+            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+            for (const trade of projectSettings.activeTrades) {
+                if (!projectSettings.allTradeLaborRates[trade]) {
+                    renderMessageBox(`Labor rates for trade "${trade}" are not defined. Please define them or deselect this trade.`);
+                    return;
+                }
+                for (const role of allRoles) {
+                    if (projectSettings.allTradeLaborRates[trade][role] === undefined || projectSettings.allTradeLaborRates[trade][role] < 0) {
+                        renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid. Please ensure all rates are non-negative numbers.`);
+                        return;
+                    }
+                }
+            }
+
+
             // Save final settings from Wizard
             projectSettings.projectName = document.getElementById('projectName').value;
             projectSettings.projectType = document.getElementById('projectType').value;
             projectSettings.projectState = document.getElementById('projectState').value;
-            saveLaborRatesFromUI();
+            // Labor rates are handled by projectSettings.allTradeLaborRates and activeTrades
             projectSettings.profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
             projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value) || 0;
             projectSettings.miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
@@ -726,7 +885,12 @@
             projectInfoElem.textContent = `${projectSettings.projectType} - ${projectSettings.projectName} - ${projectSettings.projectState}`;
 
             // Initial render of items (if any exist) and calculate totals
-            renderItems();
+            // If no items, add a default one to start
+            if (estimateItems.length === 0) {
+                addItem();
+            } else {
+                renderItems();
+            }
         }
 
         // --- Data Management Functions ---
@@ -738,26 +902,7 @@
             document.getElementById('profitMargin').value = projectSettings.profitMargin;
             document.getElementById('salesTax').value = projectSettings.salesTax;
             document.getElementById('miscellaneous').value = projectSettings.miscellaneous;
-            populateLaborRatesToUI(); // Populate Step 2 inputs
-        }
-
-        function populateLaborRatesToUI() {
-            for (const role in projectSettings.laborRates) {
-                const inputId = 'rate' + role.replace(/\s/g, ''); // e.g., 'Project Manager' -> 'rateProjectManager'
-                const inputElem = document.getElementById(inputId);
-                if (inputElem) {
-                    inputElem.value = projectSettings.laborRates[role];
-                }
-            }
-        }
-
-        function saveLaborRatesFromUI() {
-            projectSettings.laborRates["Project Manager"] = parseFloat(document.getElementById('ratePM').value) || 0;
-            projectSettings.laborRates["Superintendent"] = parseFloat(document.getElementById('rateSuperintendent').value) || 0;
-            projectSettings.laborRates["General Foreman"] = parseFloat(document.getElementById('rateGeneralForeman').value) || 0;
-            projectSettings.laborRates["Foreman"] = parseFloat(document.getElementById('rateForeman').value) || 0;
-            projectSettings.laborRates["Journeyman"] = parseFloat(document.getElementById('rateJourneyman').value) || 0;
-            projectSettings.laborRates["Apprentice"] = parseFloat(document.getElementById('rateApprentice').value) || 0;
+            // labor rates handled by populateWizardStep2LaborRates
         }
 
         const stateSalesTax = {
@@ -781,18 +926,189 @@
             updateSalesTaxForState(event.target.value);
         });
 
+        // NEW: Function to dynamically populate labor rates in Step 2 of the wizard for input
+        function populateWizardStep2LaborRates() {
+            dynamicLaborRateInputs.innerHTML = ''; // Clear existing content
+
+            const allRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
+
+            if (projectSettings.activeTrades.length === 0) {
+                dynamicLaborRateInputs.innerHTML = `<p class="text-gray-600">Please select trades in Step 1 to configure their labor rates here.</p>`;
+                return;
+            }
+
+            projectSettings.activeTrades.forEach(trade => {
+                let tradeRatesHtml = `
+                    <div class="trade-labor-rates-group">
+                        <h3>${trade} Labor Rates</h3>`;
+                
+                allRoles.forEach(role => {
+                    // Ensure the trade and role exist in allTradeLaborRates, provide default if not
+                    if (!projectSettings.allTradeLaborRates[trade]) {
+                        projectSettings.allTradeLaborRates[trade] = {};
+                    }
+                    if (projectSettings.allTradeLaborRates[trade][role] === undefined) {
+                        // Use a reasonable default if a role rate isn't set for a new trade
+                        projectSettings.allTradeLaborRates[trade][role] = 75; // Default for new roles/trades
+                    }
+
+                    const inputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
+                    tradeRatesHtml += `
+                        <div class="form-group">
+                            <label for="${inputId}" class="label">${role} ($/hr):</label>
+                            <input type="number" id="${inputId}" class="input-field" value="${projectSettings.allTradeLaborRates[trade][role]}"
+                                onchange="updateLaborRate('${trade}', '${role}', this.value)">
+                        </div>
+                    `;
+                });
+                tradeRatesHtml += `</div>`;
+                dynamicLaborRateInputs.innerHTML += tradeRatesHtml;
+            });
+        }
+
+        // NEW: Function to update labor rates in projectSettings from wizard inputs
+        function updateLaborRate(trade, role, value) {
+            const parsedValue = parseFloat(value);
+            if (!isNaN(parsedValue) && parsedValue >= 0) {
+                projectSettings.allTradeLaborRates[trade][role] = parsedValue;
+            } else {
+                // Optionally provide feedback if input is invalid
+                console.error(`Invalid input for ${trade} ${role} rate: ${value}`);
+                // Revert to old value or set to 0 if invalid
+                const inputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
+                document.getElementById(inputId).value = projectSettings.allTradeLaborRates[trade][role];
+            }
+            // No need to call renderItems here immediately, it will be called on startEstimating or next steps.
+        }
+
+
+        // --- Custom Message Box (instead of alert) ---
+        function renderMessageBox(message) {
+            const messageBoxOverlay = document.createElement('div');
+            messageBoxOverlay.id = 'messageBoxOverlay';
+            messageBoxOverlay.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[1001] backdrop-filter backdrop-blur-sm';
+            
+            const messageBox = document.createElement('div');
+            messageBox.className = 'bg-white rounded-xl p-8 shadow-2xl max-w-sm mx-auto text-center';
+            messageBox.innerHTML = `
+                <p class="text-lg font-semibold text-gray-800 mb-6">${message}</p>
+                <button class="btn btn-primary" onclick="closeMessageBox()">OK</button>
+            `;
+            messageBoxOverlay.appendChild(messageBox);
+            document.body.appendChild(messageBoxOverlay);
+        }
+
+        function closeMessageBox() {
+            const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+            if (messageBoxOverlay) {
+                messageBoxOverlay.remove();
+            }
+        }
+
+        // --- Multi-Select Trade Logic ---
+        function populateTradesDropdown() {
+            tradesDropdown.innerHTML = ''; // Clear existing checkboxes
+            const allTrades = Object.keys(projectSettings.allTradeLaborRates);
+
+            allTrades.forEach(trade => {
+                const checkboxId = `trade-${trade.replace(/\s/g, '-')}`;
+                const isChecked = projectSettings.activeTrades.includes(trade);
+
+                const label = document.createElement('label');
+                label.className = 'flex items-center';
+                label.innerHTML = `
+                    <input type="checkbox" id="${checkboxId}" value="${trade}" ${isChecked ? 'checked' : ''} onchange="handleTradeSelection(this)">
+                    <span>${trade}</span>
+                `;
+                tradesDropdown.appendChild(label);
+            });
+        }
+
+        function handleTradeSelection(checkbox) {
+            const trade = checkbox.value;
+            if (checkbox.checked) {
+                if (!projectSettings.activeTrades.includes(trade)) {
+                    projectSettings.activeTrades.push(trade);
+                    // If a new trade is selected, ensure it has default labor rates initialized
+                    if (!projectSettings.allTradeLaborRates[trade]) {
+                        projectSettings.allTradeLaborRates[trade] = {
+                            "Project Manager": 120, "Superintendent": 100, "General Foreman": 90,
+                            "Foreman": 85, "Journeyman": 75, "Apprentice": 50
+                        };
+                    }
+                }
+            } else {
+                projectSettings.activeTrades = projectSettings.activeTrades.filter(t => t !== trade);
+                // Also remove any line items associated with this trade if it's deselected
+                estimateItems = estimateItems.filter(item => item.trade !== trade);
+            }
+            updateSelectedTradesDisplay();
+            renderItems(); // Re-render table to reflect trade changes
+            populateWizardStep2LaborRates(); // Re-populate Step 2 to show/hide relevant trade rate inputs
+        }
+
+        function toggleTradeDropdown() {
+            tradesDropdown.classList.toggle('hidden');
+        }
+
+        function updateSelectedTradesDisplay() {
+            selectedTradesDisplay.innerHTML = '';
+            if (projectSettings.activeTrades.length === 0) {
+                selectedTradesDisplay.textContent = 'Click to select trades...';
+            } else {
+                projectSettings.activeTrades.forEach(trade => {
+                    const span = document.createElement('span');
+                    span.className = 'selected-trade-tag';
+                    span.innerHTML = `${trade} <span class="remove-tag" data-trade="${trade}">&times;</span>`;
+                    selectedTradesDisplay.appendChild(span);
+                });
+            }
+        }
+
+        // Add event listener for removing tags
+        selectedTradesDisplay.addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-tag')) {
+                const tradeToRemove = event.target.dataset.trade;
+                const checkboxId = `trade-${tradeToRemove.replace(/\s/g, '-')}`;
+                const checkbox = document.getElementById(checkboxId);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    handleTradeSelection(checkbox);
+                }
+            }
+        });
+
+        // Close trade dropdown if clicking outside
+        document.addEventListener('click', (event) => {
+            if (!tradesDropdown.contains(event.target) && !selectedTradesDisplay.contains(event.target)) {
+                tradesDropdown.classList.add('hidden');
+            }
+        });
+
+
         // --- Estimate Item Management ---
 
         function addItem() {
+            // Use the first active trade as default, or "General" if no specific trades are active
+            const defaultTrade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
+            const defaultRole = "Journeyman"; // Default role
+
             const newItem = {
                 id: Date.now(), // Unique ID for each item
                 taskName: '',
                 description: '',
+                trade: defaultTrade, // Assign default trade
+                rateRole: defaultRole, // Default to Journeyman
                 hours: 0,
-                rateRole: 'Journeyman', // Default to Journeyman
                 otDtMultiplier: 1.0, // New: OT/DT multiplier
-                materials: 0,
-                otherCosts: 0 // This will now represent a sum of the new categories if not specified globally
+                materialPerUnit: 0, // NEW
+                materialUnits: 0, // NEW (can be unit cost * quantity)
+                equipmentTravel: 0, // NEW
+                fixedCostLineItem: 0, // NEW
+                subcontractorCostLineItem: 0, // NEW
+                otherCostLineItem: 0, // NEW (general 'other' for line item)
+                allowances: 0, // NEW
+                estimatedAllowancePercent: 0 // NEW
             };
             estimateItems.push(newItem);
             renderItems();
@@ -806,12 +1122,9 @@
         function updateItem(id, field, value) {
             const item = estimateItems.find(item => item.id === id);
             if (item) {
-                if (['hours', 'materials', 'otherCosts'].includes(field)) {
+                if (['hours', 'materialPerUnit', 'materialUnits', 'equipmentTravel', 'fixedCostLineItem', 'subcontractorCostLineItem', 'otherCostLineItem', 'allowances', 'estimatedAllowancePercent', 'otDtMultiplier'].includes(field)) {
                     item[field] = parseFloat(value) || 0;
-                } else if (field === 'otDtMultiplier') {
-                    item[field] = parseFloat(value) || 1.0; // Ensure multiplier is a number
-                }
-                else { // For text fields like taskName, description, rateRole
+                } else { // For text fields like taskName, description, trade, rateRole
                     item[field] = value;
                 }
                 renderItems(); // Re-render to update calculations
@@ -823,10 +1136,21 @@
             let totalLaborHoursVal = 0; // To accumulate total labor hours for the overall metric
 
             estimateItems.forEach(item => {
-                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
-                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0); // Apply OT/DT multiplier
+                // Ensure the item's trade is still active, default to "General" if not
+                if (!projectSettings.activeTrades.includes(item.trade)) {
+                    item.trade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
+                }
+                
+                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
+                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const lineTotal = laborTotal + item.materials + item.otherCosts;
+                const materialsTotal = item.materialPerUnit * item.materialUnits;
+                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
+                const allowanceTotal = item.allowances; // Direct allowance amount
+                const markupAllowance = allowanceTotal * (item.estimatedAllowancePercent / 100);
+
+                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
+                const lineTotalAllowance = allowanceTotal + markupAllowance;
 
                 totalLaborHoursVal += item.hours;
 
@@ -834,14 +1158,27 @@
                 row.innerHTML = `
                     <td><input type="text" value="${item.taskName}" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field"></td>
                     <td><input type="text" value="${item.description}" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
+                    
                     <td>
-                        <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
-                            ${Object.keys(projectSettings.laborRates).map(role => `
-                                <option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
-                                    ${role} (${formatCurrency(projectSettings.laborRates[role])}/hr)
+                        <select onchange="updateItem(${item.id}, 'trade', this.value)" class="input-field">
+                            ${projectSettings.activeTrades.map(trade => `
+                                <option value="${trade}" ${item.trade === trade ? 'selected' : ''}>
+                                    ${trade}
                                 </option>
                             `).join('')}
+                             ${projectSettings.activeTrades.length === 0 ? '<option value="General" selected>General (No Trades Selected)</option>' : ''}
+                        </select>
+                    </td>
+                    <td><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
+                    <td>
+                        <!-- Skill Level / HR (read-only display) -->
+                        <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
+                            ${(projectSettings.allTradeLaborRates[item.trade] ? Object.keys(projectSettings.allTradeLaborRates[item.trade]) : []).map(role => `
+                                <option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
+                                    ${role} (${formatCurrency(projectSettings.allTradeLaborRates[item.trade][role])}/hr)
+                                </option>
+                            `).join('')}
+                            ${!projectSettings.allTradeLaborRates[item.trade] || Object.keys(projectSettings.allTradeLaborRates[item.trade]).length === 0 ? '<option value="" selected>No Rates for Trade</option>' : ''}
                         </select>
                     </td>
                     <td>
@@ -852,9 +1189,18 @@
                         </select>
                     </td>
                     <td>${formatCurrency(laborTotal)}</td>
-                    <td><input type="number" value="${item.materials}" onchange="updateItem(${item.id}, 'materials', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.otherCosts}" onchange="updateItem(${item.id}, 'otherCosts', this.value)" class="input-field"></td>
-                    <td class="font-bold text-gray-900">${formatCurrency(lineTotal)}</td>
+                    <td><input type="number" value="${item.materialPerUnit}" onchange="updateItem(${item.id}, 'materialPerUnit', this.value)" class="input-field"></td>
+                    <td>${formatCurrency(materialsTotal)}</td>
+                    <td><input type="number" value="${item.equipmentTravel}" onchange="updateItem(${item.id}, 'equipmentTravel', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.fixedCostLineItem}" onchange="updateItem(${item.id}, 'fixedCostLineItem', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.otherCostLineItem}" onchange="updateItem(${item.id}, 'otherCostLineItem', this.value)" class="input-field"></td>
+                    <td><input type="number" value="${item.allowances}" onchange="updateItem(${item.id}, 'allowances', this.value)" class="input-field"></td>
+                    <td>${formatCurrency(allowanceTotal)}</td>
+                    <td><input type="number" value="${item.estimatedAllowancePercent}" onchange="updateItem(${item.id}, 'estimatedAllowancePercent', this.value)" class="input-field"></td>
+                    <td>${formatCurrency(markupAllowance)}</td>
+                    <td class="font-bold text-gray-900">${formatCurrency(lineTotalEstimate)}</td>
+                    <td class="font-bold text-gray-900">${formatCurrency(lineTotalAllowance)}</td>
                     <td><button class="btn btn-red btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
                 `;
                 estimateTableBody.appendChild(row);
@@ -866,32 +1212,49 @@
         // --- Calculations ---
 
         function calculateTotals() {
-            let totalProjectSubtotal = 0; // Sum of all line item totals
+            let totalProjectSubtotal = 0; // Sum of all line item estimate totals
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalLineItemOtherCosts = 0; // This aggregates the 'otherCosts' from line items
-            let laborBreakdown = {}; // To store labor cost per role
-            let totalHoursByRole = {}; // To store total hours per role
+            let totalLineItemOtherCostsSum = 0;
+            let totalAllowanceAmount = 0;
+            let totalMarkupAllowance = 0;
 
-            // Initialize labor breakdown totals
-            for (const role in projectSettings.laborRates) {
+            let laborBreakdown = {}; // To store labor cost per role
+            // Initialize labor breakdown totals across all trades
+            // Only consider roles that are actually present in any active trade
+            const allPossibleRoles = new Set();
+            projectSettings.activeTrades.forEach(trade => {
+                if (projectSettings.allTradeLaborRates[trade]) {
+                    Object.keys(projectSettings.allTradeLaborRates[trade]).forEach(role => allPossibleRoles.add(role));
+                }
+            });
+            allPossibleRoles.forEach(role => {
                 laborBreakdown[role] = 0;
-                totalHoursByRole[role] = 0;
-            }
+            });
+
 
             estimateItems.forEach(item => {
-                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const lineTotal = laborTotal + item.materials + item.otherCosts;
+                const materialsTotal = item.materialPerUnit * item.materialUnits;
+                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
+                const allowanceLineTotal = item.allowances;
+                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
 
-                totalProjectSubtotal += lineTotal;
+                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
+
+                totalProjectSubtotal += lineTotalEstimate;
                 totalLaborCost += laborTotal;
-                totalMaterialCost += item.materials;
-                totalLineItemOtherCosts += item.otherCosts;
+                totalMaterialCost += materialsTotal;
+                totalLineItemOtherCostsSum += otherCategoryTotal;
+                totalAllowanceAmount += allowanceLineTotal;
+                totalMarkupAllowance += markupAllowanceLineItem;
 
-                laborBreakdown[item.rateRole] += laborTotal;
-                totalHoursByRole[item.rateRole] += item.hours;
+                // Aggregate labor costs by role, regardless of trade
+                if (laborBreakdown[item.rateRole] !== undefined) {
+                    laborBreakdown[item.rateRole] += laborTotal;
+                }
             });
 
             // Sum up the global cost categories from projectSettings
@@ -899,8 +1262,8 @@
                                      projectSettings.fixedCost + projectSettings.subcontractorCost +
                                      projectSettings.allowanceCost;
             
-            // Total other costs for breakdown includes both line item specific and global
-            const breakdownTotalOtherCosts = totalLineItemOtherCosts + globalOtherCosts;
+            // Total 'Other Costs' for breakdown includes line item specific, global fixed costs
+            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
 
 
             // Calculate main totals based on the screenshot's flow
@@ -910,7 +1273,7 @@
             const estimateSubtotalAmount = subtotalBeforeProfitTax + totalMarkupAmount; // "Estimate Subtotal" in summary
 
             const salesTaxAmount = estimateSubtotalAmount * (projectSettings.salesTax / 100);
-            const grandTotal = estimateSubtotalAmount + salesTaxAmount; // "Total Proposal"
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount + totalAllowanceAmount + totalMarkupAllowance; // "Total Proposal"
 
 
             // Update NEW Top-level Summary UI
@@ -928,12 +1291,12 @@
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
 
             // Update Labor Breakdown (middle card)
-            laborPMTotal.textContent = formatCurrency(laborBreakdown["Project Manager"]);
-            laborSuperintendentTotal.textContent = formatCurrency(laborBreakdown["Superintendent"]);
-            laborGeneralForemanTotal.textContent = formatCurrency(laborBreakdown["General Foreman"]);
-            laborForemanTotal.textContent = formatCurrency(laborBreakdown["Foreman"]);
-            laborJourneymanTotal.textContent = formatCurrency(laborBreakdown["Journeyman"]);
-            laborApprenticeTotal.textContent = formatCurrency(laborBreakdown["Apprentice"]);
+            laborPMTotal.textContent = formatCurrency(laborBreakdown["Project Manager"] || 0);
+            laborSuperintendentTotal.textContent = formatCurrency(laborBreakdown["Superintendent"] || 0);
+            laborGeneralForemanTotal.textContent = formatCurrency(laborBreakdown["General Foreman"] || 0);
+            laborForemanTotal.textContent = formatCurrency(laborBreakdown["Foreman"] || 0);
+            laborJourneymanTotal.textContent = formatCurrency(laborBreakdown["Journeyman"] || 0);
+            laborApprenticeTotal.textContent = formatCurrency(laborBreakdown["Apprentice"] || 0);
 
             // Update Project Cost Breakdown (right card)
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
@@ -942,7 +1305,7 @@
             breakdownEquipmentTotal.textContent = formatCurrency(projectSettings.equipmentCost);
             breakdownFixedTotal.textContent = formatCurrency(projectSettings.fixedCost);
             breakdownSubcontractorTotal.textContent = formatCurrency(projectSettings.subcontractorCost);
-            breakdownAllowanceTotal.textContent = formatCurrency(projectSettings.allowanceCost);
+            breakdownAllowanceTotal.textContent = formatCurrency(totalAllowanceAmount); // Sum of allowances from line items
             breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts); // Updated sum including new global costs
 
             // Render Pie Chart
@@ -1019,27 +1382,48 @@
             let totalProjectSubtotal = 0;
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalLineItemOtherCosts = 0;
+            let totalLineItemOtherCostsSum = 0;
+            let totalAllowanceAmount = 0;
+            let totalMarkupAllowance = 0;
+
             let laborBreakdownReport = {};
             let totalLaborHoursReport = 0;
 
-            for (const role in projectSettings.laborRates) {
+            // Initialize labor breakdown totals across all trades
+            const allPossibleRolesReport = new Set();
+            projectSettings.activeTrades.forEach(trade => {
+                if (projectSettings.allTradeLaborRates[trade]) {
+                    Object.keys(projectSettings.allTradeLaborRates[trade]).forEach(role => allPossibleRolesReport.add(role));
+                }
+            });
+            allPossibleRolesReport.forEach(role => {
                 laborBreakdownReport[role] = 0;
-            }
+            });
+
 
             estimateItems.forEach((item) => {
-                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const lineTotal = laborTotal + item.materials + item.otherCosts;
+                const materialsTotal = item.materialPerUnit * item.materialUnits;
+                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
+                const allowanceLineTotal = item.allowances;
+                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
 
-                totalProjectSubtotal += lineTotal;
+                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
+
+                totalProjectSubtotal += lineTotalEstimate;
                 totalLaborCost += laborTotal;
-                totalMaterialCost += item.materials;
-                totalLineItemOtherCosts += item.otherCosts;
+                totalMaterialCost += materialsTotal;
+                totalLineItemOtherCostsSum += otherCategoryTotal;
+                totalAllowanceAmount += allowanceLineTotal;
+                totalMarkupAllowance += markupAllowanceLineItem;
                 totalLaborHoursReport += item.hours;
 
-                laborBreakdownReport[item.rateRole] += laborTotal;
+                // Aggregate labor costs by role, regardless of trade
+                if (laborBreakdownReport[item.rateRole] !== undefined) {
+                    laborBreakdownReport[item.rateRole] += laborTotal;
+                }
             });
 
             // Add global costs to totalOtherCostsAggregated for report
@@ -1047,7 +1431,7 @@
                                          projectSettings.fixedCost + projectSettings.subcontractorCost +
                                          projectSettings.allowanceCost;
             
-            const breakdownTotalOtherCosts = totalLineItemOtherCosts + globalOtherCosts;
+            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
 
 
             const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
@@ -1056,7 +1440,8 @@
             const estimateSubtotalAmount = subtotalBeforeProfitTax + totalMarkupAmount;
 
             const salesTaxAmount = estimateSubtotalAmount * (projectSettings.salesTax / 100);
-            const grandTotal = estimateSubtotalAmount + salesTaxAmount;
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount + totalAllowanceAmount + totalMarkupAllowance; // "Total Proposal"
+
 
             let reportContent = `CONSTRUCTION ESTIMATE REPORT\n`;
             reportContent += `============================\n\n`;
@@ -1095,7 +1480,7 @@
             reportContent += `Equipment Total: ${formatCurrency(projectSettings.equipmentCost)}\n`;
             reportContent += `Fixed Total: ${formatCurrency(projectSettings.fixedCost)}\n`;
             reportContent += `Sub-contractor Total: ${formatCurrency(projectSettings.subcontractorCost)}\n`;
-            reportContent += `Allowance Total: ${formatCurrency(projectSettings.allowanceCost)}\n`;
+            reportContent += `Allowance Total: ${formatCurrency(totalAllowanceAmount)}\n`;
             reportContent += `Total Other Costs (Aggregated): ${formatCurrency(breakdownTotalOtherCosts)}\n\n`;
 
 
@@ -1103,21 +1488,38 @@
             reportContent += `====================\n`;
 
             estimateItems.forEach((item, index) => {
-                const laborRate = projectSettings.laborRates[item.rateRole] || 0;
+                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const lineTotal = laborTotal + item.materials + item.otherCosts;
+                const materialsTotal = item.materialPerUnit * item.materialUnits;
+                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
+                const allowanceLineTotal = item.allowances;
+                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
+
+                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
+                const lineTotalAllowance = allowanceLineTotal + markupAllowanceLineItem;
 
                 reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
                 reportContent += `  Description: ${item.description || 'No description'}\n`;
+                reportContent += `  Trade: ${item.trade}\n`;
                 reportContent += `  Hours: ${item.hours.toFixed(2)}\n`;
-                reportContent += `  Rate: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
+                reportContent += `  Skill Level / HR: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
                 reportContent += `  OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
                 reportContent += `  Effective Labor Rate: ${formatCurrency(effectiveLaborRate)}/hr\n`;
-                reportContent += `  Labor Cost: ${formatCurrency(laborTotal)}\n`;
-                reportContent += `  Materials: ${formatCurrency(item.materials)}\n`;
-                reportContent += `  Other Costs (Line Item Specific): ${formatCurrency(item.otherCosts)}\n`;
-                reportContent += `  Line Total: ${formatCurrency(lineTotal)}\n`;
+                reportContent += `  Labor Total: ${formatCurrency(laborTotal)}\n`;
+                reportContent += `  Materials Per Unit: ${formatCurrency(item.materialPerUnit)}\n`;
+                reportContent += `  Material Units: ${item.materialUnits}\n`;
+                reportContent += `  Materials Total: ${formatCurrency(materialsTotal)}\n`;
+                reportContent += `  Equipment/Travel: ${formatCurrency(item.equipmentTravel)}\n`;
+                reportContent += `  Fixed Cost (Line Item): ${formatCurrency(item.fixedCostLineItem)}\n`;
+                reportContent += `  Sub-contractor (Line Item): ${formatCurrency(item.subcontractorCostLineItem)}\n`;
+                reportContent += `  Other Cost (Line Item): ${formatCurrency(item.otherCostLineItem)}\n`;
+                reportContent += `  Total Other (Line Item Category): ${formatCurrency(otherCategoryTotal)}\n`;
+                reportContent += `  Allowance Amount: ${formatCurrency(item.allowances)}\n`;
+                reportContent += `  Estimated Allowance %: ${item.estimatedAllowancePercent.toFixed(2)}%\n`;
+                reportContent += `  Allowance Markup: ${formatCurrency(markupAllowanceLineItem)}\n`;
+                reportContent += `  Line Total (Estimate Portion): ${formatCurrency(lineTotalEstimate)}\n`;
+                reportContent += `  Line Total (Allowance Portion): ${formatCurrency(lineTotalAllowance)}\n`;
             });
 
             reportContent += `\nEnd of Report\n`;
