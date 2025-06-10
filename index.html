@@ -193,11 +193,11 @@
             gap: 15px;
             flex-wrap: wrap; /* Allows wrapping on smaller screens */
         }
-        /* Adjusted header-icon-box to be a flexible container for logo */
+        /* Reverted header-icon-box to be a rounded rectangle, matching the "most up-to-date" immersive from the user's prompt */
         .header-icon-box {
             background: #3b82f6;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 12px; /* Rounded rectangle */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -541,21 +541,21 @@
             color: #1D4ED8; /* Darker blue on hover */
         }
 
-        /* Styles for the logo upload area */
+        /* Styles for the logo upload area (Step 1 of wizard) - REVERTED TO RECTANGULAR */
         .logo-upload-area {
             background: #f8fafc; /* Light gray background */
             border: 2px dashed #cbd5e1; /* Dashed border */
-            border-radius: 12px;
+            border-radius: 12px; /* Rectangular with rounded corners */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 20px; /* Generous padding */
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             min-height: 120px; /* Ensure some minimum height */
-            gap: 10px;
+            gap: 10px; /* Space between crane and text */
             position: relative; /* For positioning the image */
             overflow: hidden; /* Hide overflow for image */
         }
@@ -568,12 +568,16 @@
             border-color: #3b82f6; /* Solid blue border when dragging over */
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
         }
-        .logo-upload-area img.uploaded-logo {
+
+        /* Image preview within the upload area (for wizard) */
+        .logo-upload-area .wizard-logo-img-preview {
             max-width: 100%;
             max-height: 100px; /* Limit height of uploaded logo in wizard */
-            object-fit: contain;
+            object-fit: contain; /* Ensure image fits without cropping */
             border-radius: 8px; /* Slightly rounded corners for the logo itself */
         }
+
+        /* Default icon and text when no logo is loaded (always visible in this format) */
         .logo-upload-area .default-icon {
             font-size: 32px;
             color: #3b82f6;
@@ -582,6 +586,8 @@
             font-size: 0.9rem;
             color: #6b7280;
         }
+        /* Removed .logo-upload-overlay and its related styles as per the new requested format */
+
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -592,7 +598,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PHBhdGggZD0iTTE2LjIgNy44TDIwLjIgMTEuOE0zLjggMTIuMkw3LjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDExLjggMy44TDEyLjIgMy44TDE2LjIgNy44Ii8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTEuOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PHBhdGggZD0iTTE2LjIgNy44TDIwLjIgMTEuOE0zLjggMTIuMkw3LjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDExLjggMy44TDEyLjIgMy44TDE2LjIgNy44Ii8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -719,6 +725,7 @@
                     <img id="wizardLogoPreview" class="uploaded-logo hidden" src="" alt="Contractor Logo">
                     <span id="defaultLogoIcon" class="default-icon">🏗️</span>
                     <p id="uploadText" class="upload-text">Drag & drop your logo here, or click to upload</p>
+                    <!-- The logoUploadOverlay and its styles have been removed as per your request -->
                 </div>
 
                 <h1>Project Setup</h1>
@@ -1088,7 +1095,7 @@
             wizardLogoPreview.src = base64Image;
             wizardLogoPreview.classList.remove('hidden');
             defaultLogoIcon.classList.add('hidden');
-            uploadText.textContent = 'Click or drag a new logo to replace';
+            uploadText.classList.add('hidden'); // Hide upload text too
 
             // Update main app logo
             mainAppLogo.src = base64Image;
@@ -1102,7 +1109,7 @@
                 // If no logo is saved, ensure default state
                 wizardLogoPreview.classList.add('hidden');
                 defaultLogoIcon.classList.remove('hidden');
-                uploadText.textContent = 'Drag & drop your logo here, or click to upload';
+                uploadText.classList.remove('hidden'); // Show upload text again
                 mainAppLogo.src = ''; // Clear main app logo src
                 // mainAppLogo's onerror will apply default SVG if src is empty or broken
             }
