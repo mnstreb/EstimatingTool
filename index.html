@@ -1086,20 +1086,23 @@
                 tradeGroupDiv.className = 'trade-labor-rates-group';
                 tradeGroupDiv.innerHTML = `<h3>${trade} Labor Rates</h3>`;
 
-                let skillLevelsHtml = '';
-                // Sort roles to maintain a consistent order (default first, then custom alphabetically)
-                const sortedRoles = Object.keys(projectSettings.allTradeLaborRates[trade] || {}).sort((a, b) => {
-                    const aIsDefault = defaultRoles.includes(a);
-                    const bIsDefault = defaultRoles.includes(b);
+                // Convert roles object to an array of [roleName, rate] pairs for sorting
+                const rolesWithRates = Object.entries(projectSettings.allTradeLaborRates[trade] || {});
 
-                    if (aIsDefault && !bIsDefault) return -1;
-                    if (!aIsDefault && bIsDefault) return 1;
-                    return a.localeCompare(b); // Alphabetical for same type (default/custom)
+                // Sort roles by rate (descending), then by name alphabetically if rates are equal
+                rolesWithRates.sort(([, rateA], [, rateB]) => {
+                    if (rateA !== rateB) {
+                        return rateB - rateA; // Sort by rate descending
+                    }
+                    // If rates are equal, sort alphabetically by role name
+                    const roleNameA = arguments[0][0]; // Extract role name from the sorted pair
+                    const roleNameB = arguments[1][0];
+                    return roleNameA.localeCompare(roleNameB);
                 });
 
-                sortedRoles.forEach(role => {
+                let skillLevelsHtml = '';
+                rolesWithRates.forEach(([role, rate]) => {
                     const rateInputId = `rate-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
-                    // Unique ID for the skill name element (either span or input)
                     const skillNameElementId = `skillname-${trade.replace(/\s/g, '')}-${role.replace(/\s/g, '')}`;
 
                     skillLevelsHtml += `
@@ -1112,7 +1115,7 @@
                             `}
                             <div class="rate-input-group">
                                 <label for="${rateInputId}" class="rate-label">Rate ($/hr):</label>
-                                <input type="number" id="${rateInputId}" class="input-field rate-input" value="${projectSettings.allTradeLaborRates[trade][role]}"
+                                <input type="number" id="${rateInputId}" class="input-field rate-input" value="${rate}"
                                     onchange="updateLaborRate('${trade}', '${role}', this.value)">
                                 ${isAdvancedModeActive ? `
                                     <button class="remove-skill-btn" onclick="confirmRemoveSkillLevel('${trade}', '${role}')">
@@ -1133,6 +1136,7 @@
             const parsedValue = parseFloat(value);
             if (!isNaN(parsedValue) && parsedValue >= 0) {
                 projectSettings.allTradeLaborRates[trade][role] = parsedValue;
+                populateWizardStep2LaborRates(); // Re-render to reflect new sorting
             } else {
                 console.error(`Invalid input for ${trade} ${role} rate: ${value}`);
                 // Revert to old value if invalid, or a default
@@ -1178,7 +1182,7 @@
                         item.rateRole = trimmedNewRole;
                     }
                 });
-                populateWizardStep2LaborRates(); // Re-render to reflect the name change in wizard
+                populateWizardStep2LaborRates(); // Re-render to reflect the name change and new sorting in wizard
                 renderItems(); // Re-render main table for updated dropdowns
             } else {
                 console.warn(`Could not find old role "${oldRole}" in trade "${trade}" for update.`);
@@ -1197,7 +1201,7 @@
                 advancedLink.textContent = 'Show Advanced Options';
                 advancedSkillLevelControls.classList.add('hidden');
             }
-            populateWizardStep2LaborRates(); // Re-render to show/hide input fields and minus buttons
+            populateWizardStep2LaborRates(); // Re-render to show/hide input fields and minus buttons, and ensure sorting
         }
 
         // Function to add a custom skill level (now called from advanced section)
@@ -1247,7 +1251,7 @@
                 // Clear inputs and re-render
                 newSkillTitleInput.value = '';
                 newSkillRateInput.value = '0';
-                populateWizardStep2LaborRates(); // Re-render to show the new skill level
+                populateWizardStep2LaborRates(); // Re-render to show the new skill level with correct sorting
             } else if (alreadyExistsForSome) {
                 renderMessageBox(`Skill level "${newTitle}" already exists for some or all selected trades. It was not added where it already existed.`);
             } else {
@@ -1291,7 +1295,7 @@
                     }
                 });
 
-                populateWizardStep2LaborRates(); // Re-render the wizard step
+                populateWizardStep2LaborRates(); // Re-render the wizard step to reflect removal and re-sorting
                 renderItems(); // Re-render the main table to reflect changes
             } else {
                 console.warn(`Could not find skill "${role}" in trade "${trade}" for removal.`);
@@ -1805,7 +1809,7 @@
 
 
             reportContent += `EXECUTIVE SUMMARY DETAILS:\n`;
-            report += `-------------------------------------------------\n`;
+            reportContent += `-------------------------------------------------\n`;
             reportContent += `Total Project Cost (Line Items Base): ${formatCurrency(totalProjectSubtotal)}\n`;
             reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmount)}\n`;
             reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`;
