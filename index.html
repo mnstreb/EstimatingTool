@@ -372,19 +372,19 @@
             }
             td:nth-of-type(1):before { content: "Task Name:"; }
             td:nth-of-type(2):before { content: "Description:"; }
-            td:nth-of-type(3):before { content: "Trade:"; }
-            td:nth-of-type(4):before { content: "Hours:"; }
-            td:nth-of-type(5):before { content: "Skill Level / HR:"; }
-            td:nth-of-type(6):before { content: "OT/DT Multiplier:"; }
+            td:nth-of-type(3):before { content: "OT/DT Multiplier:"; }
+            td:nth-of-type(4):before { content: "Skill:"; }
+            td:nth-of-type(5):before { content: "$/hr:"; }
+            td:nth-of-type(6):before { content: "# hrs:"; }
             td:nth-of-type(7):before { content: "Labor Total:"; }
-            td:nth-of-type(8):before { content: "Material Qty:"; }
-            td:nth-of-type(9):before { content: "Material $/Unit:"; }
+            td:nth-of-type(8):before { content: "QTY / UNIT:"; }
+            td:nth-of-type(9):before { content: "$ / UNIT:"; }
             td:nth-of-type(10):before { content: "Materials Total:"; }
-            td:nth-of-type(11):before { content: "Equipment/Rental:"; }
+            td:nth-of-type(11):before { content: "Equipment / Rental:"; }
             td:nth-of-type(12):before { content: "Subcontractor:"; }
-            td:nth-of-type(13):before { content: "Misc. Cost:"; }
+            td:nth-of-type(13):before { content: "Misc.:"; }
             td:nth-of-type(14):before { content: "Other Total:"; }
-            td:nth-of-type(15):before { content: "Line Total:"; }
+            td:nth-of-type(15):before { content: "TOTAL:"; }
             td:nth-of-type(16):before { content: "Actions:"; }
 
         }
@@ -653,6 +653,19 @@
             -moz-appearance: textfield; /* Firefox */
         }
 
+        /* Custom styles for Task Name and Description fields to make them wider */
+        .task-name-col {
+            width: 18%; /* Allocate more width to Task Name */
+        }
+        .description-col {
+            width: 25%; /* Allocate more width to Description */
+        }
+        /* Adjust other columns if necessary to fit */
+        .labor-col, .materials-col, .other-col, .total-col, .actions-col {
+             /* Example: Distribute remaining space, adjust as needed */
+             /* Removed fixed widths to allow more flexibility */
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -720,11 +733,9 @@
                     <h4>Project Cost Breakdown</h4>
                     <div class="summary-item"><span>Labor Total:</span> <strong id="breakdownLaborTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Material Total:</span> <strong id="breakdownMaterialTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Travel Total:</span> <strong id="breakdownTravelTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Equipment Total:</span> <strong id="breakdownEquipmentTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Fixed Total:</span> <strong id="breakdownFixedTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Sub-contractor Total:</span> <strong id="breakdownSubcontractorTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Allowance Total:</span> <strong id="breakdownAllowanceTotal">$0.00</strong></div>
+                    <div class="summary-item"><span>Misc. Total (Line Items):</span> <strong id="breakdownMiscCost">0.00</strong></div>
                     <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
                 </div>
 
@@ -744,15 +755,18 @@
             <table class="min-w-full">
                 <thead>
                     <tr>
-                        <th rowspan="2">Task Name</th>
-                        <th rowspan="2">Description</th>
-                        <th colspan="5" class="text-center">LABOR</th>
-                        <th colspan="3" class="text-center">MATERIALS</th>
-                        <th colspan="4" class="text-center">OTHER</th>
-                        <th rowspan="2">TOTAL</th>
-                        <th rowspan="2">Actions</th>
+                        <th class="task-name-col">Task Name</th>
+                        <th class="description-col">Description</th>
+                        <th colspan="5" class="text-center labor-col">LABOR</th>
+                        <th colspan="3" class="text-center materials-col">MATERIALS</th>
+                        <th colspan="3" class="text-center other-col">OTHER</th>
+                        <th class="total-col">TOTAL</th>
+                        <th class="actions-col">Actions</th>
                     </tr>
                     <tr>
+                        <!-- Placeholder for Task Name and Description columns in the second header row -->
+                        <th></th>
+                        <th></th>
                         <th>OT/DT</th>
                         <th>Skill</th>
                         <th>$/hr</th>
@@ -764,7 +778,9 @@
                         <th>Equipment / Rental</th>
                         <th>Subcontractor</th>
                         <th>Misc.</th>
-                        <th>Other Total</th>
+                        <!-- Note: 'Other Total' removed from this row as it's a sum at the next level -->
+                        <th></th> <!-- Placeholder for TOTAL -->
+                        <th></th> <!-- Placeholder for Actions -->
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -1793,7 +1809,7 @@
                 populateWizardStep2LaborRates();
                 renderItems();
             } else {
-                console.warn(`Could not find skill "${role}" in trade "${trade}" for removal.`);
+                console.warn(`Could not find skill "${role}" in trade "${trade}" for update.`);
             }
         }
 
