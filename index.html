@@ -768,7 +768,7 @@
                         <option value="FL">Florida</option>
                         <option value="WA">Washington</option>
                         <option value="IL">Illinois</option>
-                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
                 
@@ -942,7 +942,7 @@
             overhead: 0,
             additionalConsiderationsType: '%',
             additionalConsiderationsValue: 0,
-            // Define labor rates nested by trade (these are still default, but individual labor rates can be changed in Step 2)
+            // Define labor rates nested by trade
             allTradeLaborRates: {
                 "General": {
                     "Project Manager": 120,
@@ -1000,7 +1000,195 @@
         };
 
         // Estimate data structure
-        let estimateItems = [];
+        let estimateItems = [
+            {
+                id: Date.now() + 1,
+                taskName: 'GENERAL REQUIREMENTS',
+                description: 'Plans, specifications, engineering, permits, zoning, building, environmental, and survey',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0, // This corresponds to the 'Other Total' from the screenshot
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 2,
+                taskName: 'Plans and Specifications',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 3,
+                taskName: 'Plan Review',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 4,
+                taskName: 'Permits: Zoning, Building, Environmental, Other',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 5,
+                taskName: 'Survey',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 6,
+                taskName: 'Impact Fee',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 7,
+                taskName: 'Administrative Costs',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 8,
+                taskName: 'Financing Costs',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 9,
+                taskName: 'Legal Fees',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 10,
+                taskName: 'Engineering Fees',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            },
+            {
+                id: Date.now() + 11,
+                taskName: 'Insurance',
+                description: '',
+                trade: 'General',
+                rateRole: 'Journeyman',
+                hours: 0,
+                otDtMultiplier: 1.0,
+                materialPerUnit: 0,
+                materialUnits: 0,
+                equipmentTravel: 0,
+                fixedCostLineItem: 0,
+                subcontractorCostLineItem: 0,
+                otherCostLineItem: 0,
+                allowances: 0,
+                estimatedAllowancePercent: 0
+            }
+        ];
 
         // UI Element references
         const setupWizard = document.getElementById('setupWizard');
@@ -1044,7 +1232,7 @@
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
         const summaryOverallLaborHoursElem = document.getElementById('summaryOverallLaborHours');
 
-        // Executive Summary elements (now in the top row)
+        // Executive Summary elements
         const summaryProjectCost = document.getElementById('summaryProjectCost');
         const summaryMiscCost = document.getElementById('summaryMiscCost');
         const summaryMarkup = document.getElementById('summaryMarkup');
@@ -1084,9 +1272,10 @@
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             showSetup();
-            updateSalesTaxForState(projectSettings.projectState);
+            updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
             populateTradesDropdown();
             updateSelectedTradesDisplay();
+            renderItems(); // Render the pre-filled items
         });
 
         // --- Logo Upload Logic ---
@@ -1285,6 +1474,7 @@
             projectInfoElem.textContent = `${projectSettings.projectType} - ${projectSettings.projectName} - ${projectSettings.projectState}`;
 
             if (estimateItems.length === 0) {
+                // If somehow no initial items were added, add a default one
                 addItem();
             } else {
                 renderItems();
@@ -1305,7 +1495,7 @@
             document.getElementById('startDate').value = projectSettings.startDate;
             document.getElementById('endDate').value = projectSettings.endDate;
             document.getElementById('projectID').value = projectSettings.projectID;
-            document.getElementById('projectDescription').value = projectSettings.projectDescription;
+            projectSettings.projectDescription = document.getElementById('projectDescription').value;
 
             if (isAdvancedDetailsActive) {
                 advancedDetailsSection.classList.remove('hidden');
@@ -1648,6 +1838,21 @@
             }
         }
 
+        function updateSelectedTradesDisplay() {
+            selectedTradesDisplay.innerHTML = '';
+            if (projectSettings.activeTrades.length === 0) {
+                selectedTradesDisplay.textContent = 'Click to select trades...';
+                return;
+            }
+            projectSettings.activeTrades.forEach(trade => {
+                const span = document.createElement('span');
+                span.className = 'selected-trade-tag';
+                span.innerHTML = `${trade} <span class="remove-tag" data-trade="${trade}">&times;</span>`;
+                selectedTradesDisplay.appendChild(span);
+            });
+        }
+
+
         function handleTradeSelection(checkbox) {
             const trade = checkbox.value;
             if (checkbox.checked) {
@@ -1662,6 +1867,7 @@
                 }
             } else {
                 projectSettings.activeTrades = projectSettings.activeTrades.filter(t => t !== trade);
+                // Also remove line items associated with this trade
                 estimateItems = estimateItems.filter(item => item.trade !== trade);
             }
             updateSelectedTradesDisplay();
@@ -1709,12 +1915,12 @@
 
         function addItem() {
             const defaultTrade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
-            const defaultRole = "Journeyman";
+            const defaultRole = projectSettings.allTradeLaborRates[defaultTrade] && Object.keys(projectSettings.allTradeLaborRates[defaultTrade]).length > 0 ? Object.keys(projectSettings.allTradeLaborRates[defaultTrade])[0] : "Journeyman";
 
             const newItem = {
                 id: Date.now(),
-                taskName: '',
-                description: '',
+                taskName: 'New Task',
+                description: 'Description for new task',
                 trade: defaultTrade,
                 rateRole: defaultRole,
                 hours: 0,
@@ -1754,6 +1960,7 @@
             let totalLaborHoursVal = 0;
 
             estimateItems.forEach(item => {
+                // Ensure trade and role are valid, fallback if needed
                 if (!projectSettings.activeTrades.includes(item.trade)) {
                     item.trade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
                 }
