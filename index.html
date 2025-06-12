@@ -235,7 +235,7 @@
         /* Top Summary Row Styles (3 columns: Proposal, Hours, Chart) */
         .top-summary-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
+            grid-template-columns: repeat(3, 1fr); /* Explicitly 3 columns on large screens */
             gap: 20px;
             margin-bottom: 25px;
         }
@@ -613,7 +613,7 @@
             </div>
         </div>
 
-        <!-- NEW: Top-level summary boxes with Pie Chart (3 columns) -->
+        <!-- NEW: Top-level summary boxes with Executive Summary -->
         <div class="top-summary-row mb-6">
             <div class="summary-overall-metric-card">
                 <span class="label">Total Proposal</span>
@@ -623,37 +623,32 @@
                 <span class="label">Total Labor Hours</span>
                 <span class="value" id="summaryOverallLaborHours">0</span>
             </div>
-            <!-- Pie Chart Container moved here -->
-            <div class="chart-container card">
-                <h4 style="margin-top:0;">Labor vs. Material Cost Distribution</h4>
-                <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
+            <!-- Executive Summary (MOVED HERE) -->
+            <div class="card summary-block">
+                <h4>Executive Summary</h4>
+                <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
+                <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
+                <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div>
+                <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
+                <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
+                <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">0.00%</strong></div>
+                <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">0.00%</strong></div>
+                <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">0.00%</strong></div>
+                <div class="summary-item"><span>Additional Considerations:</span> <strong id="summaryAdditionalConsiderations">$0.00</strong></div>
             </div>
         </div>
 
-        <!-- Executive Summary Grid (now 3 columns) -->
+        <!-- Executive Summary Grid (now 3 columns, but without Executive Summary card) -->
         <div class="executive-summary-section mb-6">
-            <div class="executive-summary-grid-3col"> <!-- Class name changed -->
+            <div class="executive-summary-grid-3col">
                 <div class="card summary-block">
-                    <h4>Executive Summary</h4>
-                    <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
-                    <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
-                    <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div>
-                    <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
-                    <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">0.00%</strong></div>
-                    <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">0.00%</strong></div>
-                    <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">0.00%</strong></div>
-                    <div class="summary-item"><span>Additional Considerations:</span> <strong id="summaryAdditionalConsiderations">$0.00</strong></div>
-                </div>
-
-                <div class="card summary-block">
-                    <h4>Labor Breakdown (Hours)</h4> <!-- Updated title here -->
-                    <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">0.00</strong></div> <!-- Updated to hours -->
-                    <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">0.00</strong></div> <!-- Updated to hours -->
-                    <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">0.00</strong></div> <!-- Updated to hours -->
-                    <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">0.00</strong></div> <!-- Updated to hours -->
-                    <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">0.00</strong></div> <!-- Updated to hours -->
-                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <h4>Labor Breakdown (Hours)</h4>
+                    <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">0.00</strong></div>
+                    <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">0.00</strong></div>
+                    <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">0.00</strong></div>
+                    <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">0.00</strong></div>
+                    <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">0.00</strong></div>
+                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">0.00</strong></div>
                 </div>
 
                 <div class="card summary-block">
@@ -666,6 +661,12 @@
                     <div class="summary-item"><span>Sub-contractor Total:</span> <strong id="breakdownSubcontractorTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Allowance Total:</span> <strong id="breakdownAllowanceTotal">$0.00</strong></div>
                     <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
+                </div>
+
+                <!-- Pie Chart Container (MOVED HERE) -->
+                <div class="chart-container card">
+                    <h4 style="margin-top:0;">Labor vs. Material Cost Distribution</h4>
+                    <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
@@ -941,7 +942,7 @@
             overhead: 0,
             additionalConsiderationsType: '%',
             additionalConsiderationsValue: 0,
-            // Define labor rates nested by trade
+            // Define labor rates nested by trade (these are still default, but individual labor rates can be changed in Step 2)
             allTradeLaborRates: {
                 "General": {
                     "Project Manager": 120,
@@ -1043,7 +1044,7 @@
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
         const summaryOverallLaborHoursElem = document.getElementById('summaryOverallLaborHours');
 
-        // Executive Summary elements
+        // Executive Summary elements (now in the top row)
         const summaryProjectCost = document.getElementById('summaryProjectCost');
         const summaryMiscCost = document.getElementById('summaryMiscCost');
         const summaryMarkup = document.getElementById('summaryMarkup');
@@ -1083,7 +1084,7 @@
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             showSetup();
-            updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
+            updateSalesTaxForState(projectSettings.projectState);
             populateTradesDropdown();
             updateSelectedTradesDisplay();
         });
@@ -1485,8 +1486,8 @@
                 showAdvancedDetailsLink.textContent = 'Hide Advanced Details';
                 advancedDetailsSection.classList.remove('hidden');
             } else {
-                showAdvancedDetailsLink.textContent = 'Show Advanced Details';
                 advancedDetailsSection.classList.add('hidden');
+                showAdvancedDetailsLink.textContent = 'Show Advanced Details';
             }
         }
 
@@ -1840,7 +1841,6 @@
             let totalMarkupAllowance = 0;
 
             let laborBreakdown = {};
-            // NEW: Object to store labor hours breakdown
             let laborHoursBreakdown = {};
 
             const allPossibleRoles = new Set();
@@ -1851,7 +1851,7 @@
             });
             allPossibleRoles.forEach(role => {
                 laborBreakdown[role] = 0;
-                laborHoursBreakdown[role] = 0; // Initialize hours breakdown
+                laborHoursBreakdown[role] = 0;
             });
 
 
@@ -1875,7 +1875,7 @@
 
                 if (laborBreakdown[item.rateRole] !== undefined) {
                     laborBreakdown[item.rateRole] += laborTotal;
-                    laborHoursBreakdown[item.rateRole] += item.hours; // Accumulate hours here
+                    laborHoursBreakdown[item.rateRole] += item.hours;
                 }
             });
 
@@ -1910,7 +1910,7 @@
             summaryOverallLaborHoursElem.textContent = estimateItems.reduce((acc, item) => acc + item.hours, 0).toFixed(2);
 
 
-            // Update Executive Summary UI (left card)
+            // Update Executive Summary UI (now in top row)
             summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal);
             summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
             summaryOverhead.textContent = formatCurrency(totalOverheadCost);
@@ -1921,15 +1921,15 @@
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
             summaryAdditionalConsiderations.textContent = formatCurrency(additionalConsiderationAmount);
 
-            // Update Labor Breakdown (middle card) - NOW DISPLAYS HOURS
+            // Update Labor Breakdown (middle card, now in second row)
             const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
-            const laborBreakdownContainer = document.querySelector('.summary-block:nth-child(2)');
-            let currentHtml = `<h4>Labor Breakdown (Hours)</h4>`; // Updated title
+            const laborBreakdownContainer = document.querySelector('.executive-summary-grid-3col .summary-block:nth-child(1)'); // Adjusted selector
+            let currentHtml = `<h4>Labor Breakdown (Hours)</h4>`;
                                 
             defaultRoles.forEach(role => {
                 currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
             });
-            Object.keys(laborHoursBreakdown).sort().forEach(role => { // Iterate through hours breakdown
+            Object.keys(laborHoursBreakdown).sort().forEach(role => {
                 if (!defaultRoles.includes(role)) {
                     currentHtml += `<div class="summary-item"><span>${role}:</span> <strong>${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
                 }
@@ -1937,7 +1937,7 @@
             laborBreakdownContainer.innerHTML = currentHtml;
 
 
-            // Update Project Cost Breakdown (right card)
+            // Update Project Cost Breakdown (right card, still in second row)
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
             breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
             breakdownTravelTotal.textContent = formatCurrency(projectSettings.travelCost);
@@ -1947,7 +1947,7 @@
             breakdownAllowanceTotal.textContent = formatCurrency(totalAllowanceAmount);
             breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts);
 
-            // Render Pie Chart
+            // Render Pie Chart (now in second row)
             renderPieChart(totalLaborCost, totalMaterialCost);
         }
 
@@ -2025,7 +2025,7 @@
             let totalMarkupAllowance = 0;
 
             let laborBreakdownReport = {};
-            let laborHoursBreakdownReport = {}; // NEW: For hours in report
+            let laborHoursBreakdownReport = {};
             let totalLaborHoursReport = 0;
 
             const allPossibleRolesReport = new Set();
@@ -2036,7 +2036,7 @@
             });
             allPossibleRolesReport.forEach(role => {
                 laborBreakdownReport[role] = 0;
-                laborHoursBreakdownReport[role] = 0; // Initialize hours breakdown for report
+                laborHoursBreakdownReport[role] = 0;
             });
 
 
@@ -2061,7 +2061,7 @@
 
                 if (laborBreakdownReport[item.rateRole] !== undefined) {
                     laborBreakdownReport[item.rateRole] += laborTotal;
-                    laborHoursBreakdownReport[item.rateRole] += item.hours; // Accumulate hours for report
+                    laborHoursBreakdownReport[item.rateRole] += item.hours;
                 }
             });
 
@@ -2123,15 +2123,15 @@
             reportContent += `Additional Considerations (${projectSettings.additionalConsiderationsValue.toFixed(2)}${projectSettings.additionalConsiderationsType}): ${formatCurrency(additionalConsiderationAmount)}\n\n`;
 
 
-            reportContent += `LABOR BREAKDOWN (HOURS):\n`; // Updated title
+            reportContent += `LABOR BREAKDOWN (HOURS):\n`;
             reportContent += `-------------------------------------------------\n`;
             const defaultRolesReport = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
             defaultRolesReport.forEach(role => {
-                reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`; // Use formatHours
+                reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`;
             });
             Object.keys(laborHoursBreakdownReport).sort().forEach(role => {
                 if (!defaultRolesReport.includes(role)) {
-                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role])}\n`; // Use formatHours
+                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role])}\n`;
                 }
             });
             reportContent += `\n`;
