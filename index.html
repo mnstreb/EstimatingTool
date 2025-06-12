@@ -637,7 +637,7 @@
                     <h4>Executive Summary</h4>
                     <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
                     <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
-                    <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div> <!-- Changed label -->
+                    <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div>
                     <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
                     <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
                     <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">15.00%</strong></div>
@@ -864,27 +864,27 @@
             <div id="wizardStep3" class="hidden">
                 <h2 class="text-xl font-semibold mb-6">Project Settings</h2>
 
-                <!-- UPDATED: Overhead -->
+                <!-- Overhead -->
                 <div class="form-group">
                     <label for="overhead" class="label">Overhead (%):</label>
-                    <input type="number" id="overhead" class="input-field" value="10" step="0.01">
+                    <input type="number" id="overhead" class="input-field" value="0" step="0.01">
                 </div>
 
-                <!-- Re-labeled existing Profit Margin to Desired Profit -->
+                <!-- Desired Profit -->
                 <div class="form-group">
                     <label for="profitMargin" class="label">Desired Profit (%):</label>
-                    <input type="number" id="profitMargin" class="input-field" value="15" step="0.01">
+                    <input type="number" id="profitMargin" class="input-field" value="0" step="0.01">
                 </div>
 
-                <!-- Sales Tax (existing) -->
+                <!-- Sales Tax -->
                 <div class="form-group">
                     <label for="salesTax" class="label">Sales Tax (%):</label>
-                    <input type="number" id="salesTax" class="input-field" value="8.25" step="0.01">
+                    <input type="number" id="salesTax" class="input-field" value="0" step="0.01">
                 </div>
                 
                 <div class="form-group">
                     <label for="miscellaneous" class="label">Miscellaneous (%):</label>
-                    <input type="number" id="miscellaneous" class="input-field" value="5" step="0.01">
+                    <input type="number" id="miscellaneous" class="input-field" value="0" step="0.01">
                 </div>
 
                 <!-- Additional Project Considerations with Toggle -->
@@ -919,24 +919,24 @@
         // Global variables for project settings
         let projectSettings = {
             projectName: "Commercial Construction Project",
-            clientName: "", // New field
-            projectAddress: "", // New field
-            projectCity: "", // New field
-            projectZip: "", // New field
-            startDate: "", // New field
-            endDate: "", // New field
-            projectID: "", // New field
-            projectDescription: "", // New field
-            contractorLogo: "", // Stores Base64 string of the uploaded logo
+            clientName: "",
+            projectAddress: "",
+            projectCity: "",
+            projectZip: "",
+            startDate: "",
+            endDate: "",
+            projectID: "",
+            projectDescription: "",
+            contractorLogo: "",
             projectType: "Commercial",
             projectState: "CA",
-            profitMargin: 15, // Re-labeled to Desired Profit
-            salesTax: 8.25,
-            miscellaneous: 5,
-            overhead: 10, // RENAMED: from desiredOverhead to overhead
-            additionalConsiderationsType: '%', // Default type for additional considerations
-            additionalConsiderationsValue: 0, // Default value for additional considerations
-            // Define labor rates nested by trade
+            profitMargin: 0, // Changed to 0
+            salesTax: 0, // Changed to 0, will be updated by state on load
+            miscellaneous: 0, // Changed to 0
+            overhead: 0, // Changed to 0
+            additionalConsiderationsType: '%',
+            additionalConsiderationsValue: 0,
+            // Define labor rates nested by trade (these are still default, but individual labor rates can be changed in Step 2)
             allTradeLaborRates: {
                 "General": {
                     "Project Manager": 120,
@@ -985,13 +985,12 @@
                 "Masonry": { "Project Manager": 128, "Superintendent": 102, "General Foreman": 93, "Foreman": 88, "Journeyman": 76, "Apprentice": 51 },
                 "Landscaping": { "Project Manager": 100, "Superintendent": 85, "General Foreman": 75, "Foreman": 70, "Journeyman": 60, "Apprentice": 40 }
             },
-            activeTrades: ["General"], // Array to store selected trades
-            // Placeholder global costs (as discussed, could be inputs later)
-            travelCost: 1000,
-            equipmentCost: 2000,
-            fixedCost: 500,
-            subcontractorCost: 3000,
-            allowanceCost: 1500
+            activeTrades: ["General"],
+            travelCost: 0, // Changed to 0
+            equipmentCost: 0, // Changed to 0
+            fixedCost: 0, // Changed to 0
+            subcontractorCost: 0, // Changed to 0
+            allowanceCost: 0 // Changed to 0
         };
 
         // Estimate data structure
@@ -1047,7 +1046,7 @@
         const summaryProfitMargin = document.getElementById('summaryProfitMargin');
         const summarySalesTax = document.getElementById('summarySalesTax');
         const summaryMiscPercent = document.getElementById('summaryMiscPercent');
-        const summaryOverhead = document.getElementById('summaryOverhead'); // Element for overhead total
+        const summaryOverhead = document.getElementById('summaryOverhead');
         const summaryAdditionalConsiderations = document.getElementById('summaryAdditionalConsiderations');
 
 
@@ -1078,13 +1077,13 @@
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             showSetup();
-            // Set initial state tax
+            // Set initial state tax based on default CA, if it's set in projectSettings.projectState
+            // This will override the 0 just set for salesTax, which is expected behavior for state-based tax.
             updateSalesTaxForState(projectSettings.projectState);
 
             // Populate trades dropdown and display
             populateTradesDropdown();
             updateSelectedTradesDisplay();
-            // populateWizardStep2LaborRates() called in showStep(2)
 
             loadSavedLogo();
         });
@@ -1120,13 +1119,11 @@
         }
 
         function displayLogo(base64Image) {
-            // Update wizard preview
             wizardLogoPreview.src = base64Image;
             wizardLogoPreview.classList.remove('hidden');
             defaultLogoIcon.classList.add('hidden');
             uploadText.classList.add('hidden');
 
-            // Update main app logo
             mainAppLogo.src = base64Image;
         }
 
@@ -1134,7 +1131,6 @@
             if (projectSettings.contractorLogo) {
                 displayLogo(projectSettings.contractorLogo);
             } else {
-                // If no logo is saved, ensure default state
                 wizardLogoPreview.classList.add('hidden');
                 defaultLogoIcon.classList.remove('hidden');
                 uploadText.classList.remove('hidden');
@@ -1165,7 +1161,6 @@
             });
             currentStep = stepNumber;
 
-            // Populate Step 1 dynamically when it's shown, and reset advanced details visibility
             if (stepNumber === 1) {
                 isAdvancedDetailsActive = false;
                 showAdvancedDetailsLink.textContent = 'Show Advanced Details';
@@ -1173,14 +1168,12 @@
                 populateWizardInputs();
                 loadSavedLogo();
             }
-            // Populate Step 2 dynamically when it's shown, and reset advanced rates visibility
             if (stepNumber === 2) {
                 isAdvancedModeActive = false;
                 advancedLink.textContent = 'Show Advanced Options';
                 advancedSkillLevelControls.classList.add('hidden');
                 populateWizardStep2LaborRates();
             }
-            // Populate Step 3 dynamically when it's shown
             if (stepNumber === 3) {
                 populateWizardStep3Settings();
             }
@@ -1282,7 +1275,7 @@
             projectSettings.profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
             projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value) || 0;
             projectSettings.miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
-            projectSettings.overhead = parseFloat(document.getElementById('overhead').value) || 0; // RENAMED: from desiredOverhead to overhead
+            projectSettings.overhead = parseFloat(document.getElementById('overhead').value) || 0;
             projectSettings.additionalConsiderationsValue = parseFloat(document.getElementById('additionalConsiderationsValue').value) || 0;
 
             setupWizard.classList.add('hidden');
@@ -1327,7 +1320,7 @@
             document.getElementById('profitMargin').value = projectSettings.profitMargin;
             document.getElementById('salesTax').value = projectSettings.salesTax;
             document.getElementById('miscellaneous').value = projectSettings.miscellaneous;
-            document.getElementById('overhead').value = projectSettings.overhead; // RENAMED: from desiredOverhead to overhead
+            document.getElementById('overhead').value = projectSettings.overhead;
             document.getElementById('additionalConsiderationsValue').value = projectSettings.additionalConsiderationsValue;
             document.getElementById('additionalConsiderationsUnit').textContent = projectSettings.additionalConsiderationsType;
         }
@@ -1887,8 +1880,7 @@
             
             const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
 
-            // Calculate Overhead Cost (using projectSettings.overhead)
-            const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100); // RENAMED variable here
+            const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
 
             const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
             const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount + totalOverheadCost;
@@ -1916,7 +1908,7 @@
             // Update Executive Summary UI (left card)
             summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal);
             summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
-            summaryOverhead.textContent = formatCurrency(totalOverheadCost); // Display Overhead
+            summaryOverhead.textContent = formatCurrency(totalOverheadCost);
             summaryMarkup.textContent = formatCurrency(totalMarkupAmount);
             summaryEstimateSubtotal.textContent = formatCurrency(estimateSubtotalAmount);
             summaryProfitMargin.textContent = `${projectSettings.profitMargin.toFixed(2)}%`;
@@ -2071,7 +2063,7 @@
             
             const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
 
-            const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100); // RENAMED variable here
+            const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
 
             const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
             const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount + totalOverheadCost;
@@ -2116,7 +2108,7 @@
             reportContent += `-------------------------------------------------\n`;
             reportContent += `Total Project Cost (Line Items Base): ${formatCurrency(totalProjectSubtotal)}\n`;
             reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmount)}\n`;
-            reportContent += `Total Overhead Cost (${projectSettings.overhead.toFixed(2)}%): ${formatCurrency(totalOverheadCost)}\n`; // RENAMED text here
+            reportContent += `Total Overhead Cost (${projectSettings.overhead.toFixed(2)}%): ${formatCurrency(totalOverheadCost)}\n`;
             reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`;
             reportContent += `Estimate Subtotal (before sales tax): ${formatCurrency(estimateSubtotalAmount)}\n`;
             reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): ${formatCurrency(salesTaxAmount)}\n`;
