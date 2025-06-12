@@ -92,6 +92,7 @@
             padding: 15px; /* More padding */
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap; /* Prevent text wrapping in table headers/cells */
         }
         th {
             background: #f3f4f6; /* Softer header background */
@@ -330,6 +331,62 @@
             .executive-summary-grid-3col { /* Renamed class */
                 grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
             }
+            /* Adjust table for smaller screens */
+            table, thead, tbody, th, td, tr {
+                display: block; /* Make table elements stack for smaller screens */
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px; /* Hide table headers visually on small screens */
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc; /* Add border to rows */
+                margin-bottom: 10px;
+                border-radius: 8px; /* Rounded corners for rows */
+                overflow: hidden; /* Hide overflow for rounded corners */
+            }
+            td {
+                border: none; /* Remove individual cell borders */
+                position: relative;
+                padding-left: 50%; /* Make space for pseudo-element labels */
+                text-align: right;
+                font-size: 14px;
+            }
+            td:before {
+                /* Create a label for each cell using data-label attribute */
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #4b5563;
+            }
+            /* Specific adjustments for input fields in responsive table cells */
+            td .input-field, td select {
+                width: calc(100% - 10px); /* Adjust width to fit within cell padding */
+                text-align: right; /* Align input text to the right */
+            }
+            td:nth-of-type(1):before { content: "Task Name:"; }
+            td:nth-of-type(2):before { content: "Description:"; }
+            td:nth-of-type(3):before { content: "Trade:"; }
+            td:nth-of-type(4):before { content: "Hours:"; }
+            td:nth-of-type(5):before { content: "Skill Level / HR:"; }
+            td:nth-of-type(6):before { content: "OT/DT Multiplier:"; }
+            td:nth-of-type(7):before { content: "Labor Total:"; }
+            td:nth-of-type(8):before { content: "Material Qty:"; }
+            td:nth-of-type(9):before { content: "Material $/Unit:"; }
+            td:nth-of-type(10):before { content: "Materials Total:"; }
+            td:nth-of-type(11):before { content: "Equipment/Rental:"; }
+            td:nth-of-type(12):before { content: "Subcontractor:"; }
+            td:nth-of-type(13):before { content: "Misc. Cost:"; }
+            td:nth-of-type(14):before { content: "Other Total:"; }
+            td:nth-of-type(15):before { content: "Line Total:"; }
+            td:nth-of-type(16):before { content: "Actions:"; }
+
         }
 
         @media (max-width: 768px) {
@@ -347,10 +404,8 @@
             .header-subtitle {
                 font-size: 15px;
             }
-            th, td {
-                padding: 10px;
-                font-size: 14px;
-            }
+            /* Removed th, td font-size adjust for more consistent mobile labels */
+
             .summary-overall-metric-card {
                 padding: 20px;
             }
@@ -588,6 +643,16 @@
         }
         /* Removed .logo-upload-overlay and its related styles as per the new requested format */
 
+        /* Hide spinner arrows for number input fields within the table */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -681,32 +746,25 @@
                     <tr>
                         <th rowspan="2">Task Name</th>
                         <th rowspan="2">Description</th>
-                        <th colspan="3" class="text-center">BURDENED LABOR</th>
-                        <th colspan="2" class="text-center">MATERIALS</th>
+                        <th colspan="5" class="text-center">LABOR</th>
+                        <th colspan="3" class="text-center">MATERIALS</th>
                         <th colspan="4" class="text-center">OTHER</th>
-                        <th colspan="2" class="text-center">UNDEFINED SCOPE</th>
-                        <th colspan="2" class="text-center">MARKUP</th>
-                        <th colspan="2" class="text-center">ESTIMATED TOTAL</th>
+                        <th rowspan="2">TOTAL</th>
                         <th rowspan="2">Actions</th>
                     </tr>
                     <tr>
-                        <th>Trade</th>
-                        <th>Hours</th>
-                        <th>Skill Level / HR</th>
                         <th>OT/DT</th>
+                        <th>Skill</th>
+                        <th>$/hr</th>
+                        <th># hrs</th>
                         <th>Labor Total</th>
-                        <th>Materials $/Unit</th>
+                        <th>QTY / UNIT</th>
+                        <th>$ / UNIT</th>
                         <th>Materials Total</th>
-                        <th>Equipment/Travel</th>
-                        <th>Fixed</th>
-                        <th>Sub-contractor</th>
+                        <th>Equipment / Rental</th>
+                        <th>Subcontractor</th>
+                        <th>Misc.</th>
                         <th>Other Total</th>
-                        <th>Allowances</th>
-                        <th>Allowance Total</th>
-                        <th>Est. Allowance %</th>
-                        <th>Allowance $</th>
-                        <th>Total</th>
-                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -768,7 +826,7 @@
                         <option value="FL">Florida</option>
                         <option value="WA">Washington</option>
                         <option value="IL">Illinois</option>
-                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
                 
@@ -1009,14 +1067,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0, // This corresponds to the 'Other Total' from the screenshot
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0 // New field
             },
             {
                 id: Date.now() + 2,
@@ -1026,14 +1081,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 3,
@@ -1043,14 +1095,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 4,
@@ -1060,14 +1109,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 5,
@@ -1077,14 +1123,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 6,
@@ -1094,14 +1137,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 7,
@@ -1111,14 +1151,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 8,
@@ -1128,14 +1165,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 9,
@@ -1145,14 +1179,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 10,
@@ -1162,14 +1193,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             },
             {
                 id: Date.now() + 11,
@@ -1179,14 +1207,11 @@
                 rateRole: 'Journeyman',
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0,
+                materialUnitCost: 0,
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0
             }
         ];
 
@@ -1925,14 +1950,11 @@
                 rateRole: defaultRole,
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialPerUnit: 0,
-                materialUnits: 0,
-                equipmentTravel: 0,
-                fixedCostLineItem: 0,
+                materialQuantity: 0, // was materialUnits
+                materialUnitCost: 0, // was materialPerUnit
+                equipmentRentalCost: 0, // was equipmentTravel
                 subcontractorCostLineItem: 0,
-                otherCostLineItem: 0,
-                allowances: 0,
-                estimatedAllowancePercent: 0
+                miscLineItem: 0 // New field
             };
             estimateItems.push(newItem);
             renderItems();
@@ -1946,7 +1968,7 @@
         function updateItem(id, field, value) {
             const item = estimateItems.find(item => item.id === id);
             if (item) {
-                if (['hours', 'materialPerUnit', 'materialUnits', 'equipmentTravel', 'fixedCostLineItem', 'subcontractorCostLineItem', 'otherCostLineItem', 'allowances', 'estimatedAllowancePercent', 'otDtMultiplier'].includes(field)) {
+                if (['hours', 'materialQuantity', 'materialUnitCost', 'equipmentRentalCost', 'subcontractorCostLineItem', 'miscLineItem', 'otDtMultiplier'].includes(field)) {
                     item[field] = parseFloat(value) || 0;
                 } else {
                     item[field] = value;
@@ -1972,63 +1994,49 @@
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialPerUnit * item.materialUnits;
-                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
-                const allowanceTotal = item.allowances;
-                const markupAllowance = allowanceTotal * (item.estimatedAllowancePercent / 100);
-
-                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
-                const lineTotalAllowance = allowanceTotal + markupAllowance;
+                const materialsTotal = item.materialQuantity * item.materialUnitCost;
+                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
+                
+                const lineTotal = laborTotal + materialsTotal + otherCategoryTotal;
 
                 totalLaborHoursVal += item.hours;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="text" value="${item.taskName}" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field"></td>
-                    <td><input type="text" value="${item.description}" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field"></td>
+                    <td data-label="Task Name"><input type="text" value="${item.taskName}" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field"></td>
+                    <td data-label="Description"><input type="text" value="${item.description}" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field"></td>
                     
-                    <td>
-                        <select onchange="updateItem(${item.id}, 'trade', this.value)" class="input-field">
-                            ${projectSettings.activeTrades.map(trade => `
-                                <option value="${trade}" ${item.trade === trade ? 'selected' : ''}>
-                                    ${trade}
-                                </option>
-                            `).join('')}
-                             ${projectSettings.activeTrades.length === 0 ? '<option value="General" selected>General (No Trades Selected)</option>' : ''}
-                        </select>
-                    </td>
-                    <td><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
-                    <td>
-                        <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
-                            ${(projectSettings.allTradeLaborRates[item.trade] ? Object.keys(projectSettings.allTradeLaborRates[item.trade]) : []).map(role => {
-                                const rate = projectSettings.allTradeLaborRates[item.trade][role];
-                                return `<option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
-                                            ${role} (${formatCurrency(rate)}/hr)
-                                        </option>`;
-                            }).join('')}
-                            ${!projectSettings.allTradeLaborRates[item.trade] || Object.keys(projectSettings.allTradeLaborRates[item.trade]).length === 0 ? '<option value="" selected>No Rates for Trade</option>' : ''}
-                        </select>
-                    </td>
-                    <td>
+                    <td data-label="OT/DT Multiplier">
                         <select onchange="updateItem(${item.id}, 'otDtMultiplier', this.value)" class="input-field">
                             <option value="1.0" ${item.otDtMultiplier === 1.0 ? 'selected' : ''}>1.0</option>
                             <option value="1.5" ${item.otDtMultiplier === 1.5 ? 'selected' : ''}>1.5</option>
                             <option value="2.0" ${item.otDtMultiplier === 2.0 ? 'selected' : ''}>2.0</option>
                         </select>
                     </td>
-                    <td>${formatCurrency(laborTotal)}</td>
-                    <td><input type="number" value="${item.materialPerUnit}" onchange="updateItem(${item.id}, 'materialPerUnit', this.value)" class="input-field"></td>
-                    <td>${formatCurrency(materialsTotal)}</td>
-                    <td><input type="number" value="${item.equipmentTravel}" onchange="updateItem(${item.id}, 'equipmentTravel', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.fixedCostLineItem}" onchange="updateItem(${item.id}, 'fixedCostLineItem', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.otherCostLineItem}" onchange="updateItem(${item.id}, 'otherCostLineItem', this.value)" class="input-field"></td>
-                    <td><input type="number" value="${item.allowances}" onchange="updateItem(${item.id}, 'allowances', this.value)" class="input-field"></td>
-                    <td>${formatCurrency(allowanceTotal)}</td>
-                    <td><input type="number" value="${item.estimatedAllowancePercent}" onchange="updateItem(${item.id}, 'estimatedAllowancePercent', this.value)" class="input-field"></td>
-                    <td>${formatCurrency(markupAllowance)}</td>
-                    <td class="font-bold text-gray-900">${formatCurrency(lineTotalEstimate)}</td>
-                    <td class="font-bold text-gray-900">${formatCurrency(lineTotalAllowance)}</td>
+                    <td data-label="Skill">
+                        <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
+                            ${(projectSettings.allTradeLaborRates[item.trade] ? Object.keys(projectSettings.allTradeLaborRates[item.trade]) : []).map(role => {
+                                return `<option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
+                                            ${role}
+                                        </option>`;
+                            }).join('')}
+                            ${!projectSettings.allTradeLaborRates[item.trade] || Object.keys(projectSettings.allTradeLaborRates[item.trade]).length === 0 ? '<option value="" selected>No Skills</option>' : ''}
+                        </select>
+                    </td>
+                    <td data-label="$/hr">${formatCurrency(laborRate)}</td>
+                    <td data-label="# hrs"><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
+                    <td data-label="Labor Total">${formatCurrency(laborTotal)}</td>
+                    
+                    <td data-label="Material Qty"><input type="number" value="${item.materialQuantity}" onchange="updateItem(${item.id}, 'materialQuantity', this.value)" class="input-field"></td>
+                    <td data-label="Material $/Unit"><input type="number" value="${item.materialUnitCost}" onchange="updateItem(${item.id}, 'materialUnitCost', this.value)" class="input-field"></td>
+                    <td data-label="Materials Total">${formatCurrency(materialsTotal)}</td>
+                    
+                    <td data-label="Equipment/Rental"><input type="number" value="${item.equipmentRentalCost}" onchange="updateItem(${item.id}, 'equipmentRentalCost', this.value)" class="input-field"></td>
+                    <td data-label="Subcontractor"><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
+                    <td data-label="Misc. Cost"><input type="number" value="${item.miscLineItem}" onchange="updateItem(${item.id}, 'miscLineItem', this.value)" class="input-field"></td>
+                    <td data-label="Other Total">${formatCurrency(otherCategoryTotal)}</td>
+                    
+                    <td data-label="Line Total" class="font-bold text-gray-900">${formatCurrency(lineTotal)}</td>
                     <td><button class="btn btn-red btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
                 `;
                 estimateTableBody.appendChild(row);
@@ -2044,8 +2052,7 @@
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
             let totalLineItemOtherCostsSum = 0;
-            let totalAllowanceAmount = 0;
-            let totalMarkupAllowance = 0;
+            // Removed allowance totals from here as they are no longer in line items per new layout
 
             let laborBreakdown = {};
             let laborHoursBreakdown = {};
@@ -2066,19 +2073,15 @@
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialPerUnit * item.materialUnits;
-                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
-                const allowanceLineTotal = item.allowances;
-                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
-
+                const materialsTotal = item.materialQuantity * item.materialUnitCost;
+                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
+                
                 const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
 
                 totalProjectSubtotal += lineTotalEstimate;
                 totalLaborCost += laborTotal;
                 totalMaterialCost += materialsTotal;
                 totalLineItemOtherCostsSum += otherCategoryTotal;
-                totalAllowanceAmount += allowanceLineTotal;
-                totalMarkupAllowance += markupAllowanceLineItem;
 
                 if (laborBreakdown[item.rateRole] !== undefined) {
                     laborBreakdown[item.rateRole] += laborTotal;
@@ -2086,15 +2089,25 @@
                 }
             });
 
+            // Note: Global other costs (travel, equipment, fixed, subcontractor, allowance) are not explicitly
+            // requested in the executive summary breakdown based on the new line item layout.
+            // If these are still needed in the total calculation or executive summary, they should be added back
+            // into projectSettings and referenced here. For now, we will assume line item level costs
+            // are the primary input for project cost breakdown.
             const globalOtherCosts = projectSettings.travelCost + projectSettings.equipmentCost +
                                      projectSettings.fixedCost + projectSettings.subcontractorCost +
                                      projectSettings.allowanceCost;
             
-            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
+            // The previous otherTotal was totalLineItemOtherCostsSum + globalOtherCosts.
+            // With the new layout, we assume 'Other' is strictly from line items.
+            // If global costs are still desired, they need to be defined outside line items.
+            // For now, aligning with the new 'OTHER' section in the table.
+            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum; 
+
 
             const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
 
-            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
+            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100); // This is project-level misc now
             const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount + totalOverheadCost;
 
             const totalMarkupAmount = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
@@ -2109,7 +2122,8 @@
                 additionalConsiderationAmount = projectSettings.additionalConsiderationsValue;
             }
 
-            const grandTotal = estimateSubtotalAmount + salesTaxAmount + totalAllowanceAmount + totalMarkupAllowance + additionalConsiderationAmount;
+            // Recalculating grandTotal based on new columns
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount + additionalConsiderationAmount;
 
 
             // Update Top-level Summary UI
@@ -2119,7 +2133,7 @@
 
             // Update Executive Summary UI (now in top row)
             summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal);
-            summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
+            summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount); // This is project-level misc now
             summaryOverhead.textContent = formatCurrency(totalOverheadCost);
             summaryMarkup.textContent = formatCurrency(totalMarkupAmount);
             summaryEstimateSubtotal.textContent = formatCurrency(estimateSubtotalAmount);
@@ -2147,12 +2161,34 @@
             // Update Project Cost Breakdown (right card, still in second row)
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
             breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
-            breakdownTravelTotal.textContent = formatCurrency(projectSettings.travelCost);
-            breakdownEquipmentTotal.textContent = formatCurrency(projectSettings.equipmentCost);
-            breakdownFixedTotal.textContent = formatCurrency(projectSettings.fixedCost);
-            breakdownSubcontractorTotal.textContent = formatCurrency(projectSettings.subcontractorCost);
-            breakdownAllowanceTotal.textContent = formatCurrency(totalAllowanceAmount);
-            breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts);
+            
+            // These used to be global, now assuming they come from line items or are removed for simplicity of this table
+            breakdownTravelTotal.textContent = formatCurrency(0); // Travel was part of equipmentTravel before
+            breakdownEquipmentTotal.textContent = formatCurrency(0); // Equipment was part of equipmentTravel before
+            breakdownFixedTotal.textContent = formatCurrency(0); // Fixed cost removed from line item structure
+            breakdownSubcontractorTotal.textContent = formatCurrency(0); // This is now a line item specific input
+            breakdownAllowanceTotal.textContent = formatCurrency(0); // Allowances removed from line item structure
+            breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts); // This is sum of line item other costs
+
+            // To make Project Cost Breakdown accurate based on new line item structure,
+            // we should sum respective values across all estimateItems.
+            const totalEquipmentRentalCost = estimateItems.reduce((acc, item) => acc + item.equipmentRentalCost, 0);
+            const totalSubcontractorLineItemCost = estimateItems.reduce((acc, item) => acc + item.subcontractorCostLineItem, 0);
+            const totalMiscLineItemCost = estimateItems.reduce((acc, item) => acc + item.miscLineItem, 0);
+
+            // Added for clarity, as previous code had a 'Travel Total' and 'Fixed Total'
+            // For now, setting them to 0 as they aren't explicit line item fields in the new spec.
+            // If the user wants them to sum certain 'other' fields, we'd need to adjust.
+            breakdownTravelTotal.textContent = formatCurrency(0);
+            breakdownFixedTotal.textContent = formatCurrency(0);
+            breakdownEquipmentTotal.textContent = formatCurrency(totalEquipmentRentalCost);
+            breakdownSubcontractorTotal.textContent = formatCurrency(totalSubcontractorLineItemCost);
+            // This element doesn't exist, will need to be added to HTML for a separate display or combined into breakdownOtherTotal
+            // breakdownMiscCost.textContent = formatCurrency(totalMiscLineItemCost);
+            
+            // Redoing other totals for project cost breakdown.
+            breakdownOtherTotal.textContent = formatCurrency(totalEquipmentRentalCost + totalSubcontractorLineItemCost + totalMiscLineItemCost);
+
 
             // Render Pie Chart (now in second row)
             renderPieChart(totalLaborCost, totalMaterialCost);
@@ -2228,8 +2264,7 @@
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
             let totalLineItemOtherCostsSum = 0;
-            let totalAllowanceAmount = 0;
-            let totalMarkupAllowance = 0;
+            // Removed allowance totals from report generation as they are no longer in line items per new layout
 
             let laborBreakdownReport = {};
             let laborHoursBreakdownReport = {};
@@ -2251,10 +2286,8 @@
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialPerUnit * item.materialUnits;
-                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
-                const allowanceLineTotal = item.allowances;
-                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
+                const materialsTotal = item.materialQuantity * item.materialUnitCost;
+                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
 
                 const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
 
@@ -2262,8 +2295,6 @@
                 totalLaborCost += laborTotal;
                 totalMaterialCost += materialsTotal;
                 totalLineItemOtherCostsSum += otherCategoryTotal;
-                totalAllowanceAmount += allowanceLineTotal;
-                totalMarkupAllowance += markupAllowanceLineItem;
                 totalLaborHoursReport += item.hours;
 
                 if (laborBreakdownReport[item.rateRole] !== undefined) {
@@ -2272,11 +2303,13 @@
                 }
             });
 
-            const globalOtherCosts = projectSettings.travelCost + projectSettings.equipmentCost +
-                                         projectSettings.fixedCost + projectSettings.subcontractorCost +
-                                         projectSettings.allowanceCost;
-            
-            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum + globalOtherCosts;
+            // Re-evaluating global other costs for report based on removed line item columns
+            const totalEquipmentRentalCostSum = estimateItems.reduce((acc, item) => acc + item.equipmentRentalCost, 0);
+            const totalSubcontractorLineItemCostSum = estimateItems.reduce((acc, item) => acc + item.subcontractorCostLineItem, 0);
+            const totalMiscLineItemCostSum = estimateItems.reduce((acc, item) => acc + item.miscLineItem, 0);
+
+            const breakdownTotalOtherCosts = totalEquipmentRentalCostSum + totalSubcontractorLineItemCostSum + totalMiscLineItemCostSum;
+
 
             const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
 
@@ -2294,7 +2327,7 @@
                 additionalConsiderationAmount = projectSettings.additionalConsiderationsValue;
             }
 
-            const grandTotal = estimateSubtotalAmount + salesTaxAmount + totalAllowanceAmount + totalMarkupAllowance + additionalConsiderationAmount;
+            const grandTotal = estimateSubtotalAmount + salesTaxAmount + additionalConsiderationAmount;
 
 
             let reportContent = `CONSTRUCTION ESTIMATE REPORT\n`;
@@ -2347,11 +2380,9 @@
             reportContent += `-------------------------------------------------\n`;
             reportContent += `Labor Total: ${formatCurrency(totalLaborCost)}\n`;
             reportContent += `Material Total: ${formatCurrency(totalMaterialCost)}\n`;
-            reportContent += `Travel Total: ${formatCurrency(projectSettings.travelCost)}\n`;
-            reportContent += `Equipment Total: ${formatCurrency(projectSettings.equipmentCost)}\n`;
-            reportContent += `Fixed Total: ${formatCurrency(projectSettings.fixedCost)}\n`;
-            reportContent += `Sub-contractor Total: ${formatCurrency(projectSettings.subcontractorCost)}\n`;
-            reportContent += `Allowance Total: ${formatCurrency(totalAllowanceAmount)}\n`;
+            reportContent += `Equipment/Rental Total: ${formatCurrency(totalEquipmentRentalCostSum)}\n`;
+            reportContent += `Sub-contractor Total: ${formatCurrency(totalSubcontractorLineItemCostSum)}\n`;
+            reportContent += `Misc. Total (Line Items): ${formatCurrency(totalMiscLineItemCostSum)}\n`;
             reportContent += `Total Other Costs (Aggregated): ${formatCurrency(breakdownTotalOtherCosts)}\n\n`;
 
 
@@ -2362,35 +2393,28 @@
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialPerUnit * item.materialUnits;
-                const otherCategoryTotal = item.equipmentTravel + item.fixedCostLineItem + item.subcontractorCostLineItem + item.otherCostLineItem;
-                const allowanceLineTotal = item.allowances;
-                const markupAllowanceLineItem = allowanceLineTotal * (item.estimatedAllowancePercent / 100);
+                const materialsTotal = item.materialQuantity * item.materialUnitCost;
+                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
 
-                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
-                const lineTotalAllowance = allowanceLineTotal + markupAllowanceLineItem;
+                const lineTotal = laborTotal + materialsTotal + otherCategoryTotal;
 
                 reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
                 reportContent += `  Description: ${item.description || 'No description'}\n`;
-                reportContent += `  Trade: ${item.trade}\n`;
-                reportContent += `  Hours: ${item.hours.toFixed(2)}\n`;
-                reportContent += `  Skill Level / HR: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
-                reportContent += `  OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
-                reportContent += `  Effective Labor Rate: ${formatCurrency(effectiveLaborRate)}/hr\n`;
-                reportContent += `  Labor Total: ${formatCurrency(laborTotal)}\n`;
-                reportContent += `  Materials Per Unit: ${formatCurrency(item.materialPerUnit)}\n`;
-                reportContent += `  Material Units: ${item.materialUnits}\n`;
-                reportContent += `  Materials Total: ${formatCurrency(materialsTotal)}\n`;
-                reportContent += `  Equipment/Travel: ${formatCurrency(item.equipmentTravel)}\n`;
-                reportContent += `  Fixed Cost (Line Item): ${formatCurrency(item.fixedCostLineItem)}\n`;
-                reportContent += `  Sub-contractor (Line Item): ${formatCurrency(item.subcontractorCostLineItem)}\n`;
-                reportContent += `  Other Cost (Line Item): ${formatCurrency(item.otherCostLineItem)}\n`;
-                reportContent += `  Total Other (Line Item Category): ${formatCurrency(otherCategoryTotal)}\n`;
-                reportContent += `  Allowance Amount: ${formatCurrency(item.allowances)}\n`;
-                reportContent += `  Estimated Allowance %: ${item.estimatedAllowancePercent.toFixed(2)}%\n`;
-                reportContent += `  Allowance Markup: ${formatCurrency(markupAllowanceLineItem)}\n`;
-                reportContent += `  Line Total (Estimate Portion): ${formatCurrency(lineTotalEstimate)}\n`;
-                reportContent += `  Line Total (Allowance Portion): ${formatCurrency(lineTotalAllowance)}\n`;
+                reportContent += `  --- LABOR ---\n`;
+                reportContent += `    OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
+                reportContent += `    Skill: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
+                reportContent += `    # Hours: ${item.hours.toFixed(2)}\n`;
+                reportContent += `    Labor Total: ${formatCurrency(laborTotal)}\n`;
+                reportContent += `  --- MATERIALS ---\n`;
+                reportContent += `    Quantity / Unit: ${item.materialQuantity}\n`;
+                reportContent += `    $ / Unit: ${formatCurrency(item.materialUnitCost)}\n`;
+                reportContent += `    Materials Total: ${formatCurrency(materialsTotal)}\n`;
+                reportContent += `  --- OTHER ---\n`;
+                reportContent += `    Equipment / Rental: ${formatCurrency(item.equipmentRentalCost)}\n`;
+                reportContent += `    Subcontractor: ${formatCurrency(item.subcontractorCostLineItem)}\n`;
+                reportContent += `    Misc. Cost: ${formatCurrency(item.miscLineItem)}\n`;
+                reportContent += `    Other Total: ${formatCurrency(otherCategoryTotal)}\n`;
+                reportContent += `  Line Item Total: ${formatCurrency(lineTotal)}\n`;
             });
 
             reportContent += `\nEnd of Report\n`;
