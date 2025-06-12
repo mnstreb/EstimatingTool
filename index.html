@@ -640,20 +640,20 @@
                     <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div>
                     <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
                     <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">15.00%</strong></div>
-                    <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">8.25%</strong></div>
-                    <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">5.00%</strong></div>
+                    <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">0.00%</strong></div>
+                    <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">0.00%</strong></div>
+                    <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">0.00%</strong></div>
                     <div class="summary-item"><span>Additional Considerations:</span> <strong id="summaryAdditionalConsiderations">$0.00</strong></div>
                 </div>
 
                 <div class="card summary-block">
-                    <h4>Labor Breakdown</h4>
-                    <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">$0.00</strong></div>
+                    <h4>Labor Breakdown (Hours)</h4> <!-- Updated title here -->
+                    <div class="summary-item"><span>Project Manager:</span> <strong id="laborPMTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <div class="summary-item"><span>Superintendent:</span> <strong id="laborSuperintendentTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">0.00</strong></div> <!-- Updated to hours -->
+                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">0.00</strong></div> <!-- Updated to hours -->
                 </div>
 
                 <div class="card summary-block">
@@ -916,6 +916,11 @@
             }).format(amount);
         }
 
+        // Helper function for hours formatting (2 decimal places)
+        function formatHours(hours) {
+            return parseFloat(hours).toFixed(2);
+        }
+
         // Global variables for project settings
         let projectSettings = {
             projectName: "Commercial Construction Project",
@@ -930,13 +935,13 @@
             contractorLogo: "",
             projectType: "Commercial",
             projectState: "CA",
-            profitMargin: 0, // Changed to 0
-            salesTax: 0, // Changed to 0, will be updated by state on load
-            miscellaneous: 0, // Changed to 0
-            overhead: 0, // Changed to 0
+            profitMargin: 0,
+            salesTax: 0,
+            miscellaneous: 0,
+            overhead: 0,
             additionalConsiderationsType: '%',
             additionalConsiderationsValue: 0,
-            // Define labor rates nested by trade (these are still default, but individual labor rates can be changed in Step 2)
+            // Define labor rates nested by trade
             allTradeLaborRates: {
                 "General": {
                     "Project Manager": 120,
@@ -986,11 +991,11 @@
                 "Landscaping": { "Project Manager": 100, "Superintendent": 85, "General Foreman": 75, "Foreman": 70, "Journeyman": 60, "Apprentice": 40 }
             },
             activeTrades: ["General"],
-            travelCost: 0, // Changed to 0
-            equipmentCost: 0, // Changed to 0
-            fixedCost: 0, // Changed to 0
-            subcontractorCost: 0, // Changed to 0
-            allowanceCost: 0 // Changed to 0
+            travelCost: 0,
+            equipmentCost: 0,
+            fixedCost: 0,
+            subcontractorCost: 0,
+            allowanceCost: 0
         };
 
         // Estimate data structure
@@ -1050,6 +1055,7 @@
         const summaryAdditionalConsiderations = document.getElementById('summaryAdditionalConsiderations');
 
 
+        // Note: These now represent *hours* in the Labor Breakdown summary
         const laborPMTotal = document.getElementById('laborPMTotal');
         const laborSuperintendentTotal = document.getElementById('laborSuperintendentTotal');
         const laborGeneralForemanTotal = document.getElementById('laborGeneralForemanTotal');
@@ -1077,15 +1083,9 @@
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             showSetup();
-            // Set initial state tax based on default CA, if it's set in projectSettings.projectState
-            // This will override the 0 just set for salesTax, which is expected behavior for state-based tax.
-            updateSalesTaxForState(projectSettings.projectState);
-
-            // Populate trades dropdown and display
+            updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
             populateTradesDropdown();
             updateSelectedTradesDisplay();
-
-            loadSavedLogo();
         });
 
         // --- Logo Upload Logic ---
@@ -1840,6 +1840,9 @@
             let totalMarkupAllowance = 0;
 
             let laborBreakdown = {};
+            // NEW: Object to store labor hours breakdown
+            let laborHoursBreakdown = {};
+
             const allPossibleRoles = new Set();
             Object.keys(projectSettings.allTradeLaborRates).forEach(trade => {
                 if (projectSettings.allTradeLaborRates[trade]) {
@@ -1848,6 +1851,7 @@
             });
             allPossibleRoles.forEach(role => {
                 laborBreakdown[role] = 0;
+                laborHoursBreakdown[role] = 0; // Initialize hours breakdown
             });
 
 
@@ -1871,6 +1875,7 @@
 
                 if (laborBreakdown[item.rateRole] !== undefined) {
                     laborBreakdown[item.rateRole] += laborTotal;
+                    laborHoursBreakdown[item.rateRole] += item.hours; // Accumulate hours here
                 }
             });
 
@@ -1916,17 +1921,17 @@
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
             summaryAdditionalConsiderations.textContent = formatCurrency(additionalConsiderationAmount);
 
-            // Update Labor Breakdown (middle card)
+            // Update Labor Breakdown (middle card) - NOW DISPLAYS HOURS
             const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
             const laborBreakdownContainer = document.querySelector('.summary-block:nth-child(2)');
-            let currentHtml = `<h4>Labor Breakdown</h4>`;
+            let currentHtml = `<h4>Labor Breakdown (Hours)</h4>`; // Updated title
                                 
             defaultRoles.forEach(role => {
-                currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatCurrency(laborBreakdown[role] || 0)}</strong></div>`;
+                currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
             });
-            Object.keys(laborBreakdown).sort().forEach(role => {
+            Object.keys(laborHoursBreakdown).sort().forEach(role => { // Iterate through hours breakdown
                 if (!defaultRoles.includes(role)) {
-                    currentHtml += `<div class="summary-item"><span>${role}:</span> <strong>${formatCurrency(laborBreakdown[role] || 0)}</strong></div>`;
+                    currentHtml += `<div class="summary-item"><span>${role}:</span> <strong>${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
                 }
             });
             laborBreakdownContainer.innerHTML = currentHtml;
@@ -2020,6 +2025,7 @@
             let totalMarkupAllowance = 0;
 
             let laborBreakdownReport = {};
+            let laborHoursBreakdownReport = {}; // NEW: For hours in report
             let totalLaborHoursReport = 0;
 
             const allPossibleRolesReport = new Set();
@@ -2030,6 +2036,7 @@
             });
             allPossibleRolesReport.forEach(role => {
                 laborBreakdownReport[role] = 0;
+                laborHoursBreakdownReport[role] = 0; // Initialize hours breakdown for report
             });
 
 
@@ -2054,6 +2061,7 @@
 
                 if (laborBreakdownReport[item.rateRole] !== undefined) {
                     laborBreakdownReport[item.rateRole] += laborTotal;
+                    laborHoursBreakdownReport[item.rateRole] += item.hours; // Accumulate hours for report
                 }
             });
 
@@ -2115,15 +2123,15 @@
             reportContent += `Additional Considerations (${projectSettings.additionalConsiderationsValue.toFixed(2)}${projectSettings.additionalConsiderationsType}): ${formatCurrency(additionalConsiderationAmount)}\n\n`;
 
 
-            reportContent += `LABOR BREAKDOWN:\n`;
+            reportContent += `LABOR BREAKDOWN (HOURS):\n`; // Updated title
             reportContent += `-------------------------------------------------\n`;
             const defaultRolesReport = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
             defaultRolesReport.forEach(role => {
-                reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role] || 0)}\n`;
+                reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`; // Use formatHours
             });
-            Object.keys(laborBreakdownReport).sort().forEach(role => {
+            Object.keys(laborHoursBreakdownReport).sort().forEach(role => {
                 if (!defaultRolesReport.includes(role)) {
-                    reportContent += `${role}: ${formatCurrency(laborBreakdownReport[role])}\n`;
+                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role])}\n`; // Use formatHours
                 }
             });
             reportContent += `\n`;
