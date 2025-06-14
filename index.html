@@ -92,7 +92,7 @@
             padding: 15px; /* More padding */
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
-            white-space: nowrap; /* Prevent text wrapping in table headers/cells */
+            /* white-space: nowrap; */ /* Removed from general td/th to allow wrapping if needed, but will control with fixed widths */
         }
         th {
             background: #f3f4f6; /* Softer header background */
@@ -654,18 +654,69 @@
         }
 
         /* Custom styles for Task Name and Description fields to make them wider */
-        .task-name-col {
-            width: 18%; /* Allocate more width to Task Name */
-        }
-        .description-col {
-            width: 25%; /* Allocate more width to Description */
-        }
-        /* Adjust other columns if necessary to fit */
-        .labor-col, .materials-col, .other-col, .total-col, .actions-col {
-             /* Example: Distribute remaining space, adjust as needed */
-             /* Removed fixed widths to allow more flexibility */
+        /* Increased min-width of the table to ensure horizontal scroll if needed */
+        table.min-w-full {
+            min-width: 1400px; /* Increased minimum width for better spacing */
+            width: 100%; /* Still allows stretching if screen is wider */
         }
 
+        /* General td padding adjustment for a more compact look */
+        #estimateTableBody td {
+            padding: 8px 10px;
+        }
+
+        /* Styles for Task Name and Description Textareas */
+        #estimateTableBody td:nth-child(1) textarea, /* Task Name */
+        #estimateTableBody td:nth-child(2) textarea { /* Description */
+            white-space: normal; /* Allow text to wrap */
+            height: auto; /* Auto height based on content */
+            min-height: 40px; /* Minimum height for visibility */
+            box-sizing: border-box;
+            resize: vertical; /* Allow vertical resizing */
+            overflow-y: auto; /* Add scrollbar if content exceeds min-height */
+        }
+        /* Ensure these textareas fill their cell width */
+        #estimateTableBody td:nth-child(1) textarea,
+        #estimateTableBody td:nth-child(2) textarea {
+            width: 100%; /* Fill the cell */
+            max-width: none; /* Override any max-width */
+        }
+
+        /* Styles for compact numerical input fields and selects */
+        #estimateTableBody input[type="number"],
+        #estimateTableBody select {
+            width: 70px; /* A fixed, smaller width for numerical inputs */
+            font-size: 0.9em; /* Smaller font for inputs */
+            padding: 6px 8px; /* Reduced padding */
+            box-sizing: border-box; /* Include padding/border in width */
+            text-align: right; /* Align numbers to the right */
+        }
+
+        /* Specific width adjustments for 'Skill' and 'OT/DT' selects */
+        #estimateTableBody td:nth-child(3) select, /* OT/DT Multiplier */
+        #estimateTableBody td:nth-child(4) select { /* Skill */
+            width: 90px; /* Slightly more space for selects */
+            text-align: left; /* Keep text aligned left for selections */
+        }
+
+        /* Keep currency output and total values on one line and bold */
+        #estimateTableBody td:nth-child(5), /* $/hr */
+        #estimateTableBody td:nth-child(7), /* Labor Total */
+        #estimateTableBody td:nth-child(10), /* Materials Total */
+        #estimateTableBody td:nth-child(14), /* Other Total */
+        #estimateTableBody td:nth-child(15) { /* TOTAL */
+            white-space: nowrap;
+            font-weight: bold;
+            color: #1f2937; /* Darker text for totals */
+            text-align: right; /* Align currency/totals to the right */
+        }
+        
+        /* Adjust actions column button size */
+        #estimateTableBody td button.btn-red {
+            padding: 6px 10px; /* Smaller padding for action button */
+            font-size: 0.85em; /* Smaller font */
+        }
+        
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -755,32 +806,26 @@
             <table class="min-w-full">
                 <thead>
                     <tr>
-                        <th class="task-name-col">Task Name</th>
-                        <th class="description-col">Description</th>
+                        <th rowspan="2" class="task-name-col">Task Name</th>
+                        <th rowspan="2" class="description-col">Description</th>
                         <th colspan="5" class="text-center labor-col">LABOR</th>
                         <th colspan="3" class="text-center materials-col">MATERIALS</th>
                         <th colspan="3" class="text-center other-col">OTHER</th>
-                        <th class="total-col">TOTAL</th>
-                        <th class="actions-col">Actions</th>
+                        <th rowspan="2" class="total-col">TOTAL</th>
+                        <th rowspan="2" class="actions-col">Actions</th>
                     </tr>
                     <tr>
-                        <!-- Placeholder for Task Name and Description columns in the second header row -->
-                        <th></th>
-                        <th></th>
-                        <th>OT/DT</th>
-                        <th>Skill</th>
-                        <th>$/hr</th>
-                        <th># hrs</th>
-                        <th>Labor Total</th>
-                        <th>QTY / UNIT</th>
-                        <th>$ / UNIT</th>
-                        <th>Materials Total</th>
-                        <th>Equipment / Rental</th>
-                        <th>Subcontractor</th>
-                        <th>Misc.</th>
-                        <!-- Note: 'Other Total' removed from this row as it's a sum at the next level -->
-                        <th></th> <!-- Placeholder for TOTAL -->
-                        <th></th> <!-- Placeholder for Actions -->
+                        <th class="border-b">OT/DT</th>
+                        <th class="border-b">Skill</th>
+                        <th class="border-b">$/hr</th>
+                        <th class="border-b"># hrs</th>
+                        <th class="border-b">Labor Total</th>
+                        <th class="border-b">QTY / UNIT</th>
+                        <th class="border-b">$ / UNIT</th>
+                        <th class="border-b">Materials Total</th>
+                        <th class="border-b">Equipment / Rental</th>
+                        <th class="border-b">Subcontractor</th>
+                        <th class="border-b">Misc.</th>
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -2019,8 +2064,8 @@
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td data-label="Task Name"><input type="text" value="${item.taskName}" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field"></td>
-                    <td data-label="Description"><input type="text" value="${item.description}" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field"></td>
+                    <td data-label="Task Name"><textarea rows="2" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field">${item.taskName}</textarea></td>
+                    <td data-label="Description"><textarea rows="2" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field">${item.description}</textarea></td>
                     
                     <td data-label="OT/DT Multiplier">
                         <select onchange="updateItem(${item.id}, 'otDtMultiplier', this.value)" class="input-field">
