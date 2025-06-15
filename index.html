@@ -264,7 +264,7 @@
             font-weight: 800;
             line-height: 1;
         }
-         /* Pie Chart specific styles (now in top row, also a card) */
+        /* Pie Chart specific styles (now in top row, also a card) */
         .chart-container.card { /* Make it a card for consistent styling */
             padding: 20px; /* Adjust padding for visual balance */
             display: flex;
@@ -727,7 +727,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PHBhdGggZD0iTTE2LjIgNy44TDIwLjIgMTEuOE0zLjggMTIuMkw3LjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDExLjggMy44TDEyLjIgMy44TDE2LjIgNy44Ii8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLjhMMTYuMiA3LjhDIi8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -786,7 +786,7 @@
                     <div class="summary-item"><span>Material Total:</span> <strong id="breakdownMaterialTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Equipment Total:</span> <strong id="breakdownEquipmentTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Sub-contractor Total:</span> <strong id="breakdownSubcontractorTotal">$0.00</strong></div>
-                    <div class="summary-item"><span>Misc. Total (Line Items):</span> <strong id="breakdownMiscCost">0.00</strong></div>
+                    <div class="summary-item"><span>Misc. Total (Line Items):</span> <strong id="breakdownMiscCost">$0.00</strong></div>
                     <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
                 </div>
 
@@ -840,10 +840,10 @@
                 <!-- Logo Upload Area -->
                 <input type="file" id="logoUploadInput" accept="image/*" style="display: none;">
                 <div id="logoUploadArea" class="logo-upload-area"
-                     ondragover="event.preventDefault(); this.classList.add('drag-over');"
-                     ondragleave="this.classList.remove('drag-over');"
-                     ondrop="handleLogoDrop(event); this.classList.remove('drag-over');"
-                     onclick="document.getElementById('logoUploadInput').click();">
+                    ondragover="event.preventDefault(); this.classList.add('drag-over');"
+                    ondragleave="this.classList.remove('drag-over');"
+                    ondrop="handleLogoDrop(event); this.classList.remove('drag-over');"
+                    onclick="document.getElementById('logoUploadInput').click();">
                     <img id="wizardLogoPreview" class="uploaded-logo hidden" src="" alt="Contractor Logo">
                     <span id="defaultLogoIcon" class="default-icon">🏗️</span>
                     <p id="uploadText" class="upload-text">Drag & drop your logo here, or click to upload</p>
@@ -935,7 +935,7 @@
                         <label for="projectID" class="label">Project ID/Number:</label>
                         <input type="text" id="projectID" class="input-field" placeholder="e.g., PROJ-001">
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label for="projectDescription" class="label">Project Description/Scope Summary:</label>
                         <textarea id="projectDescription" class="input-field" rows="4" placeholder="Briefly describe the project scope..."></textarea>
                     </div>
@@ -1320,7 +1320,7 @@
 
         // Executive Summary elements
         const summaryProjectCost = document.getElementById('summaryProjectCost');
-        const summaryMiscCost = document.getElementById('summaryMiscCost');
+        const summaryMiscCost = document.getElementById('summaryMiscCost'); // This refers to the project-level Misc (%)
         const summaryMarkup = document.getElementById('summaryMarkup');
         const summaryEstimateSubtotal = document.getElementById('summaryEstimateSubtotal');
         const summaryProfitMargin = document.getElementById('summaryProfitMargin');
@@ -1340,11 +1340,14 @@
 
         const breakdownLaborTotal = document.getElementById('breakdownLaborTotal');
         const breakdownMaterialTotal = document.getElementById('breakdownMaterialTotal');
-        const breakdownTravelTotal = document.getElementById('breakdownTravelTotal');
+        // These are not directly used in the HTML breakdown section as global fields anymore,
+        // but can be kept for future expansion or clarity
+        const breakdownTravelTotal = document.getElementById('breakdownTravelTotal'); 
         const breakdownEquipmentTotal = document.getElementById('breakdownEquipmentTotal');
         const breakdownFixedTotal = document.getElementById('breakdownFixedTotal');
         const breakdownSubcontractorTotal = document.getElementById('breakdownSubcontractorTotal');
-        const breakdownAllowanceTotal = document.getElementById('breakdownAllowanceTotal');
+        const breakdownAllowanceTotal = document.getElementById('breakdownAllowanceTotal'); 
+        const breakdownMiscCostLineItems = document.getElementById('breakdownMiscCost'); // Added for line item misc total
         const breakdownOtherTotal = document.getElementById('breakdownOtherTotal');
 
         const projectInfoElem = document.getElementById('projectInfo');
@@ -1483,11 +1486,14 @@
 
             } else if (stepNumber === 2) {
                 for (const trade of projectSettings.activeTrades) {
-                    for (const role in projectSettings.allTradeLaborRates[trade]) {
-                        const rate = projectSettings.allTradeLaborRates[trade][role];
-                        if (isNaN(rate) || rate < 0) {
-                            renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid (${rate}). Please ensure all rates are non-negative numbers.`);
-                            return;
+                    // Only validate if the trade actually exists in the rates data
+                    if (projectSettings.allTradeLaborRates[trade]) {
+                        for (const role in projectSettings.allTradeLaborRates[trade]) {
+                            const rate = projectSettings.allTradeLaborRates[trade][role];
+                            if (isNaN(rate) || rate < 0) {
+                                renderMessageBox(`Labor rate for "${role}" in "${trade}" is not valid (${rate}). Please ensure all rates are non-negative numbers.`);
+                                return;
+                            }
                         }
                     }
                 }
@@ -1581,7 +1587,7 @@
             document.getElementById('startDate').value = projectSettings.startDate;
             document.getElementById('endDate').value = projectSettings.endDate;
             document.getElementById('projectID').value = projectSettings.projectID;
-            projectSettings.projectDescription = document.getElementById('projectDescription').value;
+            document.getElementById('projectDescription').value = projectSettings.projectDescription; // Corrected: assign value to textarea
 
             if (isAdvancedDetailsActive) {
                 advancedDetailsSection.classList.remove('hidden');
@@ -1762,8 +1768,8 @@
                 showAdvancedDetailsLink.textContent = 'Hide Advanced Details';
                 advancedDetailsSection.classList.remove('hidden');
             } else {
+                advancedDetailsLink.textContent = 'Show Advanced Details';
                 advancedDetailsSection.classList.add('hidden');
-                showAdvancedDetailsLink.textContent = 'Show Advanced Details';
             }
         }
 
@@ -1814,7 +1820,7 @@
             } else if (alreadyExistsForSome) {
                 renderMessageBox(`Skill level "${newTitle}" already exists for some or all selected trades. It was not added where it already existed.`);
             } else {
-                 renderMessageBox(`Skill level "${newTitle}" already exists for all selected trades or no trades are selected.`);
+                renderMessageBox(`Skill level "${newTitle}" already exists for all selected trades or no trades are selected.`);
             }
         }
 
@@ -2048,8 +2054,8 @@
                     item.trade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
                 }
                 if (!projectSettings.allTradeLaborRates[item.trade] || !projectSettings.allTradeLaborRates[item.trade][item.rateRole]) {
-                     const availableRoles = Object.keys(projectSettings.allTradeLaborRates[item.trade] || {});
-                     item.rateRole = availableRoles.length > 0 ? availableRoles[0] : "Journeyman";
+                    const availableRoles = Object.keys(projectSettings.allTradeLaborRates[item.trade] || {});
+                    item.rateRole = availableRoles.length > 0 ? availableRoles[0] : "Journeyman";
                 }
 
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
@@ -2078,13 +2084,13 @@
                         <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
                             ${(projectSettings.allTradeLaborRates[item.trade] ? Object.keys(projectSettings.allTradeLaborRates[item.trade]) : []).map(role => {
                                 return `<option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
-                                            ${role}
-                                        </option>`;
+                                                ${role}
+                                            </option>`;
                             }).join('')}
                             ${!projectSettings.allTradeLaborRates[item.trade] || Object.keys(projectSettings.allTradeLaborRates[item.trade]).length === 0 ? '<option value="" selected>No Skills</option>' : ''}
                         </select>
                     </td>
-                    <td data-label="$/hr">${formatCurrency(laborRate)}</td>
+                    <td data-label="$/hr">${formatCurrency(effectiveLaborRate)}</td>
                     <td data-label="# hrs"><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
                     <td data-label="Labor Total">${formatCurrency(laborTotal)}</td>
                     
@@ -2112,8 +2118,7 @@
             let totalProjectSubtotal = 0;
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalLineItemOtherCostsSum = 0;
-            // Removed allowance totals from here as they are no longer in line items per new layout
+            let totalLineItemOtherCostsSum = 0; // This aggregates Equipment, Subcontractor, Misc from line items
 
             let laborBreakdown = {};
             let laborHoursBreakdown = {};
@@ -2142,29 +2147,13 @@
                 totalProjectSubtotal += lineTotalEstimate;
                 totalLaborCost += laborTotal;
                 totalMaterialCost += materialsTotal;
-                totalLineItemOtherCostsSum += otherCategoryTotal;
+                totalLineItemOtherCostsSum += otherCategoryTotal; // Summing up 'other' costs from line items
 
                 if (laborBreakdown[item.rateRole] !== undefined) {
                     laborBreakdown[item.rateRole] += laborTotal;
                     laborHoursBreakdown[item.rateRole] += item.hours;
                 }
             });
-
-            // Note: Global other costs (travel, equipment, fixed, subcontractor, allowance) are not explicitly
-            // requested in the executive summary breakdown based on the new line item layout.
-            // If these are still needed in the total calculation or executive summary, they should be added back
-            // into projectSettings and referenced here. For now, we will assume line item level costs
-            // are the primary input for project cost breakdown.
-            const globalOtherCosts = projectSettings.travelCost + projectSettings.equipmentCost +
-                                     projectSettings.fixedCost + projectSettings.subcontractorCost +
-                                     projectSettings.allowanceCost;
-            
-            // The previous otherTotal was totalLineItemOtherCostsSum + globalOtherCosts.
-            // With the new layout, we assume 'Other' is strictly from line items.
-            // If global costs are still desired, they need to be defined outside line items.
-            // For now, aligning with the new 'OTHER' section in the table.
-            const breakdownTotalOtherCosts = totalLineItemOtherCostsSum; 
-
 
             const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
 
@@ -2183,7 +2172,6 @@
                 additionalConsiderationAmount = projectSettings.additionalConsiderationsValue;
             }
 
-            // Recalculating grandTotal based on new columns
             const grandTotal = estimateSubtotalAmount + salesTaxAmount + additionalConsiderationAmount;
 
 
@@ -2207,7 +2195,7 @@
             const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
             const laborBreakdownContainer = document.querySelector('.executive-summary-grid-3col .summary-block:nth-child(1)'); // Adjusted selector
             let currentHtml = `<h4>Labor Breakdown (Hours)</h4>`;
-                                
+                                        
             defaultRoles.forEach(role => {
                 currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
             });
@@ -2220,43 +2208,23 @@
 
 
             // Update Project Cost Breakdown (right card, still in second row)
-            breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
-            breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
-            
-            // These used to be global, now assuming they come from line items or are removed for simplicity of this table
-            breakdownTravelTotal.textContent = formatCurrency(0); // Travel was part of equipmentTravel before
-            breakdownEquipmentTotal.textContent = formatCurrency(0); // Equipment was part of equipmentTravel before
-            breakdownFixedTotal.textContent = formatCurrency(0); // Fixed cost removed from line item structure
-            breakdownSubcontractorTotal.textContent = formatCurrency(0); // This is now a line item specific input
-            breakdownAllowanceTotal.textContent = formatCurrency(0); // Allowances removed from line item structure
-            breakdownOtherTotal.textContent = formatCurrency(breakdownTotalOtherCosts); // This is sum of line item other costs
-
-            // To make Project Cost Breakdown accurate based on new line item structure,
-            // we should sum respective values across all estimateItems.
             const totalEquipmentRentalCost = estimateItems.reduce((acc, item) => acc + item.equipmentRentalCost, 0);
             const totalSubcontractorLineItemCost = estimateItems.reduce((acc, item) => acc + item.subcontractorCostLineItem, 0);
             const totalMiscLineItemCost = estimateItems.reduce((acc, item) => acc + item.miscLineItem, 0);
-
-            // Added for clarity, as previous code had a 'Travel Total' and 'Fixed Total'
-            // For now, setting them to 0 as they aren't explicit line item fields in the new spec.
-            // If the user wants them to sum certain 'other' fields, we'd need to adjust.
-            breakdownTravelTotal.textContent = formatCurrency(0);
-            breakdownFixedTotal.textContent = formatCurrency(0);
+            
+            breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
+            breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
             breakdownEquipmentTotal.textContent = formatCurrency(totalEquipmentRentalCost);
             breakdownSubcontractorTotal.textContent = formatCurrency(totalSubcontractorLineItemCost);
-            // This element doesn't exist, will need to be added to HTML for a separate display or combined into breakdownOtherTotal
-            // breakdownMiscCost.textContent = formatCurrency(totalMiscLineItemCost);
-            
-            // Redoing other totals for project cost breakdown.
+            breakdownMiscCostLineItems.textContent = formatCurrency(totalMiscLineItemCost); // Now using the correct element for line item misc
             breakdownOtherTotal.textContent = formatCurrency(totalEquipmentRentalCost + totalSubcontractorLineItemCost + totalMiscLineItemCost);
 
-
-            // Render Pie Chart (now in second row)
-            renderPieChart(totalLaborCost, totalMaterialCost);
+            // Render Pie Chart (now in second row) - Pass totalLineItemOtherCostsSum
+            renderPieChart(totalLaborCost, totalMaterialCost, totalLineItemOtherCostsSum);
         }
 
         // --- Pie Chart Rendering ---
-        function renderPieChart(laborTotal, materialTotal) {
+        function renderPieChart(laborTotal, materialTotal, otherTotal) { // Added otherTotal parameter
             if (laborMaterialPieChart) {
                 laborMaterialPieChart.destroy();
             }
@@ -2265,16 +2233,18 @@
             laborMaterialPieChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Labor Cost', 'Material Cost'],
+                    labels: ['Labor Cost', 'Material Cost', 'Other Costs'], // Added 'Other Costs' label
                     datasets: [{
-                        data: [laborTotal, materialTotal],
+                        data: [laborTotal, materialTotal, otherTotal], // Added otherTotal to data
                         backgroundColor: [
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(16, 185, 129, 0.8)'
+                            'rgba(59, 130, 246, 0.8)', // Blue for Labor
+                            'rgba(16, 185, 129, 0.8)', // Green for Material
+                            'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
                         ],
                         borderColor: [
                             'rgba(255, 255, 255, 1)',
-                            'rgba(255, 255, 255, 1)'
+                            'rgba(255, 255, 255, 1)',
+                            'rgba(255, 255, 255, 1)' // Border for Other Costs
                         ],
                         borderWidth: 2
                     }]
@@ -2325,7 +2295,6 @@
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
             let totalLineItemOtherCostsSum = 0;
-            // Removed allowance totals from report generation as they are no longer in line items per new layout
 
             let laborBreakdownReport = {};
             let laborHoursBreakdownReport = {};
@@ -2460,22 +2429,22 @@
                 const lineTotal = laborTotal + materialsTotal + otherCategoryTotal;
 
                 reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
-                reportContent += `  Description: ${item.description || 'No description'}\n`;
-                reportContent += `  --- LABOR ---\n`;
-                reportContent += `    OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
-                reportContent += `    Skill: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
-                reportContent += `    # Hours: ${item.hours.toFixed(2)}\n`;
-                reportContent += `    Labor Total: ${formatCurrency(laborTotal)}\n`;
-                reportContent += `  --- MATERIALS ---\n`;
-                reportContent += `    Quantity / Unit: ${item.materialQuantity}\n`;
-                reportContent += `    $ / Unit: ${formatCurrency(item.materialUnitCost)}\n`;
-                reportContent += `    Materials Total: ${formatCurrency(materialsTotal)}\n`;
-                reportContent += `  --- OTHER ---\n`;
-                reportContent += `    Equipment / Rental: ${formatCurrency(item.equipmentRentalCost)}\n`;
-                reportContent += `    Subcontractor: ${formatCurrency(item.subcontractorCostLineItem)}\n`;
-                reportContent += `    Misc. Cost: ${formatCurrency(item.miscLineItem)}\n`;
-                reportContent += `    Other Total: ${formatCurrency(otherCategoryTotal)}\n`;
-                reportContent += `  Line Item Total: ${formatCurrency(lineTotal)}\n`;
+                reportContent += `    Description: ${item.description || 'No description'}\n`;
+                reportContent += `    --- LABOR ---\n`;
+                reportContent += `      OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
+                reportContent += `      Skill: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
+                reportContent += `      # Hours: ${item.hours.toFixed(2)}\n`;
+                reportContent += `      Labor Total: ${formatCurrency(laborTotal)}\n`;
+                reportContent += `    --- MATERIALS ---\n`;
+                reportContent += `      Quantity / Unit: ${item.materialQuantity}\n`;
+                reportContent += `      $ / Unit: ${formatCurrency(item.materialUnitCost)}\n`;
+                reportContent += `      Materials Total: ${formatCurrency(materialsTotal)}\n`;
+                reportContent += `    --- OTHER ---\n`;
+                reportContent += `      Equipment / Rental: ${formatCurrency(item.equipmentRentalCost)}\n`;
+                reportContent += `      Subcontractor: ${formatCurrency(item.subcontractorCostLineItem)}\n`;
+                reportContent += `      Misc. Cost: ${formatCurrency(item.miscLineItem)}\n`;
+                reportContent += `      Other Total: ${formatCurrency(otherCategoryTotal)}\n`;
+                reportContent += `    Line Item Total: ${formatCurrency(lineTotal)}\n`;
             });
 
             reportContent += `\nEnd of Report\n`;
