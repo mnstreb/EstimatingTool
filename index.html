@@ -365,11 +365,6 @@
                 font-weight: bold;
                 color: #4b5563;
             }
-            /* Specific adjustments for input fields in responsive table cells */
-            td .input-field, td select {
-                width: calc(100% - 10px); /* Adjust width to fit within cell padding */
-                text-align: right; /* Align input text to the right */
-            }
             td:nth-of-type(1):before { content: "Task Name:"; }
             td:nth-of-type(2):before { content: "Description:"; }
             td:nth-of-type(3):before { content: "OT/DT Multiplier:"; }
@@ -778,6 +773,7 @@
                     <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">0.00</strong></div>
                     <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">0.00</strong></div>
                     <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">0.00</strong></div>
+                    <div class="summary-item total"><span>Total Labor Hours:</span> <strong id="breakdownLaborHoursTotal">0.00</strong></div>
                 </div>
 
                 <div class="card summary-block">
@@ -787,12 +783,12 @@
                     <div class="summary-item"><span>Equipment Total:</span> <strong id="breakdownEquipmentTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Sub-contractor Total:</span> <strong id="breakdownSubcontractorTotal">$0.00</strong></div>
                     <div class="summary-item"><span>Misc. Total (Line Items):</span> <strong id="breakdownMiscCost">$0.00</strong></div>
-                    <div class="summary-item total"><span>Total Other Costs:</span> <strong id="breakdownOtherTotal">$0.00</strong></div>
+                    <div class="summary-item total"><span>Total Project Cost:</span> <strong id="breakdownProjectTotal">$0.00</strong></div>
                 </div>
 
                 <!-- Pie Chart Container (MOVED HERE) -->
                 <div class="chart-container card">
-                    <h4 style="margin-top:0;">Labor vs. Material Cost Distribution</h4>
+                    <h4 style="margin-top:0;">Cost Distribution</h4>
                     <canvas id="laborMaterialPieChart" class="chart-canvas"></canvas>
                 </div>
             </div>
@@ -887,7 +883,7 @@
                         <option value="FL">Florida</option>
                         <option value="WA">Washington</option>
                         <option value="IL">Illinois</option>
-                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</s option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</s option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
                 
@@ -1337,18 +1333,15 @@
         const laborForemanTotal = document.getElementById('laborForemanTotal');
         const laborJourneymanTotal = document.getElementById('laborJourneymanTotal');
         const laborApprenticeTotal = document.getElementById('laborApprenticeTotal');
+        const breakdownLaborHoursTotal = document.getElementById('breakdownLaborHoursTotal'); // New element for total labor hours in breakdown
 
         const breakdownLaborTotal = document.getElementById('breakdownLaborTotal');
         const breakdownMaterialTotal = document.getElementById('breakdownMaterialTotal');
-        // These are not directly used in the HTML breakdown section as global fields anymore,
-        // but can be kept for future expansion or clarity
-        const breakdownTravelTotal = document.getElementById('breakdownTravelTotal'); 
         const breakdownEquipmentTotal = document.getElementById('breakdownEquipmentTotal');
-        const breakdownFixedTotal = document.getElementById('breakdownFixedTotal');
         const breakdownSubcontractorTotal = document.getElementById('breakdownSubcontractorTotal');
-        const breakdownAllowanceTotal = document.getElementById('breakdownAllowanceTotal'); 
         const breakdownMiscCostLineItems = document.getElementById('breakdownMiscCost'); // Added for line item misc total
         const breakdownOtherTotal = document.getElementById('breakdownOtherTotal');
+        const breakdownProjectTotal = document.getElementById('breakdownProjectTotal'); // New element for total project cost in breakdown
 
         const projectInfoElem = document.getElementById('projectInfo');
         const laborMaterialPieChartCanvas = document.getElementById('laborMaterialPieChart');
@@ -2019,7 +2012,7 @@
                 otDtMultiplier: 1.0,
                 materialQuantity: 0, // was materialUnits
                 materialUnitCost: 0, // was materialPerUnit
-                equipmentRentalCost: 0, // was equipmentTravel
+                equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
                 miscLineItem: 0 // New field
             };
@@ -2115,14 +2108,16 @@
         // --- Calculations ---
 
         function calculateTotals() {
-            let totalProjectSubtotal = 0;
-            let totalLaborCost = 0;
-            let totalMaterialCost = 0;
-            let totalLineItemOtherCostsSum = 0; // This aggregates Equipment, Subcontractor, Misc from line items
+            let totalProjectSubtotal = 0; // This accumulates the total direct cost from all line items
+            let totalLaborCost = 0; // Accumulates total labor cost from line items
+            let totalMaterialCost = 0; // Accumulates total material cost from line items
+            let totalEquipmentCost = 0; // Accumulates equipment cost from line items
+            let totalSubcontractorCost = 0; // Accumulates subcontractor cost from line items
+            let totalMiscLineItemCosts = 0; // Accumulates misc line item costs
 
-            let laborBreakdown = {};
-            let laborHoursBreakdown = {};
+            let laborHoursBreakdown = {}; // This accumulates hours per role for the UI
 
+            // Initialize all possible labor roles to 0 for consistent display
             const allPossibleRoles = new Set();
             Object.keys(projectSettings.allTradeLaborRates).forEach(trade => {
                 if (projectSettings.allTradeLaborRates[trade]) {
@@ -2130,7 +2125,6 @@
                 }
             });
             allPossibleRoles.forEach(role => {
-                laborBreakdown[role] = 0;
                 laborHoursBreakdown[role] = 0;
             });
 
@@ -2140,29 +2134,34 @@
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
                 const materialsTotal = item.materialQuantity * item.materialUnitCost;
-                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
                 
-                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
-
-                totalProjectSubtotal += lineTotalEstimate;
                 totalLaborCost += laborTotal;
                 totalMaterialCost += materialsTotal;
-                totalLineItemOtherCostsSum += otherCategoryTotal; // Summing up 'other' costs from line items
-
-                if (laborBreakdown[item.rateRole] !== undefined) {
-                    laborBreakdown[item.rateRole] += laborTotal;
+                totalEquipmentCost += item.equipmentRentalCost;
+                totalSubcontractorCost += item.subcontractorCostLineItem;
+                totalMiscLineItemCosts += item.miscLineItem;
+                
+                const lineTotalEstimate = laborTotal + materialsTotal + item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
+                totalProjectSubtotal += lineTotalEstimate;
+                
+                if (laborHoursBreakdown[item.rateRole] !== undefined) {
                     laborHoursBreakdown[item.rateRole] += item.hours;
                 }
             });
+            
+            // Total labor hours for overall summary
+            const overallLaborHoursSum = Object.values(laborHoursBreakdown).reduce((sum, hours) => sum + hours, 0);
 
+            // Sum of all 'Other' category costs for the pie chart
+            const totalOtherCostsForPieChart = totalEquipmentCost + totalSubcontractorCost + totalMiscLineItemCosts;
+
+
+            // Calculate project-level overhead, misc, profit, tax
             const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
-
-            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100); // This is project-level misc now
+            const totalMiscCostAmount = totalProjectSubtotal * (projectSettings.miscellaneous / 100);
             const subtotalBeforeProfitTax = totalProjectSubtotal + totalMiscCostAmount + totalOverheadCost;
-
             const totalMarkupAmount = subtotalBeforeProfitTax * (projectSettings.profitMargin / 100);
             const estimateSubtotalAmount = subtotalBeforeProfitTax + totalMarkupAmount;
-
             const salesTaxAmount = estimateSubtotalAmount * (projectSettings.salesTax / 100);
             
             let additionalConsiderationAmount = 0;
@@ -2175,14 +2174,16 @@
             const grandTotal = estimateSubtotalAmount + salesTaxAmount + additionalConsiderationAmount;
 
 
-            // Update Top-level Summary UI
+            // --- Update UI Elements ---
+
+            // Top-level Summary UI
             summaryTotalProposalElem.textContent = formatCurrency(grandTotal);
-            summaryOverallLaborHoursElem.textContent = estimateItems.reduce((acc, item) => acc + item.hours, 0).toFixed(2);
+            summaryOverallLaborHoursElem.textContent = overallLaborHoursSum.toFixed(2);
 
 
-            // Update Executive Summary UI (now in top row)
-            summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal);
-            summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount); // This is project-level misc now
+            // Executive Summary UI (top row)
+            summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal); // This is the total direct cost from line items
+            summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
             summaryOverhead.textContent = formatCurrency(totalOverheadCost);
             summaryMarkup.textContent = formatCurrency(totalMarkupAmount);
             summaryEstimateSubtotal.textContent = formatCurrency(estimateSubtotalAmount);
@@ -2191,36 +2192,42 @@
             summaryMiscPercent.textContent = `${projectSettings.miscellaneous.toFixed(2)}%`;
             summaryAdditionalConsiderations.textContent = formatCurrency(additionalConsiderationAmount);
 
-            // Update Labor Breakdown (middle card, now in second row)
+            // Labor Breakdown (Hours) - middle card in second row
             const defaultRoles = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
-            const laborBreakdownContainer = document.querySelector('.executive-summary-grid-3col .summary-block:nth-child(1)'); // Adjusted selector
+            const laborBreakdownContainer = document.querySelector('.executive-summary-grid-3col .summary-block:nth-child(1)');
             let currentHtml = `<h4>Labor Breakdown (Hours)</h4>`;
                                         
+            // Display default roles first
             defaultRoles.forEach(role => {
                 currentHtml += `<div class="summary-item"><span>${role}:</span> <strong id="labor${role.replace(/\s/g, '')}Total">${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
             });
+            // Then display any custom roles
             Object.keys(laborHoursBreakdown).sort().forEach(role => {
                 if (!defaultRoles.includes(role)) {
                     currentHtml += `<div class="summary-item"><span>${role}:</span> <strong>${formatHours(laborHoursBreakdown[role] || 0)}</strong></div>`;
                 }
             });
+            currentHtml += `<div class="summary-item total"><span>Total Labor Hours:</span> <strong id="breakdownLaborHoursTotal">${formatHours(overallLaborHoursSum)}</strong></div>`;
             laborBreakdownContainer.innerHTML = currentHtml;
 
 
-            // Update Project Cost Breakdown (right card, still in second row)
-            const totalEquipmentRentalCost = estimateItems.reduce((acc, item) => acc + item.equipmentRentalCost, 0);
-            const totalSubcontractorLineItemCost = estimateItems.reduce((acc, item) => acc + item.subcontractorCostLineItem, 0);
-            const totalMiscLineItemCost = estimateItems.reduce((acc, item) => acc + item.miscLineItem, 0);
-            
+            // Project Cost Breakdown - right card in second row
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
             breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
-            breakdownEquipmentTotal.textContent = formatCurrency(totalEquipmentRentalCost);
-            breakdownSubcontractorTotal.textContent = formatCurrency(totalSubcontractorLineItemCost);
-            breakdownMiscCostLineItems.textContent = formatCurrency(totalMiscLineItemCost); // Now using the correct element for line item misc
-            breakdownOtherTotal.textContent = formatCurrency(totalEquipmentRentalCost + totalSubcontractorLineItemCost + totalMiscLineItemCost);
+            breakdownEquipmentTotal.textContent = formatCurrency(totalEquipmentCost);
+            breakdownSubcontractorTotal.textContent = formatCurrency(totalSubcontractorCost);
+            breakdownMiscCostLineItems.textContent = formatCurrency(totalMiscLineItemCosts);
+            
+            // FIX: Ensure totalProjectCost is the sum of all components in this breakdown
+            document.getElementById('breakdownProjectTotal').textContent = formatCurrency(totalProjectSubtotal);
 
-            // Render Pie Chart (now in second row) - Pass totalLineItemOtherCostsSum
-            renderPieChart(totalLaborCost, totalMaterialCost, totalLineItemOtherCostsSum);
+
+            // Render Pie Chart - using the specific cost totals for Labor, Material, and OTHER
+            console.log('--- Pie Chart Data before rendering: ---');
+            console.log('Labor Cost (for Pie Chart):', totalLaborCost);
+            console.log('Material Cost (for Pie Chart):', totalMaterialCost);
+            console.log('Other Costs (for Pie Chart - Equipment + Subcontractor + Misc Line Items):', totalOtherCostsForPieChart);
+            renderPieChart(totalLaborCost, totalMaterialCost, totalOtherCostsForPieChart);
         }
 
         // --- Pie Chart Rendering ---
@@ -2294,10 +2301,11 @@
             let totalProjectSubtotal = 0;
             let totalLaborCost = 0;
             let totalMaterialCost = 0;
-            let totalLineItemOtherCostsSum = 0;
+            let totalEquipmentCostReport = 0;
+            let totalSubcontractorCostReport = 0;
+            let totalMiscLineItemCostReport = 0;
 
-            let laborBreakdownReport = {};
-            let laborHoursBreakdownReport = {};
+            let laborHoursBreakdownReport = {}; // Correctly for hours in report
             let totalLaborHoursReport = 0;
 
             const allPossibleRolesReport = new Set();
@@ -2307,7 +2315,6 @@
                 }
             });
             allPossibleRolesReport.forEach(role => {
-                laborBreakdownReport[role] = 0;
                 laborHoursBreakdownReport[role] = 0;
             });
 
@@ -2317,28 +2324,24 @@
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
                 const materialsTotal = item.materialQuantity * item.materialUnitCost;
-                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
-
-                const lineTotalEstimate = laborTotal + materialsTotal + otherCategoryTotal;
-
-                totalProjectSubtotal += lineTotalEstimate;
+                
                 totalLaborCost += laborTotal;
                 totalMaterialCost += materialsTotal;
-                totalLineItemOtherCostsSum += otherCategoryTotal;
+                totalEquipmentCostReport += item.equipmentRentalCost;
+                totalSubcontractorCostReport += item.subcontractorCostLineItem;
+                totalMiscLineItemCostReport += item.miscLineItem;
+
+                const lineTotalEstimate = laborTotal + materialsTotal + item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
+                totalProjectSubtotal += lineTotalEstimate;
+                
                 totalLaborHoursReport += item.hours;
 
-                if (laborBreakdownReport[item.rateRole] !== undefined) {
-                    laborBreakdownReport[item.rateRole] += laborTotal;
+                if (laborHoursBreakdownReport[item.rateRole] !== undefined) {
                     laborHoursBreakdownReport[item.rateRole] += item.hours;
                 }
             });
 
-            // Re-evaluating global other costs for report based on removed line item columns
-            const totalEquipmentRentalCostSum = estimateItems.reduce((acc, item) => acc + item.equipmentRentalCost, 0);
-            const totalSubcontractorLineItemCostSum = estimateItems.reduce((acc, item) => acc + item.subcontractorCostLineItem, 0);
-            const totalMiscLineItemCostSum = estimateItems.reduce((acc, item) => acc + item.miscLineItem, 0);
-
-            const breakdownTotalOtherCosts = totalEquipmentRentalCostSum + totalSubcontractorLineItemCostSum + totalMiscLineItemCostSum;
+            const totalOtherCostsSumReport = totalEquipmentCostReport + totalSubcontractorCostReport + totalMiscLineItemCostReport;
 
 
             const totalOverheadCost = totalProjectSubtotal * (projectSettings.overhead / 100);
@@ -2401,19 +2404,19 @@
             });
             Object.keys(laborHoursBreakdownReport).sort().forEach(role => {
                 if (!defaultRolesReport.includes(role)) {
-                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role])}\n`;
+                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`;
                 }
             });
-            reportContent += `\n`;
+            reportContent += `Total Labor Hours (Breakdown): ${formatHours(totalLaborHoursReport)}\n\n`;
 
             reportContent += `PROJECT COST BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
             reportContent += `Labor Total: ${formatCurrency(totalLaborCost)}\n`;
             reportContent += `Material Total: ${formatCurrency(totalMaterialCost)}\n`;
-            reportContent += `Equipment/Rental Total: ${formatCurrency(totalEquipmentRentalCostSum)}\n`;
-            reportContent += `Sub-contractor Total: ${formatCurrency(totalSubcontractorLineItemCostSum)}\n`;
-            reportContent += `Misc. Total (Line Items): ${formatCurrency(totalMiscLineItemCostSum)}\n`;
-            reportContent += `Total Other Costs (Aggregated): ${formatCurrency(breakdownTotalOtherCosts)}\n\n`;
+            reportContent += `Equipment/Rental Total: ${formatCurrency(totalEquipmentCostReport)}\n`;
+            reportContent += `Sub-contractor Total: ${formatCurrency(totalSubcontractorCostReport)}\n`;
+            reportContent += `Misc. Total (Line Items): ${formatCurrency(totalMiscLineItemCostReport)}\n`;
+            reportContent += `Total Project Cost (Direct): ${formatCurrency(totalProjectSubtotal)}\n\n`;
 
 
             reportContent += `ESTIMATE LINE ITEMS:\n`;
