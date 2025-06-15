@@ -988,7 +988,6 @@
                     <div class="summary-item"><span>General Foreman:</span> <strong id="laborGeneralForemanTotal">0.00</strong></div>
                     <div class="summary-item"><span>Foreman:</span> <strong id="laborForemanTotal">0.00</strong></div>
                     <div class="summary-item"><span>Journeyman:</span> <strong id="laborJourneymanTotal">0.00</strong></div>
-                    <div class="summary-item"><span>Apprentice:</span> <strong id="laborApprenticeTotal">0.00</strong></div>
                     <div class="summary-item total"><span>Total Labor Hours:</span> <strong id="breakdownLaborHoursTotal">0.00</strong></div>
                 </div>
 
@@ -1729,6 +1728,9 @@
                         'rgba(68, 185, 129, 0.8)', // Lighter Green for Material
                         'rgba(255, 182, 70, 0.8)'  // Lighter Orange for Other Costs
                     ];
+                    laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(200, 200, 200, 0.2)'; // Softer border for dark theme
+                    laborMaterialPieChart.data.datasets[0].borderWidth = 1; // Slightly thinner border
+
                     // Update legend label colors for dark theme
                     laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend
                     laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title
@@ -1744,6 +1746,9 @@
                         'rgba(16, 185, 129, 0.8)', // Green for Material
                         'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
                     ];
+                    laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(255, 255, 255, 1)'; // Original white border
+                    laborMaterialPieChart.data.datasets[0].borderWidth = 2; // Original border width
+
                     // Revert legend label colors to light theme
                     laborMaterialPieChart.options.plugins.legend.labels.color = '#1f2937'; // Dark text for legend
                     laborMaterialPieChart.options.plugins.title.font.color = '#1f2937'; // Dark text for title
@@ -2758,6 +2763,8 @@
                     'rgba(68, 185, 129, 0.8)',
                     'rgba(255, 182, 70, 0.8)'
                 ];
+                laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(200, 200, 200, 0.2)'; // Softer border for dark theme
+                laborMaterialPieChart.data.datasets[0].borderWidth = 1; // Slightly thinner border
                 laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend in dark mode
                 laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title in dark mode
                 laborMaterialPieChart.update();
