@@ -728,15 +728,24 @@
         }
 
         /* Keep currency output and total values on one line and bold */
+        /* This applies to $/hr and TOTAL */
         #estimateTableBody td:nth-child(5), /* $/hr */
-        #estimateTableBody td:nth-child(7), /* Labor Total */
-        #estimateTableBody td:nth-child(10), /* Materials Total */
-        #estimateTableBody td:nth-child(14), /* Other Total */
         #estimateTableBody td:nth-child(15) { /* TOTAL */
             white-space: nowrap;
             font-weight: bold;
             color: #1f2937; /* Darker text for totals */
             text-align: right; /* Align currency/totals to the right */
+            transition: color 0.3s; /* Smooth transition for theme changes */
+        }
+
+        /* Center Labor Total, Materials Total, Other Total Cells in tbody */
+        #estimateTableBody td:nth-child(7), /* Labor Total */
+        #estimateTableBody td:nth-child(10), /* Materials Total */
+        #estimateTableBody td:nth-child(14) { /* Other Total */
+            white-space: nowrap;
+            font-weight: bold;
+            color: #1f2937; /* Darker text for totals */
+            text-align: center; /* ALIGNED TO CENTER FOR COLLAPSED VIEW */
             transition: color 0.3s; /* Smooth transition for theme changes */
         }
         
@@ -775,28 +784,11 @@
             display: none !important; /* Important to override default table cell display */
         }
 
-        /* New styles to center "LABOR", "MATERIALS", "OTHER" over their respective totals when collapsed */
-        th.labor-col .collapsible-header.collapsed {
-            justify-content: center; /* Center the content */
-            padding-right: 0; /* Remove specific padding for right alignment */
-        }
-
-        th.materials-col .collapsible-header.collapsed {
-            justify-content: center; /* Center the content */
-            padding-right: 0;
-        }
-
-        th.other-col .collapsible-header.collapsed {
-            justify-content: center; /* Center the content */
-            padding-right: 0;
-        }
-
-        /* Remove the previous right-alignment style for collapsed headers if it exists */
-        th.labor-col.collapsed-view .collapsible-header,
-        th.materials-col.collapsed-view .collapsible-header,
-        th.other-col.collapsed-view .collapsible-header {
-            justify-content: center; /* Ensure they are centered */
-            padding-right: 0; /* Remove any previous right padding */
+        /* Ensure second-row total headers are centered */
+        th.labor-total-col,
+        th.materials-total-col,
+        th.other-total-col {
+            text-align: center;
         }
 
         /* Dark Theme Styles */
@@ -1671,15 +1663,18 @@
                 estimateTableBody.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
                     if (group === 'labor') {
-                        [2, 3, 4, 5].forEach(index => { // OT/DT, Skill, $/hr, #hrs
+                        // Original indices for labor details: 2(OT/DT), 3(Skill), 4($/hr), 5(#hrs)
+                        [2, 3, 4, 5].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'materials') {
-                        [7, 8].forEach(index => { // QTY / UNIT, $ / UNIT
+                        // Original indices for materials details: 7(QTY/UNIT), 8($/UNIT)
+                        [7, 8].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'other') {
-                        [10, 11, 12].forEach(index => { // Equipment, Subcontractor, Misc.
+                        // Original indices for other details: 10(Equipment), 11(Subcontractor), 12(Misc.)
+                        [10, 11, 12].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     }
