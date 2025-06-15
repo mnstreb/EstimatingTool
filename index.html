@@ -775,10 +775,29 @@
             display: none !important; /* Important to override default table cell display */
         }
 
-        /* Styling for the main group headers when their details are collapsed */
-        /* This pushes the text to the right, aligning with the visible total column */
-        /* Removed this specific style, as dynamic colspan and fixed width for totals will handle alignment */
+        /* New styles to center "LABOR", "MATERIALS", "OTHER" over their respective totals when collapsed */
+        th.labor-col .collapsible-header.collapsed {
+            justify-content: center; /* Center the content */
+            padding-right: 0; /* Remove specific padding for right alignment */
+        }
 
+        th.materials-col .collapsible-header.collapsed {
+            justify-content: center; /* Center the content */
+            padding-right: 0;
+        }
+
+        th.other-col .collapsible-header.collapsed {
+            justify-content: center; /* Center the content */
+            padding-right: 0;
+        }
+
+        /* Remove the previous right-alignment style for collapsed headers if it exists */
+        th.labor-col.collapsed-view .collapsible-header,
+        th.materials-col.collapsed-view .collapsible-header,
+        th.other-col.collapsed-view .collapsible-header {
+            justify-content: center; /* Ensure they are centered */
+            padding-right: 0; /* Remove any previous right padding */
+        }
 
         /* Dark Theme Styles */
         body.dark-theme {
@@ -1641,8 +1660,8 @@
             
             if (collapsedState[group]) {
                 headerElement.classList.add('collapsed');
-                // Set colspan to 1 when collapsed, as it will align over the respective total column
-                mainThElement.colSpan = 1;
+                // When collapsed, the header spans only the "Total" column
+                mainThElement.colSpan = 1; 
 
                 // Hide the detail headers in the second row
                 document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
@@ -1673,7 +1692,7 @@
                 } else if (group === 'materials') {
                     mainThElement.colSpan = 3;
                 } else if (group === 'other') {
-                    mainThElement.colSpan = 4; // Corrected to 4
+                    mainThElement.colSpan = 4;
                 }
 
                 // Show the detail headers in the second row
