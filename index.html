@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #c1e0fa 100%); /* Lighter, softer blue gradient */
             min-height: 100vh;
             color: #374151; /* Default text color */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
         }
         .container {
             max-width: 1200px;
@@ -28,6 +29,7 @@
             box-shadow: 0 6px 25px rgba(0,0,0,0.08); /* Softer, larger shadow */
             padding: 30px; /* More padding */
             margin-bottom: 25px;
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for theme changes */
         }
         .input-field {
             width: 100%;
@@ -35,7 +37,7 @@
             border: 1px solid #d1d5db; /* Softer border */
             border-radius: 8px; /* More rounded */
             font-size: 15px; /* Slightly larger font */
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); /* Subtle inner shadow */
         }
         .input-field:focus {
@@ -92,6 +94,7 @@
             padding: 15px; /* More padding */
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
+            transition: border-color 0.3s; /* Smooth transition for theme changes */
             /* white-space: nowrap; */ /* Removed from general td/th to allow wrapping if needed, but will control with fixed widths */
         }
         th {
@@ -101,6 +104,7 @@
             position: sticky; /* Sticky header for scrollable tables */
             top: 0;
             z-index: 1;
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
         }
         /* Rounded corners for table header */
         th:first-child { border-top-left-radius: 10px; }
@@ -108,6 +112,7 @@
 
         tr:nth-child(even) {
             background: #f8fafc; /* Subtle zebra striping */
+            transition: background-color 0.3s; /* Smooth transition for theme changes */
         }
         tr:hover {
             background: #e0f2fe; /* Light blue on hover */
@@ -135,6 +140,7 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2); /* Stronger shadow */
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for theme changes */
         }
         .step-indicator {
             display: flex;
@@ -171,21 +177,25 @@
             font-weight: 600;
             color: #4b5563; /* Softer label color */
             font-size: 15px;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         h1 {
             font-size: 32px;
             color: #1f2937;
             margin-bottom: 15px !important; /* Ensure consistent heading margin */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         h2 {
             font-size: 26px;
             color: #1f2937;
             margin-bottom: 25px !important;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         h3 {
             font-size: 22px;
             color: #1f2937;
             margin-bottom: 20px !important;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         /* Specific styles for the project info header in main app */
         .header-info-container {
@@ -205,6 +215,7 @@
             width: 64px; /* Fixed size */
             height: 64px;
             overflow: hidden; /* Hide overflow for images */
+            transition: background-color 0.3s; /* Smooth transition for theme changes */
         }
         .header-logo-img { /* Style for the actual logo image */
             max-width: 100%;
@@ -219,11 +230,13 @@
             color: #1f2937;
             font-size: 28px;
             font-weight: 700; /* Make title bolder */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .header-subtitle {
             margin: 5px 0 0 0;
             color: #6b7280;
             font-size: 16px;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         /* Small adjustment for the action buttons in the header */
         .header-buttons {
@@ -285,6 +298,7 @@
             color: #1f2937;
             margin-bottom: 10px;
             text-align: center;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
 
 
@@ -302,6 +316,7 @@
             font-weight: 600;
             color: #1f2937;
             margin-bottom: 10px;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .summary-item {
             display: flex;
@@ -309,9 +324,11 @@
             padding: 4px 0;
             font-size: 0.95rem;
             color: #4b5563;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .summary-item strong {
             color: #1f2937;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .summary-item.total {
             font-weight: bold;
@@ -320,6 +337,7 @@
             border-top: 1px dashed #cbd5e1;
             margin-top: 8px;
             padding-top: 8px;
+            transition: color 0.3s, border-color 0.3s; /* Smooth transition for theme changes */
         }
 
 
@@ -345,6 +363,7 @@
                 margin-bottom: 10px;
                 border-radius: 8px; /* Rounded corners for rows */
                 overflow: hidden; /* Hide overflow for rounded corners */
+                transition: border-color 0.3s; /* Smooth transition for theme changes */
             }
             td {
                 border: none; /* Remove individual cell borders */
@@ -364,6 +383,7 @@
                 text-align: left;
                 font-weight: bold;
                 color: #4b5563;
+                transition: color 0.3s; /* Smooth transition for theme changes */
             }
             td:nth-of-type(1):before { content: "Task Name:"; }
             td:nth-of-type(2):before { content: "Description:"; }
@@ -433,6 +453,7 @@
             width: 100%;
             z-index: 10;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Smooth transition for theme changes */
         }
         .multi-select-dropdown label {
             display: block;
@@ -441,6 +462,7 @@
         }
         .multi-select-dropdown label:hover {
             background-color: #f3f4f6;
+            transition: background-color 0.3s; /* Smooth transition for theme changes */
         }
         .multi-select-dropdown input[type="checkbox"] {
             margin-right: 8px;
@@ -456,6 +478,7 @@
             flex-wrap: wrap;
             gap: 6px;
             align-items: center;
+            transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for theme changes */
         }
         .selected-trade-tag {
             background-color: #e0f2fe; /* Light blue tag */
@@ -466,11 +489,13 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
         }
         .selected-trade-tag .remove-tag {
             cursor: pointer;
             font-weight: bold;
             color: #94a3b8; /* Gray for X */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         /* Styles for dynamic labor rate inputs in wizard */
         .trade-labor-rates-group {
@@ -479,6 +504,7 @@
             padding: 20px;
             margin-bottom: 20px; /* Space between trade groups */
             background-color: #fcfcfc;
+            transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for theme changes */
         }
         .trade-labor-rates-group h3 {
             margin-top: 0;
@@ -487,6 +513,7 @@
             color: #1f2937;
             padding-bottom: 10px; /* Space below header */
             border-bottom: 1px solid #e5e7eb; /* Separator for trade header */
+            transition: color 0.3s, border-color 0.3s; /* Smooth transition for theme changes */
         }
 
         .skill-level-row {
@@ -497,6 +524,7 @@
             padding-bottom: 10px; /* Add some padding below each row */
             border-bottom: 1px dashed #e5e7eb; /* Subtle separator for skill rows */
             justify-content: space-between; /* Pushes skill name to left, rate input to right */
+            transition: border-color 0.3s; /* Smooth transition for theme changes */
         }
         .skill-level-row:last-child {
             margin-bottom: 0;
@@ -510,6 +538,7 @@
             font-size: 15px;
             flex-shrink: 0; /* Prevent shrinking if content is long */
             width: 150px; /* Give it a fixed width for alignment */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
 
         /* Adjustments for the rate input to align with the design */
@@ -526,6 +555,7 @@
             color: #4b5563;
             font-size: 15px;
             margin-right: 0; /* Remove previous margin-right */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .rate-input { /* Specific class for the rate input field */
             width: 100px; /* Fixed width for rate input for consistent alignment */
@@ -539,7 +569,7 @@
             border-radius: 8px;
             font-size: 15px;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
             flex-shrink: 0;
             box-sizing: border-box; /* Include padding and border in the width */
         }
@@ -631,10 +661,12 @@
         .logo-upload-area .default-icon {
             font-size: 32px;
             color: #3b82f6;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         .logo-upload-area .upload-text {
             font-size: 0.9rem;
             color: #6b7280;
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         /* Removed .logo-upload-overlay and its related styles as per the new requested format */
 
@@ -685,6 +717,7 @@
             padding: 6px 8px; /* Reduced padding */
             box-sizing: border-box; /* Include padding/border in width */
             text-align: right; /* Align numbers to the right */
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition for theme changes */
         }
 
         /* Specific width adjustments for 'Skill' and 'OT/DT' selects */
@@ -704,6 +737,7 @@
             font-weight: bold;
             color: #1f2937; /* Darker text for totals */
             text-align: right; /* Align currency/totals to the right */
+            transition: color 0.3s; /* Smooth transition for theme changes */
         }
         
         /* Adjust actions column button size */
@@ -711,7 +745,127 @@
             padding: 6px 10px; /* Smaller padding for action button */
             font-size: 0.85em; /* Smaller font */
         }
-        
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); /* Darker gradient */
+            color: #e2e8f0; /* Light text */
+        }
+        .dark-theme .card {
+            background: #2d3748; /* Darker card background */
+            box-shadow: 0 6px 25px rgba(0,0,0,0.4); /* Stronger dark shadow */
+        }
+        .dark-theme .input-field {
+            background-color: #4a5568; /* Darker input field background */
+            border-color: #4a5568; /* Darker border */
+            color: #e2e8f0; /* Light text for inputs */
+        }
+        .dark-theme .input-field:focus {
+            border-color: #63b3ed; /* Lighter blue focus */
+            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.3);
+        }
+        .dark-theme .label,
+        .dark-theme h1,
+        .dark-theme h2,
+        .dark-theme h3,
+        .dark-theme .summary-block h4,
+        .dark-theme .summary-item strong {
+            color: #e2e8f0; /* Light headings and strong text */
+        }
+        .dark-theme .header-subtitle,
+        .dark-theme .summary-item,
+        .dark-theme .logo-upload-area .upload-text,
+        .dark-theme .multi-select-dropdown p,
+        .dark-theme .multi-select-dropdown label span,
+        .dark-theme .skill-name-display,
+        .dark-theme .rate-label {
+            color: #a0aec0; /* Lighter gray for general text */
+        }
+        .dark-theme .header-icon-box {
+            background: #4299e1; /* Slightly different blue for dark theme icon box */
+        }
+        .dark-theme .summary-overall-metric-card {
+            background: linear-gradient(135deg, #2a4365 0%, #2c5282 100%); /* Darker blue gradient for prominence */
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .dark-theme table,
+        .dark-theme th,
+        .dark-theme td {
+            border-color: #4a5568; /* Darker table borders */
+        }
+        .dark-theme th {
+            background: #4a5568; /* Darker table header background */
+            color: #e2e8f0;
+        }
+        .dark-theme tr:nth-child(even) {
+            background: #2d3748; /* Darker zebra striping */
+        }
+        .dark-theme tr:hover {
+            background: #4a5568; /* Darker hover */
+        }
+        .dark-theme .selected-trades-display,
+        .dark-theme .multi-select-dropdown {
+            background-color: #4a5568; /* Darker dropdown/tag background */
+            border-color: #4a5568;
+        }
+        .dark-theme .selected-trade-tag {
+            background-color: #4299e1; /* Darker tag background */
+            color: white;
+        }
+        .dark-theme .selected-trade-tag .remove-tag {
+            color: #a0aec0; /* Lighter gray for X in tags */
+        }
+        .dark-theme .multi-select-dropdown label:hover {
+            background-color: #2d3748;
+        }
+        .dark-theme .trade-labor-rates-group {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+        .dark-theme .trade-labor-rates-group h3 {
+            border-color: #4a5568;
+        }
+        .dark-theme .skill-level-row {
+            border-color: #4a5568;
+        }
+        .dark-theme .advanced-link {
+            color: #63b3ed; /* Lighter blue for links in dark theme */
+        }
+        .dark-theme .advanced-link:hover {
+            color: #90cdf4;
+        }
+        .dark-theme .summary-item.total {
+            color: #90cdf4; /* Lighter blue for totals in dark theme */
+            border-color: #4a5568;
+        }
+        .dark-theme .logo-upload-area {
+            background: #2d3748;
+            border-color: #4a5568;
+        }
+        .dark-theme .logo-upload-area:hover {
+            background: #4a5568;
+            border-color: #63b3ed;
+        }
+        .dark-theme .logo-upload-area.drag-over {
+            background: #4a5568;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 4px rgba(99, 179, 237, 0.4);
+        }
+        .dark-theme .logo-upload-area .default-icon {
+            color: #63b3ed;
+        }
+        .dark-theme .setup-wizard .wizard-content {
+            background: #2d3748;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .dark-theme .step.inactive {
+            background: #4a5568;
+            color: #a0aec0;
+        }
+        .dark-theme .step.active {
+            background: #4299e1;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.4);
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -722,7 +876,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLmhMMTYuMiA3LjhDIi8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLmhMMTYuMiA3LjhDIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -731,6 +885,8 @@
                     </div>
                 </div>
                 <div class="header-buttons">
+                    <!-- Updated theme toggle button with moon icon -->
+                    <button id="themeToggleBtn" class="btn btn-primary">🌙</button>
                     <button id="reconfigureBtn" class="btn btn-primary">⚙️ Reconfigure</button>
                     <button id="generateReportBtn" class="btn btn-green">📄 Generate Report</button>
                 </div>
@@ -1307,12 +1463,18 @@
 
         const mainAppLogo = document.getElementById('mainAppLogo');
 
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
 
         // State for advanced mode in Step 2
         let isAdvancedModeActive = false;
 
         // State for advanced details in Step 1
         let isAdvancedDetailsActive = false;
+        
+        // State for theme
+        let isDarkTheme = false;
+
 
         // Top-level summary elements
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
@@ -1376,7 +1538,7 @@
             document.getElementById('startEstimatingBtn').addEventListener('click', startEstimating);
             document.getElementById('toggleAdditionalConsiderationsBtn').addEventListener('click', toggleAdditionalConsiderationsType);
             document.getElementById('addItemBtn').addEventListener('click', addItem);
-
+            themeToggleBtn.addEventListener('click', toggleTheme); // Event listener for theme toggle
 
             showSetup();
             updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
@@ -1384,6 +1546,37 @@
             updateSelectedTradesDisplay();
             renderItems(); // Render the pre-filled items
         });
+
+        // --- Theme Toggle Logic ---
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            if (isDarkTheme) {
+                document.body.classList.add('dark-theme');
+                themeToggleBtn.innerHTML = '☀️'; // Sun icon for light theme
+                // Update Chart colors for dark theme
+                if (laborMaterialPieChart) {
+                    laborMaterialPieChart.data.datasets[0].backgroundColor = [
+                        'rgba(66, 153, 225, 0.8)', // Lighter Blue for Labor
+                        'rgba(68, 185, 129, 0.8)', // Lighter Green for Material
+                        'rgba(255, 182, 70, 0.8)'  // Lighter Orange for Other Costs
+                    ];
+                    laborMaterialPieChart.update();
+                }
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggleBtn.innerHTML = '🌙'; // Moon icon for dark theme
+                // Revert Chart colors to light theme
+                if (laborMaterialPieChart) {
+                    laborMaterialPieChart.data.datasets[0].backgroundColor = [
+                        'rgba(59, 130, 246, 0.8)', // Blue for Labor
+                        'rgba(16, 185, 129, 0.8)', // Green for Material
+                        'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
+                    ];
+                    laborMaterialPieChart.update();
+                }
+            }
+        }
+
 
         // --- Logo Upload Logic ---
         logoUploadInput.addEventListener('change', function() {
@@ -2341,6 +2534,15 @@
                     }
                 }
             });
+            // Update chart colors immediately if dark theme is active
+            if (isDarkTheme) {
+                laborMaterialPieChart.data.datasets[0].backgroundColor = [
+                    'rgba(66, 153, 225, 0.8)',
+                    'rgba(68, 185, 129, 0.8)',
+                    'rgba(255, 182, 70, 0.8)'
+                ];
+                laborMaterialPieChart.update();
+            }
         }
 
         // --- Report Generation ---
