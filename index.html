@@ -722,7 +722,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLjhMMTYuMiA3LjhDIi8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLmhMMTYuMiA3LjhDIi8+PHBhdGggZD0iTTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDcuOCAxNi4yIi8+PC9zdmc+'">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -731,8 +731,8 @@
                     </div>
                 </div>
                 <div class="header-buttons">
-                    <button class="btn btn-primary" onclick="showSetup()">⚙️ Reconfigure</button>
-                    <button class="btn btn-green" onclick="generateReport()">📄 Generate Report</button>
+                    <button id="reconfigureBtn" class="btn btn-primary">⚙️ Reconfigure</button>
+                    <button id="generateReportBtn" class="btn btn-green">📄 Generate Report</button>
                 </div>
             </div>
         </div>
@@ -753,8 +753,9 @@
                 <div class="summary-item"><span>Total Project Cost:</span> <strong id="summaryProjectCost">$0.00</strong></div>
                 <div class="summary-item"><span>Total Misc Cost:</span> <strong id="summaryMiscCost">$0.00</strong></div>
                 <div class="summary-item"><span>Total Overhead:</span> <strong id="summaryOverhead">$0.00</strong></div>
-                <div class="summary-item"><span>Total Markup:</span> <strong id="summaryMarkup">$0.00</strong></div>
-                <div class="summary-item"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
+                <!-- Removed Total Markup as per user request -->
+                <div class="summary-item"><span>Material Markup (%):</span> <strong id="summaryMaterialMarkup">0.00%</strong></div>
+                <div class="summary-item pb-2 mb-2 border-b border-dashed border-gray-300"><span>Estimate Subtotal:</span> <strong id="summaryEstimateSubtotal">$0.00</strong></div>
                 <div class="summary-item"><span>Profit Margin (%):</span> <strong id="summaryProfitMargin">0.00%</strong></div>
                 <div class="summary-item"><span>Sales Tax (%):</span> <strong id="summarySalesTax">0.00%</strong></div>
                 <div class="summary-item"><span>Misc. (%):</span> <strong id="summaryMiscPercent">0.00%</strong></div>
@@ -797,7 +798,7 @@
         <div class="card overflow-x-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-gray-800">Estimate Line Items</h3>
-                <button class="btn btn-green" onclick="addItem()">➕ Add Item</button>
+                <button id="addItemBtn" class="btn btn-green">➕ Add Item</button>
             </div>
             <table class="min-w-full">
                 <thead>
@@ -835,11 +836,7 @@
             <div style="text-align: center; margin-bottom: 30px;">
                 <!-- Logo Upload Area -->
                 <input type="file" id="logoUploadInput" accept="image/*" style="display: none;">
-                <div id="logoUploadArea" class="logo-upload-area"
-                    ondragover="event.preventDefault(); this.classList.add('drag-over');"
-                    ondragleave="this.classList.remove('drag-over');"
-                    ondrop="handleLogoDrop(event); this.classList.remove('drag-over');"
-                    onclick="document.getElementById('logoUploadInput').click();">
+                <div id="logoUploadArea" class="logo-upload-area">
                     <img id="wizardLogoPreview" class="uploaded-logo hidden" src="" alt="Contractor Logo">
                     <span id="defaultLogoIcon" class="default-icon">🏗️</span>
                     <p id="uploadText" class="upload-text">Drag & drop your logo here, or click to upload</p>
@@ -890,8 +887,8 @@
                 <div class="form-group">
                     <label for="tradesInvolved" class="label">Trades Involved (Select multiple):</label>
                     <div class="multi-select-container">
-                        <input type="text" id="tradeSearchInput" class="input-field mb-2" placeholder="Search trades..." onfocus="showTradeDropdown()" onblur="hideTradeDropdown()">
-                        <div id="selectedTradesDisplay" class="selected-trades-display" onclick="toggleTradeDropdown()">
+                        <input type="text" id="tradeSearchInput" class="input-field mb-2" placeholder="Search trades...">
+                        <div id="selectedTradesDisplay" class="selected-trades-display">
                             Click to select trades...
                         </div>
                         <div id="tradesDropdown" class="multi-select-dropdown hidden">
@@ -902,7 +899,7 @@
 
                 <!-- Advanced Details Section -->
                 <div class="advanced-link-wrapper mt-6">
-                    <a href="#" class="advanced-link" id="showAdvancedDetailsLink" onclick="toggleAdvancedDetails(event)">Show Advanced Details</a>
+                    <a href="#" class="advanced-link" id="showAdvancedDetailsLink">Show Advanced Details</a>
                 </div>
 
                 <div id="advancedDetailsSection" class="hidden mt-4 pt-4 border-t border-gray-200">
@@ -939,7 +936,7 @@
 
 
                 <div class="flex justify-end gap-3 mt-8">
-                    <button class="btn btn-primary" onclick="nextStep(1)">Next</button>
+                    <button id="nextStep1Btn" class="btn btn-primary">Next</button>
                 </div>
             </div>
 
@@ -954,7 +951,7 @@
 
                 <!-- Advanced link at the bottom-left -->
                 <div class="advanced-link-wrapper">
-                    <a href="#" class="advanced-link" id="advancedLink" onclick="toggleAdvancedRates(event)">Show Advanced Options</a>
+                    <a href="#" class="advanced-link" id="advancedLink">Show Advanced Options</a>
                 </div>
                 
                 <!-- Advanced section for adding new skill levels - hidden by default -->
@@ -968,12 +965,12 @@
                         <label for="newSkillRate" class="label">New Skill Rate ($/hr):</label>
                         <input type="number" id="newSkillRate" class="input-field" value="0">
                     </div>
-                    <button class="btn btn-primary w-full mt-2" onclick="addSkillLevelFromAdvanced()">Add Skill Level</button>
+                    <button id="addSkillLevelBtn" class="btn btn-primary w-full mt-2">Add Skill Level</button>
                 </div>
 
                 <div class="flex justify-between gap-3 mt-8">
-                    <button class="btn btn-primary" onclick="prevStep(2)">Previous</button>
-                    <button class="btn btn-primary" onclick="nextStep(2)">Next</button>
+                    <button id="prevStep2Btn" class="btn btn-primary">Previous</button>
+                    <button id="nextStep2Btn" class="btn btn-primary">Next</button>
                 </div>
             </div>
 
@@ -984,6 +981,12 @@
                 <div class="form-group">
                     <label for="overhead" class="label">Overhead (%):</label>
                     <input type="number" id="overhead" class="input-field" value="0" step="0.01">
+                </div>
+
+                <!-- Material Markup (NEW FIELD) -->
+                <div class="form-group">
+                    <label for="materialMarkup" class="label">Material Markup (%):</label>
+                    <input type="number" id="materialMarkup" class="input-field" value="0" step="0.01">
                 </div>
 
                 <!-- Desired Profit -->
@@ -1009,13 +1012,13 @@
                     <div class="flex items-center gap-3">
                         <input type="number" id="additionalConsiderationsValue" class="input-field flex-grow" value="0" step="0.01">
                         <span id="additionalConsiderationsUnit" class="font-semibold text-gray-600 w-10 text-center">%</span>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="toggleAdditionalConsiderationsType()">Toggle</button>
+                        <button id="toggleAdditionalConsiderationsBtn" type="button" class="btn btn-primary btn-sm">Toggle</button>
                     </div>
                 </div>
 
                 <div class="flex justify-between gap-3 mt-8">
-                    <button class="btn btn-primary" onclick="prevStep(3)">Previous</button>
-                    <button class="btn btn-green" onclick="startEstimating()">Start Estimating</button>
+                    <button id="prevStep3Btn" class="btn btn-primary">Previous</button>
+                    <button id="startEstimatingBtn" class="btn btn-green">Start Estimating</button>
                 </div>
             </div>
         </div>
@@ -1055,6 +1058,7 @@
             salesTax: 0,
             miscellaneous: 0,
             overhead: 0,
+            materialMarkup: 0, // NEW: Material Markup percentage
             additionalConsiderationsType: '%',
             additionalConsiderationsValue: 0,
             // Define labor rates nested by trade
@@ -1317,7 +1321,7 @@
         // Executive Summary elements
         const summaryProjectCost = document.getElementById('summaryProjectCost');
         const summaryMiscCost = document.getElementById('summaryMiscCost'); // This refers to the project-level Misc (%)
-        const summaryMarkup = document.getElementById('summaryMarkup');
+        const summaryMaterialMarkup = document.getElementById('summaryMaterialMarkup'); // Reference for Material Markup
         const summaryEstimateSubtotal = document.getElementById('summaryEstimateSubtotal');
         const summaryProfitMargin = document.getElementById('summaryProfitMargin');
         const summarySalesTax = document.getElementById('summarySalesTax');
@@ -1353,6 +1357,27 @@
 
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
+            // Attach event listeners for static elements
+            document.getElementById('reconfigureBtn').addEventListener('click', showSetup);
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            document.getElementById('logoUploadArea').addEventListener('dragover', (event) => { event.preventDefault(); event.currentTarget.classList.add('drag-over'); });
+            document.getElementById('logoUploadArea').addEventListener('dragleave', (event) => { event.currentTarget.classList.remove('drag-over'); });
+            document.getElementById('logoUploadArea').addEventListener('drop', (event) => { handleLogoDrop(event); event.currentTarget.classList.remove('drag-over'); });
+            document.getElementById('logoUploadArea').addEventListener('click', () => document.getElementById('logoUploadInput').click());
+            document.getElementById('tradeSearchInput').addEventListener('focus', showTradeDropdown);
+            document.getElementById('tradeSearchInput').addEventListener('blur', hideTradeDropdown);
+            document.getElementById('selectedTradesDisplay').addEventListener('click', toggleTradeDropdown);
+            document.getElementById('nextStep1Btn').addEventListener('click', () => nextStep(1));
+            document.getElementById('showAdvancedDetailsLink').addEventListener('click', toggleAdvancedDetails);
+            document.getElementById('prevStep2Btn').addEventListener('click', () => prevStep(2));
+            document.getElementById('nextStep2Btn').addEventListener('click', () => nextStep(2));
+            document.getElementById('addSkillLevelBtn').addEventListener('click', addSkillLevelFromAdvanced);
+            document.getElementById('prevStep3Btn').addEventListener('click', () => prevStep(3));
+            document.getElementById('startEstimatingBtn').addEventListener('click', startEstimating);
+            document.getElementById('toggleAdditionalConsiderationsBtn').addEventListener('click', toggleAdditionalConsiderationsType);
+            document.getElementById('addItemBtn').addEventListener('click', addItem);
+
+
             showSetup();
             updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
             populateTradesDropdown();
@@ -1551,6 +1576,7 @@
             projectSettings.salesTax = parseFloat(document.getElementById('salesTax').value) || 0;
             projectSettings.miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
             projectSettings.overhead = parseFloat(document.getElementById('overhead').value) || 0;
+            projectSettings.materialMarkup = parseFloat(document.getElementById('materialMarkup').value) || 0; // NEW: Get material markup
             projectSettings.additionalConsiderationsValue = parseFloat(document.getElementById('additionalConsiderationsValue').value) || 0;
 
             setupWizard.classList.add('hidden');
@@ -1597,6 +1623,7 @@
             document.getElementById('salesTax').value = projectSettings.salesTax;
             document.getElementById('miscellaneous').value = projectSettings.miscellaneous;
             document.getElementById('overhead').value = projectSettings.overhead;
+            document.getElementById('materialMarkup').value = projectSettings.materialMarkup; // NEW: Set material markup
             document.getElementById('additionalConsiderationsValue').value = projectSettings.additionalConsiderationsValue;
             document.getElementById('additionalConsiderationsUnit').textContent = projectSettings.additionalConsiderationsType;
         }
@@ -1619,9 +1646,16 @@
             projectSettings.salesTax = taxRate;
         }
 
-        document.getElementById('projectState').addEventListener('change', (event) => {
-            updateSalesTaxForState(event.target.value);
+        // document.getElementById('projectState').addEventListener('change', (event) => {
+        //     updateSalesTaxForState(event.target.value);
+        // });
+        // Event listener for projectState change:
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('projectState').addEventListener('change', (event) => {
+                updateSalesTaxForState(event.target.value);
+            });
         });
+
 
         function toggleAdditionalConsiderationsType() {
             if (projectSettings.additionalConsiderationsType === '%') {
@@ -1970,8 +2004,10 @@
         
         function hideTradeDropdown() {
             setTimeout(() => {
-                if (!tradesDropdown.matches(':hover')) {
-                    tradesDropdown.classList.add('hidden');
+                // Ensure the dropdown is truly hidden only if mouse is not over it
+                // This is a common pattern to allow clicking on dropdown items without immediately closing it
+                if (!tradesDropdown.contains(document.activeElement) && !selectedTradesDisplay.contains(document.activeElement)) {
+                     tradesDropdown.classList.add('hidden');
                 }
             }, 100);
         }
@@ -1990,6 +2026,9 @@
                     checkbox.checked = false;
                     handleTradeSelection(checkbox);
                 }
+                event.stopPropagation(); // Prevent the click from toggling the dropdown immediately after removing a tag
+            } else {
+                toggleTradeDropdown();
             }
         });
 
@@ -2110,7 +2149,8 @@
         function calculateTotals() {
             let totalProjectSubtotal = 0; // This accumulates the total direct cost from all line items
             let totalLaborCost = 0; // Accumulates total labor cost from line items
-            let totalMaterialCost = 0; // Accumulates total material cost from line items
+            let totalMaterialCostRaw = 0; // Raw material cost from line items (before markup)
+            let totalMaterialCostWithMarkup = 0; // Material cost after applying markup
             let totalEquipmentCost = 0; // Accumulates equipment cost from line items
             let totalSubcontractorCost = 0; // Accumulates subcontractor cost from line items
             let totalMiscLineItemCosts = 0; // Accumulates misc line item costs
@@ -2136,19 +2176,26 @@
                 const materialsTotal = item.materialQuantity * item.materialUnitCost;
                 
                 totalLaborCost += laborTotal;
-                totalMaterialCost += materialsTotal;
+                totalMaterialCostRaw += materialsTotal; // Sum raw material costs
                 totalEquipmentCost += item.equipmentRentalCost;
                 totalSubcontractorCost += item.subcontractorCostLineItem;
                 totalMiscLineItemCosts += item.miscLineItem;
                 
-                const lineTotalEstimate = laborTotal + materialsTotal + item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
-                totalProjectSubtotal += lineTotalEstimate;
+                // For pie chart and breakdown, use the costs directly from line items
+                // The totalProjectSubtotal will be derived from these direct costs + material markup
                 
                 if (laborHoursBreakdown[item.rateRole] !== undefined) {
                     laborHoursBreakdown[item.rateRole] += item.hours;
                 }
             });
             
+            // Apply material markup to the total raw material cost
+            totalMaterialCostWithMarkup = totalMaterialCostRaw * (1 + projectSettings.materialMarkup / 100);
+
+            // Now, sum all components to get the total project subtotal, including the marked-up material cost
+            totalProjectSubtotal = totalLaborCost + totalMaterialCostWithMarkup + totalEquipmentCost + totalSubcontractorCost + totalMiscLineItemCosts;
+
+
             // Total labor hours for overall summary
             const overallLaborHoursSum = Object.values(laborHoursBreakdown).reduce((sum, hours) => sum + hours, 0);
 
@@ -2182,10 +2229,11 @@
 
 
             // Executive Summary UI (top row)
-            summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal); // This is the total direct cost from line items
+            summaryProjectCost.textContent = formatCurrency(totalProjectSubtotal); // This is the total direct cost from line items, now including material markup
             summaryMiscCost.textContent = formatCurrency(totalMiscCostAmount);
             summaryOverhead.textContent = formatCurrency(totalOverheadCost);
-            summaryMarkup.textContent = formatCurrency(totalMarkupAmount);
+            // summaryMarkup.textContent = formatCurrency(totalMarkupAmount); // Removed as per user request
+            summaryMaterialMarkup.textContent = `${projectSettings.materialMarkup.toFixed(2)}%`; // Display Material Markup
             summaryEstimateSubtotal.textContent = formatCurrency(estimateSubtotalAmount);
             summaryProfitMargin.textContent = `${projectSettings.profitMargin.toFixed(2)}%`;
             summarySalesTax.textContent = `${projectSettings.salesTax.toFixed(2)}%`;
@@ -2213,21 +2261,21 @@
 
             // Project Cost Breakdown - right card in second row
             breakdownLaborTotal.textContent = formatCurrency(totalLaborCost);
-            breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCost);
+            breakdownMaterialTotal.textContent = formatCurrency(totalMaterialCostWithMarkup); // Display material cost with markup
             breakdownEquipmentTotal.textContent = formatCurrency(totalEquipmentCost);
             breakdownSubcontractorTotal.textContent = formatCurrency(totalSubcontractorCost);
             breakdownMiscCostLineItems.textContent = formatCurrency(totalMiscLineItemCosts);
             
-            // FIX: Ensure totalProjectCost is the sum of all components in this breakdown
+            // Total Project Cost in Breakdown should be the sum of all components in that breakdown
             document.getElementById('breakdownProjectTotal').textContent = formatCurrency(totalProjectSubtotal);
 
 
-            // Render Pie Chart - using the specific cost totals for Labor, Material, and OTHER
+            // Render Pie Chart - using the specific cost totals for Labor, Material (with markup), and OTHER
             console.log('--- Pie Chart Data before rendering: ---');
             console.log('Labor Cost (for Pie Chart):', totalLaborCost);
-            console.log('Material Cost (for Pie Chart):', totalMaterialCost);
+            console.log('Material Cost (for Pie Chart - with markup):', totalMaterialCostWithMarkup);
             console.log('Other Costs (for Pie Chart - Equipment + Subcontractor + Misc Line Items):', totalOtherCostsForPieChart);
-            renderPieChart(totalLaborCost, totalMaterialCost, totalOtherCostsForPieChart);
+            renderPieChart(totalLaborCost, totalMaterialCostWithMarkup, totalOtherCostsForPieChart);
         }
 
         // --- Pie Chart Rendering ---
@@ -2300,7 +2348,8 @@
         function generateReport() {
             let totalProjectSubtotal = 0;
             let totalLaborCost = 0;
-            let totalMaterialCost = 0;
+            let totalMaterialCostRaw = 0;
+            let totalMaterialCostWithMarkupReport = 0;
             let totalEquipmentCostReport = 0;
             let totalSubcontractorCostReport = 0;
             let totalMiscLineItemCostReport = 0;
@@ -2326,20 +2375,24 @@
                 const materialsTotal = item.materialQuantity * item.materialUnitCost;
                 
                 totalLaborCost += laborTotal;
-                totalMaterialCost += materialsTotal;
+                totalMaterialCostRaw += materialsTotal;
                 totalEquipmentCostReport += item.equipmentRentalCost;
                 totalSubcontractorCostReport += item.subcontractorCostLineItem;
                 totalMiscLineItemCostReport += item.miscLineItem;
 
-                const lineTotalEstimate = laborTotal + materialsTotal + item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
-                totalProjectSubtotal += lineTotalEstimate;
-                
                 totalLaborHoursReport += item.hours;
 
                 if (laborHoursBreakdownReport[item.rateRole] !== undefined) {
                     laborHoursBreakdownReport[item.rateRole] += item.hours;
                 }
             });
+
+            // Apply material markup to the total raw material cost for the report as well
+            totalMaterialCostWithMarkupReport = totalMaterialCostRaw * (1 + projectSettings.materialMarkup / 100);
+
+            // Recalculate total project subtotal for report to include marked-up materials
+            totalProjectSubtotal = totalLaborCost + totalMaterialCostWithMarkupReport + totalEquipmentCostReport + totalSubcontractorCostReport + totalMiscLineItemCostReport;
+
 
             const totalOtherCostsSumReport = totalEquipmentCostReport + totalSubcontractorCostReport + totalMiscLineItemCostReport;
 
@@ -2390,8 +2443,9 @@
             reportContent += `Total Project Cost (Line Items Base): ${formatCurrency(totalProjectSubtotal)}\n`;
             reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmount)}\n`;
             reportContent += `Total Overhead Cost (${projectSettings.overhead.toFixed(2)}%): ${formatCurrency(totalOverheadCost)}\n`;
-            reportContent += `Total Markup (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`;
-            reportContent += `Estimate Subtotal (before sales tax): ${formatCurrency(estimateSubtotalAmount)}\n`;
+            reportContent += `Material Markup (${projectSettings.materialMarkup.toFixed(2)}%): ${formatCurrency(totalMaterialCostWithMarkupReport - totalMaterialCostRaw)}\n`; // Show actual markup amount
+            reportContent += `Estimate Subtotal (before sales tax and final markup): ${formatCurrency(estimateSubtotalAmount)}\n`; // Adjusted label
+            reportContent += `Profit Margin (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalMarkupAmount)}\n`; // Now this is specifically the profit margin amount
             reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): ${formatCurrency(salesTaxAmount)}\n`;
             reportContent += `Additional Considerations (${projectSettings.additionalConsiderationsValue.toFixed(2)}${projectSettings.additionalConsiderationsType}): ${formatCurrency(additionalConsiderationAmount)}\n\n`;
 
@@ -2412,7 +2466,7 @@
             reportContent += `PROJECT COST BREAKDOWN:\n`;
             reportContent += `-------------------------------------------------\n`;
             reportContent += `Labor Total: ${formatCurrency(totalLaborCost)}\n`;
-            reportContent += `Material Total: ${formatCurrency(totalMaterialCost)}\n`;
+            reportContent += `Material Total (incl. Markup): ${formatCurrency(totalMaterialCostWithMarkupReport)}\n`; // Reflect markup in report
             reportContent += `Equipment/Rental Total: ${formatCurrency(totalEquipmentCostReport)}\n`;
             reportContent += `Sub-contractor Total: ${formatCurrency(totalSubcontractorCostReport)}\n`;
             reportContent += `Misc. Total (Line Items): ${formatCurrency(totalMiscLineItemCostReport)}\n`;
@@ -2426,10 +2480,11 @@
                 const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
                 const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
                 const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialQuantity * item.materialUnitCost;
+                const materialsTotalRaw = item.materialQuantity * item.materialUnitCost;
+                const materialsTotalWithMarkupLineItem = materialsTotalRaw * (1 + projectSettings.materialMarkup / 100);
                 const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
 
-                const lineTotal = laborTotal + materialsTotal + otherCategoryTotal;
+                const lineTotal = laborTotal + materialsTotalWithMarkupLineItem + otherCategoryTotal; // Line total also includes marked-up materials
 
                 reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
                 reportContent += `    Description: ${item.description || 'No description'}\n`;
@@ -2440,8 +2495,8 @@
                 reportContent += `      Labor Total: ${formatCurrency(laborTotal)}\n`;
                 reportContent += `    --- MATERIALS ---\n`;
                 reportContent += `      Quantity / Unit: ${item.materialQuantity}\n`;
-                reportContent += `      $ / Unit: ${formatCurrency(item.materialUnitCost)}\n`;
-                reportContent += `      Materials Total: ${formatCurrency(materialsTotal)}\n`;
+                reportContent += `      $ / Unit (Raw): ${formatCurrency(item.materialUnitCost)}\n`;
+                reportContent += `      Materials Total (incl. Markup): ${formatCurrency(materialsTotalWithMarkupLineItem)}\n`; // Reflect markup in line item
                 reportContent += `    --- OTHER ---\n`;
                 reportContent += `      Equipment / Rental: ${formatCurrency(item.equipmentRentalCost)}\n`;
                 reportContent += `      Subcontractor: ${formatCurrency(item.subcontractorCostLineItem)}\n`;
