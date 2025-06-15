@@ -747,15 +747,17 @@
         }
 
         /* Styles for collapsible columns */
+        /* Flexbox for centering within the header cell */
         .collapsible-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Default: centers content within the header TH's colspan */
             gap: 8px;
             cursor: pointer;
             user-select: none; /* Prevent text selection on click */
-            padding: 0; /* Remove default padding, allow flexbox to control */
-            height: 100%; /* Make clickable area fill the cell */
+            padding: 0;
+            height: 100%;
+            width: 100%; /* Ensure it fills its parent TH */
         }
         .collapsible-header span {
             display: inline-block; /* Ensure text behaves well with flex */
@@ -765,13 +767,18 @@
             transition: transform 0.2s ease-in-out;
             display: inline-block;
         }
-        .collapsed .collapse-toggle-icon {
+        .collapsible-header.collapsed .collapse-toggle-icon {
             transform: rotate(-90deg); /* Rotate for collapsed state */
         }
         /* Class to hide columns */
         .column-hidden {
             display: none !important; /* Important to override default table cell display */
         }
+
+        /* Styling for the main group headers when their details are collapsed */
+        /* This pushes the text to the right, aligning with the visible total column */
+        /* Removed this specific style, as dynamic colspan and fixed width for totals will handle alignment */
+
 
         /* Dark Theme Styles */
         body.dark-theme {
@@ -1002,19 +1009,22 @@
                     <tr>
                         <th rowspan="2" class="task-name-col">Task Name</th>
                         <th rowspan="2" class="description-col">Description</th>
-                        <th colspan="5" class="text-center labor-col">
+                        <!-- Initial colspan="5" for LABOR (4 detail + 1 total) -->
+                        <th colspan="5" class="text-center labor-col" id="thLaborHeader">
                             <div class="collapsible-header" data-group="labor">
                                 <span>LABOR</span>
                                 <span class="collapse-toggle-icon">▼</span>
                             </div>
                         </th>
-                        <th colspan="3" class="text-center materials-col">
+                        <!-- Initial colspan="3" for MATERIALS (2 detail + 1 total) -->
+                        <th colspan="3" class="text-center materials-col" id="thMaterialsHeader">
                             <div class="collapsible-header" data-group="materials">
                                 <span>MATERIALS</span>
                                 <span class="collapse-toggle-icon">▼</span>
                             </div>
                         </th>
-                        <th colspan="3" class="text-center other-col">
+                        <!-- Initial colspan="4" for OTHER (3 detail + 1 total) - Corrected from 3 to 4 -->
+                        <th colspan="4" class="text-center other-col" id="thOtherHeader">
                             <div class="collapsible-header" data-group="other">
                                 <span>OTHER</span>
                                 <span class="collapse-toggle-icon">▼</span>
@@ -1024,17 +1034,21 @@
                         <th rowspan="2" class="actions-col">Actions</th>
                     </tr>
                     <tr>
-                        <th class="border-b" data-group="labor-details">OT/DT</th>
-                        <th class="border-b" data-group="labor-details">Skill</th>
-                        <th class="border-b" data-group="labor-details">$/hr</th>
-                        <th class="border-b" data-group="labor-details"># hrs</th>
+                        <!-- These THs will be hidden/shown by JS and are targeted by data-col-group -->
+                        <th class="border-b" data-col-group="labor-details">OT/DT</th>
+                        <th class="border-b" data-col-group="labor-details">Skill</th>
+                        <th class="border-b" data-col-group="labor-details">$/hr</th>
+                        <th class="border-b" data-col-group="labor-details"># hrs</th>
                         <th class="border-b labor-total-col">Labor Total</th>
-                        <th class="border-b" data-group="materials-details">QTY / UNIT</th>
-                        <th class="border-b" data-group="materials-details">$ / UNIT</th>
+
+                        <th class="border-b" data-col-group="materials-details">QTY / UNIT</th>
+                        <th class="border-b" data-col-group="materials-details">$ / UNIT</th>
                         <th class="border-b materials-total-col">Materials Total</th>
-                        <th class="border-b" data-group="other-details">Equipment / Rental</th>
-                        <th class="border-b" data-group="other-details">Subcontractor</th>
-                        <th class="border-b" data-group="other-details">Misc.</th>
+
+                        <th class="border-b" data-col-group="other-details">Equipment / Rental</th>
+                        <th class="border-b" data-col-group="other-details">Subcontractor</th>
+                        <th class="border-b" data-col-group="other-details">Misc.</th>
+                        <th class="border-b other-total-col">Other Total</th> <!-- Added this header -->
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -1531,7 +1545,7 @@
         // State for theme
         let isDarkTheme = false;
 
-        // State for collapsed columns (initially expanded)
+        // State for collapsed columns (initially expanded, so false for collapsed)
         const collapsedState = {
             labor: false,
             materials: false,
@@ -1623,38 +1637,68 @@
         function toggleColumnVisibility(group) {
             collapsedState[group] = !collapsedState[group];
             const headerElement = document.querySelector(`.collapsible-header[data-group="${group}"]`);
+            const mainThElement = document.getElementById(`th${group.charAt(0).toUpperCase() + group.slice(1)}Header`);
             
             if (collapsedState[group]) {
                 headerElement.classList.add('collapsed');
+                // Set colspan to 1 when collapsed, as it will align over the respective total column
+                mainThElement.colSpan = 1;
+
+                // Hide the detail headers in the second row
+                document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
+                    th.classList.add('column-hidden');
+                });
+                // Also hide the associated cells in the tbody
+                estimateTableBody.querySelectorAll('tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (group === 'labor') {
+                        [2, 3, 4, 5].forEach(index => { // OT/DT, Skill, $/hr, #hrs
+                            if (cells[index]) cells[index].classList.add('column-hidden');
+                        });
+                    } else if (group === 'materials') {
+                        [7, 8].forEach(index => { // QTY / UNIT, $ / UNIT
+                            if (cells[index]) cells[index].classList.add('column-hidden');
+                        });
+                    } else if (group === 'other') {
+                        [10, 11, 12].forEach(index => { // Equipment, Subcontractor, Misc.
+                            if (cells[index]) cells[index].classList.add('column-hidden');
+                        });
+                    }
+                });
             } else {
                 headerElement.classList.remove('collapsed');
-            }
-            
-            // Toggle visibility for all columns in this group in both thead and tbody
-            document.querySelectorAll(`[data-group="${group}-details"]`).forEach(el => {
-                el.classList.toggle('column-hidden', collapsedState[group]);
-            });
-
-            // Iterate through table body rows to hide/show cells
-            estimateTableBody.querySelectorAll('tr').forEach(row => {
-                const cells = row.querySelectorAll('td');
+                // Restore original colspan when expanded
                 if (group === 'labor') {
-                    // labor details columns are 3, 4, 5, 6 (0-indexed)
-                    [2, 3, 4, 5].forEach(index => { // Corresponds to OT/DT, Skill, $/hr, #hrs
-                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
-                    });
+                    mainThElement.colSpan = 5;
                 } else if (group === 'materials') {
-                    // materials details columns are 8, 9 (0-indexed)
-                    [7, 8].forEach(index => { // Corresponds to QTY / UNIT, $ / UNIT
-                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
-                    });
+                    mainThElement.colSpan = 3;
                 } else if (group === 'other') {
-                    // other details columns are 11, 12, 13 (0-indexed)
-                    [10, 11, 12].forEach(index => { // Corresponds to Equipment, Subcontractor, Misc.
-                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
-                    });
+                    mainThElement.colSpan = 4; // Corrected to 4
                 }
-            });
+
+                // Show the detail headers in the second row
+                document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
+                    th.classList.remove('column-hidden');
+                });
+                // Also show the associated cells in the tbody
+                estimateTableBody.querySelectorAll('tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (group === 'labor') {
+                        [2, 3, 4, 5].forEach(index => {
+                            if (cells[index]) cells[index].classList.remove('column-hidden');
+                        });
+                    } else if (group === 'materials') {
+                        [7, 8].forEach(index => {
+                            if (cells[index]) cells[index].classList.remove('column-hidden');
+                        });
+                    } else if (group === 'other') {
+                        [10, 11, 12].forEach(index => {
+                            if (cells[index]) cells[index].classList.remove('column-hidden');
+                        });
+                    }
+                });
+            }
+            adjustTableMinWidth();
         }
 
 
@@ -2453,6 +2497,37 @@
             summaryOverallLaborHoursElem.textContent = totalLaborHoursVal.toFixed(2);
             calculateTotals();
         }
+
+        // Adjusts the min-width of the table based on collapsed/expanded state
+        function adjustTableMinWidth() {
+            const table = document.querySelector('.min-w-full');
+            // Base width for fixed columns (Task Name, Description, TOTAL, Actions)
+            // Approximate widths based on current input/text sizes:
+            // Task Name: ~150px, Description: ~200px, TOTAL: ~100px, Actions: ~80px
+            let currentMinWidth = 150 + 200 + 100 + 80; 
+
+            // Add width for currently visible Labor, Materials, Other Total columns (which are always visible)
+            // Labor Total: ~100px, Materials Total: ~100px, Other Total: ~100px
+            currentMinWidth += (100 + 100 + 100);
+
+            // Add width for currently visible detail columns based on collapsed state
+            if (!collapsedState.labor) {
+                // OT/DT: ~90px, Skill: ~90px, $/hr: ~70px, #hrs: ~70px
+                currentMinWidth += (90 + 90 + 70 + 70); 
+            }
+            if (!collapsedState.materials) {
+                // QTY/UNIT: ~70px, $/UNIT: ~70px
+                currentMinWidth += (70 + 70); 
+            }
+            if (!collapsedState.other) {
+                // Equipment: ~70px, Subcontractor: ~70px, Misc: ~70px
+                currentMinWidth += (70 + 70 + 70); 
+            }
+            
+            // Set the minimum width to allow horizontal scrolling if content overflows
+            table.style.minWidth = `${currentMinWidth}px`;
+        }
+
 
         // --- Calculations ---
 
