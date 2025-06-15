@@ -382,7 +382,7 @@
                 white-space: nowrap;
                 text-align: left;
                 font-weight: bold;
-                color: #4b5563;
+                color: #4b5563; /* Default label color */
                 transition: color 0.3s; /* Smooth transition for theme changes */
             }
             td:nth-of-type(1):before { content: "Task Name:"; }
@@ -781,6 +781,19 @@
         .dark-theme .rate-label {
             color: #a0aec0; /* Lighter gray for general text */
         }
+        /* Fix: Lighter color for table total columns in dark mode */
+        .dark-theme #estimateTableBody td:nth-child(5),
+        .dark-theme #estimateTableBody td:nth-child(7),
+        .dark-theme #estimateTableBody td:nth-child(10),
+        .dark-theme #estimateTableBody td:nth-child(14),
+        .dark-theme #estimateTableBody td:nth-child(15) {
+            color: #e2e8f0; /* Light text for totals */
+        }
+        /* Fix: Lighter color for mobile table labels in dark mode */
+        .dark-theme td:before {
+            color: #a0aec0; /* Lighter gray for mobile labels */
+        }
+
         .dark-theme .header-icon-box {
             background: #4299e1; /* Slightly different blue for dark theme icon box */
         }
@@ -876,7 +889,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLmhMMTYuMiA3LjhDIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxMS44TTMuOCAxMi4yTDcuOCAxNi4yIi8+PHBhdGggZD0iTTcuOCA3LjhMMTEuOCAzLjhMMTIuMiAzLmhMMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -1560,6 +1573,9 @@
                         'rgba(68, 185, 129, 0.8)', // Lighter Green for Material
                         'rgba(255, 182, 70, 0.8)'  // Lighter Orange for Other Costs
                     ];
+                    // Update legend label colors for dark theme
+                    laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend
+                    laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title
                     laborMaterialPieChart.update();
                 }
             } else {
@@ -1572,6 +1588,9 @@
                         'rgba(16, 185, 129, 0.8)', // Green for Material
                         'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
                     ];
+                    // Revert legend label colors to light theme
+                    laborMaterialPieChart.options.plugins.legend.labels.color = '#1f2937'; // Dark text for legend
+                    laborMaterialPieChart.options.plugins.title.font.color = '#1f2937'; // Dark text for title
                     laborMaterialPieChart.update();
                 }
             }
@@ -2506,7 +2525,8 @@
                             labels: {
                                 font: {
                                     size: 14
-                                }
+                                },
+                                color: '#1f2937' // Default legend label color for light theme
                             }
                         },
                         tooltip: {
@@ -2529,18 +2549,20 @@
                             font: {
                                 size: 16
                             },
-                            color: '#1f2937'
+                            color: '#1f2937' // Default title color for light theme
                         }
                     }
                 }
             });
-            // Update chart colors immediately if dark theme is active
+            // Update chart colors and text colors immediately if dark theme is active
             if (isDarkTheme) {
                 laborMaterialPieChart.data.datasets[0].backgroundColor = [
                     'rgba(66, 153, 225, 0.8)',
                     'rgba(68, 185, 129, 0.8)',
                     'rgba(255, 182, 70, 0.8)'
                 ];
+                laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend in dark mode
+                laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title in dark mode
                 laborMaterialPieChart.update();
             }
         }
