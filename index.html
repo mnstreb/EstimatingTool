@@ -746,6 +746,33 @@
             font-size: 0.85em; /* Smaller font */
         }
 
+        /* Styles for collapsible columns */
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none; /* Prevent text selection on click */
+            padding: 0; /* Remove default padding, allow flexbox to control */
+            height: 100%; /* Make clickable area fill the cell */
+        }
+        .collapsible-header span {
+            display: inline-block; /* Ensure text behaves well with flex */
+        }
+        .collapse-toggle-icon {
+            font-size: 0.8em; /* Smaller icon */
+            transition: transform 0.2s ease-in-out;
+            display: inline-block;
+        }
+        .collapsed .collapse-toggle-icon {
+            transform: rotate(-90deg); /* Rotate for collapsed state */
+        }
+        /* Class to hide columns */
+        .column-hidden {
+            display: none !important; /* Important to override default table cell display */
+        }
+
         /* Dark Theme Styles */
         body.dark-theme {
             background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); /* Darker gradient */
@@ -975,24 +1002,39 @@
                     <tr>
                         <th rowspan="2" class="task-name-col">Task Name</th>
                         <th rowspan="2" class="description-col">Description</th>
-                        <th colspan="5" class="text-center labor-col">LABOR</th>
-                        <th colspan="3" class="text-center materials-col">MATERIALS</th>
-                        <th colspan="3" class="text-center other-col">OTHER</th>
+                        <th colspan="5" class="text-center labor-col">
+                            <div class="collapsible-header" data-group="labor">
+                                <span>LABOR</span>
+                                <span class="collapse-toggle-icon">▼</span>
+                            </div>
+                        </th>
+                        <th colspan="3" class="text-center materials-col">
+                            <div class="collapsible-header" data-group="materials">
+                                <span>MATERIALS</span>
+                                <span class="collapse-toggle-icon">▼</span>
+                            </div>
+                        </th>
+                        <th colspan="3" class="text-center other-col">
+                            <div class="collapsible-header" data-group="other">
+                                <span>OTHER</span>
+                                <span class="collapse-toggle-icon">▼</span>
+                            </div>
+                        </th>
                         <th rowspan="2" class="total-col">TOTAL</th>
                         <th rowspan="2" class="actions-col">Actions</th>
                     </tr>
                     <tr>
-                        <th class="border-b">OT/DT</th>
-                        <th class="border-b">Skill</th>
-                        <th class="border-b">$/hr</th>
-                        <th class="border-b"># hrs</th>
-                        <th class="border-b">Labor Total</th>
-                        <th class="border-b">QTY / UNIT</th>
-                        <th class="border-b">$ / UNIT</th>
-                        <th class="border-b">Materials Total</th>
-                        <th class="border-b">Equipment / Rental</th>
-                        <th class="border-b">Subcontractor</th>
-                        <th class="border-b">Misc.</th>
+                        <th class="border-b" data-group="labor-details">OT/DT</th>
+                        <th class="border-b" data-group="labor-details">Skill</th>
+                        <th class="border-b" data-group="labor-details">$/hr</th>
+                        <th class="border-b" data-group="labor-details"># hrs</th>
+                        <th class="border-b labor-total-col">Labor Total</th>
+                        <th class="border-b" data-group="materials-details">QTY / UNIT</th>
+                        <th class="border-b" data-group="materials-details">$ / UNIT</th>
+                        <th class="border-b materials-total-col">Materials Total</th>
+                        <th class="border-b" data-group="other-details">Equipment / Rental</th>
+                        <th class="border-b" data-group="other-details">Subcontractor</th>
+                        <th class="border-b" data-group="other-details">Misc.</th>
                     </tr>
                 </thead>
                 <tbody id="estimateTableBody">
@@ -1489,6 +1531,12 @@
         // State for theme
         let isDarkTheme = false;
 
+        // State for collapsed columns (initially expanded)
+        const collapsedState = {
+            labor: false,
+            materials: false,
+            other: false
+        };
 
         // Top-level summary elements
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
@@ -1555,12 +1603,60 @@
             document.getElementById('addItemBtn').addEventListener('click', addItem);
             themeToggleBtn.addEventListener('click', toggleTheme); // Event listener for theme toggle
 
+            // Add event listeners for collapsible headers
+            document.querySelectorAll('.collapsible-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const group = this.dataset.group;
+                    toggleColumnVisibility(group);
+                });
+            });
+
+
             showSetup();
             updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
             populateTradesDropdown();
             updateSelectedTradesDisplay();
             renderItems(); // Render the pre-filled items
         });
+
+        // --- Collapsible Column Logic ---
+        function toggleColumnVisibility(group) {
+            collapsedState[group] = !collapsedState[group];
+            const headerElement = document.querySelector(`.collapsible-header[data-group="${group}"]`);
+            
+            if (collapsedState[group]) {
+                headerElement.classList.add('collapsed');
+            } else {
+                headerElement.classList.remove('collapsed');
+            }
+            
+            // Toggle visibility for all columns in this group in both thead and tbody
+            document.querySelectorAll(`[data-group="${group}-details"]`).forEach(el => {
+                el.classList.toggle('column-hidden', collapsedState[group]);
+            });
+
+            // Iterate through table body rows to hide/show cells
+            estimateTableBody.querySelectorAll('tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (group === 'labor') {
+                    // labor details columns are 3, 4, 5, 6 (0-indexed)
+                    [2, 3, 4, 5].forEach(index => { // Corresponds to OT/DT, Skill, $/hr, #hrs
+                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
+                    });
+                } else if (group === 'materials') {
+                    // materials details columns are 8, 9 (0-indexed)
+                    [7, 8].forEach(index => { // Corresponds to QTY / UNIT, $ / UNIT
+                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
+                    });
+                } else if (group === 'other') {
+                    // other details columns are 11, 12, 13 (0-indexed)
+                    [10, 11, 12].forEach(index => { // Corresponds to Equipment, Subcontractor, Misc.
+                        if (cells[index]) cells[index].classList.toggle('column-hidden', collapsedState[group]);
+                    });
+                }
+            });
+        }
+
 
         // --- Theme Toggle Logic ---
         function toggleTheme() {
@@ -2319,14 +2415,14 @@
                     <td data-label="Task Name"><textarea rows="2" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field">${item.taskName}</textarea></td>
                     <td data-label="Description"><textarea rows="2" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field">${item.description}</textarea></td>
                     
-                    <td data-label="OT/DT Multiplier">
+                    <td data-label="OT/DT Multiplier" class="${collapsedState.labor ? 'column-hidden' : ''}">
                         <select onchange="updateItem(${item.id}, 'otDtMultiplier', this.value)" class="input-field">
                             <option value="1.0" ${item.otDtMultiplier === 1.0 ? 'selected' : ''}>1.0</option>
                             <option value="1.5" ${item.otDtMultiplier === 1.5 ? 'selected' : ''}>1.5</option>
                             <option value="2.0" ${item.otDtMultiplier === 2.0 ? 'selected' : ''}>2.0</option>
                         </select>
                     </td>
-                    <td data-label="Skill">
+                    <td data-label="Skill" class="${collapsedState.labor ? 'column-hidden' : ''}">
                         <select onchange="updateItem(${item.id}, 'rateRole', this.value)" class="input-field">
                             ${(projectSettings.allTradeLaborRates[item.trade] ? Object.keys(projectSettings.allTradeLaborRates[item.trade]) : []).map(role => {
                                 return `<option value="${role}" ${item.rateRole === role ? 'selected' : ''}>
@@ -2336,17 +2432,17 @@
                             ${!projectSettings.allTradeLaborRates[item.trade] || Object.keys(projectSettings.allTradeLaborRates[item.trade]).length === 0 ? '<option value="" selected>No Skills</option>' : ''}
                         </select>
                     </td>
-                    <td data-label="$/hr">${formatCurrency(effectiveLaborRate)}</td>
-                    <td data-label="# hrs"><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
+                    <td data-label="$/hr" class="${collapsedState.labor ? 'column-hidden' : ''}">${formatCurrency(effectiveLaborRate)}</td>
+                    <td data-label="# hrs" class="${collapsedState.labor ? 'column-hidden' : ''}"><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
                     <td data-label="Labor Total">${formatCurrency(laborTotal)}</td>
                     
-                    <td data-label="Material Qty"><input type="number" value="${item.materialQuantity}" onchange="updateItem(${item.id}, 'materialQuantity', this.value)" class="input-field"></td>
-                    <td data-label="Material $/Unit"><input type="number" value="${item.materialUnitCost}" onchange="updateItem(${item.id}, 'materialUnitCost', this.value)" class="input-field"></td>
+                    <td data-label="Material Qty" class="${collapsedState.materials ? 'column-hidden' : ''}"><input type="number" value="${item.materialQuantity}" onchange="updateItem(${item.id}, 'materialQuantity', this.value)" class="input-field"></td>
+                    <td data-label="Material $/Unit" class="${collapsedState.materials ? 'column-hidden' : ''}"><input type="number" value="${item.materialUnitCost}" onchange="updateItem(${item.id}, 'materialUnitCost', this.value)" class="input-field"></td>
                     <td data-label="Materials Total">${formatCurrency(materialsTotal)}</td>
                     
-                    <td data-label="Equipment/Rental"><input type="number" value="${item.equipmentRentalCost}" onchange="updateItem(${item.id}, 'equipmentRentalCost', this.value)" class="input-field"></td>
-                    <td data-label="Subcontractor"><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
-                    <td data-label="Misc. Cost"><input type="number" value="${item.miscLineItem}" onchange="updateItem(${item.id}, 'miscLineItem', this.value)" class="input-field"></td>
+                    <td data-label="Equipment/Rental" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.equipmentRentalCost}" onchange="updateItem(${item.id}, 'equipmentRentalCost', this.value)" class="input-field"></td>
+                    <td data-label="Subcontractor" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
+                    <td data-label="Misc. Cost" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.miscLineItem}" onchange="updateItem(${item.id}, 'miscLineItem', this.value)" class="input-field"></td>
                     <td data-label="Other Total">${formatCurrency(otherCategoryTotal)}</td>
                     
                     <td data-label="Line Total" class="font-bold text-gray-900">${formatCurrency(lineTotal)}</td>
