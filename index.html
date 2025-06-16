@@ -817,6 +817,10 @@
         .dark-theme .summary-item strong {
             color: #e2e8f0; /* Light headings and strong text */
         }
+        /* ADDED: Specific rule for the chart h4 title in dark theme */
+        .dark-theme .chart-container.card h4 {
+            color: #e2e8f0; /* Ensures the "Cost Distribution" title is light in dark mode */
+        }
         .dark-theme .header-subtitle,
         .dark-theme .summary-item,
         .dark-theme .logo-upload-area .upload-text,
@@ -934,7 +938,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDE1LjgMMTMu MoyaIDcuOEw1LjhMMTIuMiAzLmhMMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDE1LjgwMTMyMiAzLjE3MjQ1MzM4TDEzLjE0NTgzOTQ5OSA3Ljg1NDgzMzkyNCA3Ljg4NDc5ODUzIDE1LjkwNDQwNTkgNS44MTIxNzcyMSAxMi42MjM1NjQ0NCAxMi4xOTA5MjgyIDMuMTcyNDUzMzggMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -1116,7 +1120,7 @@
                         <option value="FL">Florida</option>
                         <option value="WA">Washington</option>
                         <option value="IL">Illinois</option>
-                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</s option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</s option> <option value="WY">Wyoming</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</s option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</s option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</s option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
                 
@@ -1354,154 +1358,14 @@
             allowanceCost: 0
         };
 
-        // Estimate data structure
+        // Estimate data structure (starting with only one item)
         let estimateItems = [
             {
-                id: Date.now() + 1,
-                taskName: 'GENERAL REQUIREMENTS',
-                description: 'Plans, specifications, engineering, permits, zoning, building, environmental, and survey',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0 // New field
-            },
-            {
-                id: Date.now() + 2,
-                taskName: 'Plans and Specifications',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 3,
-                taskName: 'Plan Review',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 4,
-                taskName: 'Permits: Zoning, Building, Environmental, Other',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 5,
-                taskName: 'Survey',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 6,
-                taskName: 'Impact Fee',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 7,
-                taskName: 'Administrative Costs',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 8,
-                taskName: 'Financing Costs',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 9,
-                taskName: 'Legal Fees',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 10,
-                taskName: 'Engineering Fees',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
-                hours: 0,
-                otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
-                equipmentRentalCost: 0,
-                subcontractorCostLineItem: 0,
-                miscLineItem: 0
-            },
-            {
-                id: Date.now() + 11,
-                taskName: 'Insurance',
-                description: '',
-                trade: 'General',
-                rateRole: 'Journeyman',
+                id: Date.now(), // Ensures a unique ID for the first item
+                taskName: 'First Task', // A more generic default name
+                description: 'Detail your first project task here.',
+                trade: 'General', // This will be updated to match activeTrades later if needed
+                rateRole: 'Journeyman', // This will be updated to match activeTrades later if needed
                 hours: 0,
                 otDtMultiplier: 1.0,
                 materialQuantity: 0,
@@ -1511,6 +1375,13 @@
                 miscLineItem: 0
             }
         ];
+
+        // State for collapsed columns (initially collapsed for all)
+        const collapsedState = {
+            labor: true,
+            materials: true,
+            other: true
+        };
 
         // UI Element references
         const setupWizard = document.getElementById('setupWizard');
@@ -1552,15 +1423,8 @@
         // State for advanced details in Step 1
         let isAdvancedDetailsActive = false;
         
-        // State for theme
+        // State for theme - will be initialized in DOMContentLoaded
         let isDarkTheme = false;
-
-        // State for collapsed columns (initially expanded, so false for collapsed)
-        const collapsedState = {
-            labor: false,
-            materials: false,
-            other: false
-        };
 
         // Top-level summary elements
         const summaryTotalProposalElem = document.getElementById('summaryTotalProposal');
@@ -1573,9 +1437,9 @@
         const summaryMaterialMarkupAmount = document.getElementById('summaryMaterialMarkupAmount'); // NEW: Reference for Material Markup Amount
         const summaryEstimateSubtotal = document.getElementById('summaryEstimateSubtotal');
         const summaryProfitMargin = document.getElementById('summaryProfitMargin');
-        const summarySalesTax = document.getElementById('summarySalesTax');
-        const summaryMiscPercent = document.getElementById('summaryMiscPercent');
-        const summaryOverhead = document.getElementById('summaryOverhead');
+        const summarySalesTax = document.getElementById('salesTax'); // Changed to direct input reference
+        const summaryMiscPercent = document.getElementById('miscellaneous'); // Changed to direct input reference
+        const summaryOverhead = document.getElementById('overhead'); // Changed to direct input reference
         const summaryAdditionalConsiderations = document.getElementById('summaryAdditionalConsiderations');
 
 
@@ -1606,6 +1470,11 @@
 
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
+            // Set initial theme to light by default
+            isDarkTheme = false;
+            document.body.classList.remove('dark-theme'); // Ensure light theme is active
+            themeToggleBtn.innerHTML = '🌙'; // Moon icon for light theme (toggle to dark)
+
             // Attach event listeners for static elements
             document.getElementById('reconfigureBtn').addEventListener('click', showSetup);
             document.getElementById('generateReportBtn').addEventListener('click', generateReport);
@@ -1635,12 +1504,26 @@
                 });
             });
 
-
             showSetup();
             updateSalesTaxForState(projectSettings.projectState); // Will set based on default CA, overriding the 0
             populateTradesDropdown();
             updateSelectedTradesDisplay();
-            renderItems(); // Render the pre-filled items
+
+            // Immediately apply initial collapsed state to the main table headers
+            for (const group in collapsedState) {
+                if (collapsedState.hasOwnProperty(group) && collapsedState[group]) {
+                    const headerElement = document.querySelector(`.collapsible-header[data-group="${group}"]`);
+                    const mainThElement = document.getElementById(`th${group.charAt(0).toUpperCase() + group.slice(1)}Header`);
+                    if (headerElement && mainThElement) {
+                        headerElement.classList.add('collapsed');
+                        mainThElement.colSpan = 1;
+                        document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
+                            th.classList.add('column-hidden');
+                        });
+                    }
+                }
+            }
+            adjustTableMinWidth(); // Call adjustTableMinWidth initially as well
         });
 
         // --- Collapsible Column Logic ---
@@ -1721,39 +1604,37 @@
             if (isDarkTheme) {
                 document.body.classList.add('dark-theme');
                 themeToggleBtn.innerHTML = '☀️'; // Sun icon for light theme
-                // Update Chart colors for dark theme
-                if (laborMaterialPieChart) {
-                    laborMaterialPieChart.data.datasets[0].backgroundColor = [
-                        'rgba(66, 153, 225, 0.8)', // Lighter Blue for Labor
-                        'rgba(68, 185, 129, 0.8)', // Lighter Green for Material
-                        'rgba(255, 182, 70, 0.8)'  // Lighter Orange for Other Costs
-                    ];
-                    laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(200, 200, 200, 0.2)'; // Softer border for dark theme
-                    laborMaterialPieChart.data.datasets[0].borderWidth = 1; // Slightly thinner border
-
-                    // Update legend label colors for dark theme
-                    laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend
-                    laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title
-                    laborMaterialPieChart.update();
-                }
             } else {
                 document.body.classList.remove('dark-theme');
                 themeToggleBtn.innerHTML = '🌙'; // Moon icon for dark theme
-                // Revert Chart colors to light theme
-                if (laborMaterialPieChart) {
-                    laborMaterialPieChart.data.datasets[0].backgroundColor = [
-                        'rgba(59, 130, 246, 0.8)', // Blue for Labor
-                        'rgba(16, 185, 129, 0.8)', // Green for Material
-                        'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
-                    ];
-                    laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(255, 255, 255, 1)'; // Original white border
-                    laborMaterialPieChart.data.datasets[0].borderWidth = 2; // Original border width
+            }
+            applyChartTheme(); // Apply theme to chart immediately
+        }
 
-                    // Revert legend label colors to light theme
-                    laborMaterialPieChart.options.plugins.legend.labels.color = '#1f2937'; // Dark text for legend
-                    laborMaterialPieChart.options.plugins.title.font.color = '#1f2937'; // Dark text for title
-                    laborMaterialPieChart.update();
-                }
+        // Dedicated function to apply theme colors to the chart
+        function applyChartTheme() {
+            if (laborMaterialPieChart) {
+                const textColor = isDarkTheme ? '#e2e8f0' : '#1f2937';
+                const borderColor = isDarkTheme ? 'rgba(200, 200, 200, 0.2)' : 'rgba(255, 255, 255, 1)';
+                const borderWidth = isDarkTheme ? 1 : 2;
+                const backgroundColor = isDarkTheme ? [
+                    'rgba(66, 153, 225, 0.8)', // Lighter Blue for Labor
+                    'rgba(68, 185, 129, 0.8)', // Lighter Green for Material
+                    'rgba(255, 182, 70, 0.8)'  // Lighter Orange for Other Costs
+                ] : [
+                    'rgba(59, 130, 246, 0.8)', // Blue for Labor
+                    'rgba(16, 185, 129, 0.8)', // Green for Material
+                    'rgba(245, 158, 11, 0.8)' // Orange for Other Costs
+                ];
+
+                laborMaterialPieChart.data.datasets[0].backgroundColor = backgroundColor;
+                laborMaterialPieChart.data.datasets[0].borderColor = borderColor;
+                laborMaterialPieChart.data.datasets[0].borderWidth = borderWidth;
+                laborMaterialPieChart.options.plugins.legend.labels.color = textColor;
+                // Note: The main chart title is not display:true, so this 'title.font.color' property won't be visible.
+                // The H4 element outside the canvas is controlled by CSS.
+                laborMaterialPieChart.options.plugins.title.font.color = textColor; 
+                laborMaterialPieChart.update();
             }
         }
 
@@ -1957,12 +1838,45 @@
 
             projectInfoElem.textContent = `${projectSettings.projectType} - ${projectSettings.projectName} - ${projectSettings.projectState}`;
 
-            if (estimateItems.length === 0) {
-                // If somehow no initial items were added, add a default one
-                addItem();
-            } else {
-                renderItems();
+            // Ensure default trade/role is set for the single item if it's new or needs update
+            if (estimateItems.length === 1) { // Only update the first item if it's the default one
+                const firstItem = estimateItems[0];
+                const defaultTrade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
+                const defaultRole = projectSettings.allTradeLaborRates[defaultTrade] && Object.keys(projectSettings.allTradeLaborRates[defaultTrade]).length > 0 ? Object.keys(projectSettings.allTradeLaborRates[defaultTrade])[0] : "Journeyman";
+                
+                // Only set if the item still has the initial generic names or trade/role are invalid
+                if (firstItem.taskName === 'First Task' && firstItem.description === 'Detail your first project task here.' ||
+                    !projectSettings.activeTrades.includes(firstItem.trade) ||
+                    !projectSettings.allTradeLaborRates[firstItem.trade]?.[firstItem.rateRole]
+                ) {
+                    firstItem.trade = defaultTrade;
+                    firstItem.rateRole = defaultRole;
+                }
             }
+            
+            renderItems(); // This will now render based on the (single) item and collapsedState for TDs.
+
+            // Re-apply column visual states (colspans, icons, column-hidden class on second row THs)
+            for (const group in collapsedState) {
+                if (collapsedState.hasOwnProperty(group)) {
+                    const headerElement = document.querySelector(`.collapsible-header[data-group="${group}"]`);
+                    const mainThElement = document.getElementById(`th${group.charAt(0).toUpperCase() + group.slice(1)}Header`);
+                    if (headerElement && mainThElement) {
+                        if (collapsedState[group]) {
+                            headerElement.classList.add('collapsed');
+                            mainThElement.colSpan = 1;
+                            document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => th.classList.add('column-hidden'));
+                        } else {
+                            headerElement.classList.remove('collapsed');
+                            if (group === 'labor') mainThElement.colSpan = 5;
+                            else if (group === 'materials') mainThElement.colSpan = 3;
+                            else if (group === 'other') mainThElement.colSpan = 4;
+                            document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => th.classList.remove('column-hidden'));
+                        }
+                    }
+                }
+            }
+            adjustTableMinWidth();
         }
 
         // --- Data Management Functions ---
@@ -2705,6 +2619,7 @@
                     labels: ['Labor Cost', 'Material Cost', 'Other Costs'], // Added 'Other Costs' label
                     datasets: [{
                         data: [laborTotal, materialTotal, otherTotal], // Added otherTotal to data
+                        // Set initial colors to default light theme, then apply theme using applyChartTheme
                         backgroundColor: [
                             'rgba(59, 130, 246, 0.8)', // Blue for Labor
                             'rgba(16, 185, 129, 0.8)', // Green for Material
@@ -2728,7 +2643,8 @@
                                 font: {
                                     size: 14
                                 },
-                                color: '#1f2937' // Default legend label color for light theme
+                                // Set color directly based on isDarkTheme during creation
+                                color: isDarkTheme ? '#e2e8f0' : '#1f2937' 
                             }
                         },
                         tooltip: {
@@ -2747,28 +2663,15 @@
                         },
                         title: {
                             display: false,
-                            text: 'Labor vs. Material Cost Distribution',
-                            font: {
-                                size: 16
-                            },
-                            color: '#1f2937' // Default title color for light theme
+                            text: 'Cost Distribution',
+                            // Set color directly based on isDarkTheme during creation
+                            color: isDarkTheme ? '#e2e8f0' : '#1f2937'
                         }
                     }
                 }
             });
-            // Update chart colors and text colors immediately if dark theme is active
-            if (isDarkTheme) {
-                laborMaterialPieChart.data.datasets[0].backgroundColor = [
-                    'rgba(66, 153, 225, 0.8)',
-                    'rgba(68, 185, 129, 0.8)',
-                    'rgba(255, 182, 70, 0.8)'
-                ];
-                laborMaterialPieChart.data.datasets[0].borderColor = 'rgba(200, 200, 200, 0.2)'; // Softer border for dark theme
-                laborMaterialPieChart.data.datasets[0].borderWidth = 1; // Slightly thinner border
-                laborMaterialPieChart.options.plugins.legend.labels.color = '#e2e8f0'; // Light text for legend in dark mode
-                laborMaterialPieChart.options.plugins.title.font.color = '#e2e8f0'; // Light text for title in dark mode
-                laborMaterialPieChart.update();
-            }
+            // No need to call applyChartTheme here, as colors are set during Chart creation.
+            // applyChartTheme(); 
         }
 
         // --- Report Generation ---
