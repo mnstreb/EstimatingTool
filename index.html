@@ -112,7 +112,7 @@
 
         tr:nth-child(even) {
             background: #f8fafc; /* Subtle zebra striping */
-            transition: background-color 0.3s; /* Smooth transition for theme changes */
+            transition: background-color 0.3s, background-color 0.3s; /* Smooth transition for theme changes */
         }
         tr:hover {
             background: #e0f2fe; /* Light blue on hover */
@@ -741,18 +741,17 @@
             transition: color 0.3s; /* Smooth transition for theme changes */
         }
 
-        /* Center Labor Total, Materials Total, Other Total Cells in tbody */
-        /* Adjusted indices for new 'Line' column */
-        #estimateTableBody td:nth-child(8), /* Labor Total */
-        #estimateTableBody td:nth-child(11), /* Materials Total */
-        #estimateTableBody td:nth-child(15) { /* Other Total */
+        /* General alignment for total cells */
+        #estimateTableBody td[data-label="Labor Total"],
+        #estimateTableBody td[data-label="Materials Total"],
+        #estimateTableBody td[data-label="Other Total"] {
             white-space: nowrap;
             font-weight: bold;
             color: #1f2937; /* Darker text for totals */
-            text-align: center; /* ALIGNED TO CENTER FOR COLLAPSED VIEW */
             transition: color 0.3s; /* Smooth transition for theme changes */
+            /* Default alignment for these cells is left, will override with JS when collapsed */
         }
-        
+
         /* Adjust actions column button size */
         #estimateTableBody td button.btn-red {
             padding: 6px 10px; /* Smaller padding for action button */
@@ -794,6 +793,12 @@
         th.other-total-col {
             text-align: center;
         }
+
+        /* NEW: Class to force center alignment for total cells when columns are collapsed */
+        td.align-center-collapsed {
+            text-align: center !important;
+        }
+
 
         /* Dark Theme Styles */
         body.dark-theme {
@@ -987,7 +992,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDE1LjgwMTMyMiAzLjE3MjQ1MzM4TDEzLjE0NTgzOTQ5OSA3Ljg1NDgzMzkyNCA3Ljg4NDc5ODUzIDE1LjkwNDQwNTkgNS44MTIxNzcyMSAxMi42MjM1NjQ0NCAxMi4xOTA5MjgyIDMuMTcyNDUzMzggMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9M003LjggNy44TDE1LjgwMTMyMiAzLjE3MjQ1MzM4TDEzLjE0NTgzOTQ5OSA3Ljg1NDgzMzkyNCA3Ljg4NDc5ODUzIDE1LjkwNDQwNTkgNS44MTIxNzcyMSAxMi42MjM1NjQ0NCAxMi4xOTA5MjgyIDMuMTcyNDUzMzggMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -1626,40 +1631,37 @@
             
             if (collapsedState[group]) {
                 headerElement.classList.add('collapsed');
-                // When collapsed, the header spans only the "Total" column
                 mainThElement.colSpan = 1; 
 
-                // Hide the detail headers in the second row
                 document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
                     th.classList.add('column-hidden');
                 });
-                // Also hide the associated cells in the tbody
+                
+                // Add align-center-collapsed class to the total column's cells
                 estimateTableBody.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    // Adjusted indices for new "Line" column: Task Name (1), Description (2) etc.
+                    if (group === 'labor' && cells[7]) cells[7].classList.add('align-center-collapsed'); // Labor Total
+                    else if (group === 'materials' && cells[10]) cells[10].classList.add('align-center-collapsed'); // Materials Total
+                    else if (group === 'other' && cells[14]) cells[14].classList.add('align-center-collapsed'); // Other Total
+                    
+                    // Also hide the associated detail cells in the tbody
                     if (group === 'labor') {
-                        // Original indices for labor details: 2(OT/DT), 3(Skill), 4($/hr), 5(#hrs) in *old* table.
-                        // Now: 3(OT/DT), 4(Skill), 5($/hr), 6(#hrs)
                         [3, 4, 5, 6].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'materials') {
-                        // Original indices for materials details: 7(QTY/UNIT), 8($/UNIT)
-                        // Now: 8(QTY/UNIT), 9($/UNIT)
                         [8, 9].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'other') {
-                        // Original indices for other details: 10(Equipment), 11(Subcontractor), 12(Misc.)
-                        // Now: 11(Equipment), 12(Subcontractor), 13(Misc.)
                         [11, 12, 13].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     }
                 });
+
             } else {
                 headerElement.classList.remove('collapsed');
-                // Restore original colspan when expanded
                 if (group === 'labor') {
                     mainThElement.colSpan = 5;
                 } else if (group === 'materials') {
@@ -1668,14 +1670,17 @@
                     mainThElement.colSpan = 4;
                 }
 
-                // Show the detail headers in the second row
                 document.querySelectorAll(`th[data-col-group="${group}-details"]`).forEach(th => {
                     th.classList.remove('column-hidden');
                 });
-                // Also show the associated cells in the tbody
+
+                // Remove align-center-collapsed class and show detail cells
                 estimateTableBody.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    // Adjusted indices for new "Line" column
+                    if (group === 'labor' && cells[7]) cells[7].classList.remove('align-center-collapsed');
+                    else if (group === 'materials' && cells[10]) cells[10].classList.remove('align-center-collapsed');
+                    else if (group === 'other' && cells[14]) cells[14].classList.remove('align-center-collapsed');
+
                     if (group === 'labor') {
                         [3, 4, 5, 6].forEach(index => {
                             if (cells[index]) cells[index].classList.remove('column-hidden');
@@ -2509,16 +2514,16 @@
                     </td>
                     <td data-label="$/hr" class="${collapsedState.labor ? 'column-hidden' : ''}">${formatCurrency(effectiveLaborRate)}</td>
                     <td data-label="# hrs" class="${collapsedState.labor ? 'column-hidden' : ''}"><input type="number" value="${item.hours}" onchange="updateItem(${item.id}, 'hours', this.value)" class="input-field"></td>
-                    <td data-label="Labor Total">${formatCurrency(laborTotal)}</td>
+                    <td data-label="Labor Total" class="${collapsedState.labor ? 'align-center-collapsed' : ''}">${formatCurrency(laborTotal)}</td>
                     
                     <td data-label="Material Qty" class="${collapsedState.materials ? 'column-hidden' : ''}"><input type="number" value="${item.materialQuantity}" onchange="updateItem(${item.id}, 'materialQuantity', this.value)" class="input-field"></td>
                     <td data-label="Material $/Unit" class="${collapsedState.materials ? 'column-hidden' : ''}"><input type="number" value="${item.materialUnitCost}" onchange="updateItem(${item.id}, 'materialUnitCost', this.value)" class="input-field"></td>
-                    <td data-label="Materials Total">${formatCurrency(materialsTotal)}</td>
+                    <td data-label="Materials Total" class="${collapsedState.materials ? 'align-center-collapsed' : ''}">${formatCurrency(materialsTotal)}</td>
                     
                     <td data-label="Equipment/Rental" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.equipmentRentalCost}" onchange="updateItem(${item.id}, 'equipmentRentalCost', this.value)" class="input-field"></td>
                     <td data-label="Subcontractor" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.subcontractorCostLineItem}" onchange="updateItem(${item.id}, 'subcontractorCostLineItem', this.value)" class="input-field"></td>
                     <td data-label="Misc. Cost" class="${collapsedState.other ? 'column-hidden' : ''}"><input type="number" value="${item.miscLineItem}" onchange="updateItem(${item.id}, 'miscLineItem', this.value)" class="input-field"></td>
-                    <td data-label="Other Total">${formatCurrency(otherCategoryTotal)}</td>
+                    <td data-label="Other Total" class="${collapsedState.other ? 'align-center-collapsed' : ''}">${formatCurrency(otherCategoryTotal)}</td>
                     
                     <td data-label="Line Total" class="font-bold text-gray-900">${formatCurrency(lineTotal)}</td>
                     <td><button class="btn btn-red btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
