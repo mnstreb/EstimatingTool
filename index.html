@@ -118,7 +118,7 @@
             background: #e0f2fe; /* Light blue on hover */
             transition: background 0.15s ease-in-out;
         }
-        .setup-wizard {
+        .setup-wizard, .modal-overlay { /* Combined setup-wizard and modal-overlay for common styles */
             position: fixed;
             top: 0;
             left: 0;
@@ -131,7 +131,7 @@
             z-index: 1000;
             backdrop-filter: blur(5px); /* Subtle blur effect */
         }
-        .wizard-content {
+        .wizard-content, .modal-content { /* Combined wizard-content and modal-content */
             background: white;
             border-radius: 20px; /* More rounded */
             padding: 45px; /* More padding */
@@ -385,27 +385,29 @@
                 color: #4b5563; /* Default label color */
                 transition: color 0.3s; /* Smooth transition for theme changes */
             }
-            td:nth-of-type(1):before { content: "Task Name:"; }
-            td:nth-of-type(2):before { content: "Description:"; }
-            td:nth-of-type(3):before { content: "OT/DT Multiplier:"; }
-            td:nth-of-type(4):before { content: "Skill:"; }
-            td:nth-of-type(5):before { content: "$/hr:"; }
-            td:nth-of-type(6):before { content: "# hrs:"; }
-            td:nth-of-type(7):before { content: "Labor Total:"; }
-            td:nth-of-type(8):before { content: "QTY / UNIT:"; }
-            td:nth-of-type(9):before { content: "$ / UNIT:"; }
-            td:nth-of-type(10):before { content: "Materials Total:"; }
-            td:nth-of-type(11):before { content: "Equipment / Rental:"; }
-            td:nth-of-type(12):before { content: "Subcontractor:"; }
-            td:nth-of-type(13):before { content: "Misc.:"; }
-            td:nth-of-type(14):before { content: "Other Total:"; }
-            td:nth-of-type(15):before { content: "TOTAL:"; }
-            td:nth-of-type(16):before { content: "Actions:"; }
+            /* Updated :before content for new "Line" column */
+            td:nth-of-type(1):before { content: "Line:"; }
+            td:nth-of-type(2):before { content: "Task Name:"; }
+            td:nth-of-type(3):before { content: "Description:"; }
+            td:nth-of-type(4):before { content: "OT/DT Multiplier:"; }
+            td:nth-of-type(5):before { content: "Skill:"; }
+            td:nth-of-type(6):before { content: "$/hr:"; }
+            td:nth-of-type(7):before { content: "# hrs:"; }
+            td:nth-of-type(8):before { content: "Labor Total:"; }
+            td:nth-of-type(9):before { content: "QTY / UNIT:"; }
+            td:nth-of-type(10):before { content: "$ / UNIT:"; }
+            td:nth-of-type(11):before { content: "Materials Total:"; }
+            td:nth-of-type(12):before { content: "Equipment / Rental:"; }
+            td:nth-of-type(13):before { content: "Subcontractor:"; }
+            td:nth-of-type(14):before { content: "Misc.:"; }
+            td:nth-of-type(15):before { content: "Other Total:"; }
+            td:nth-of-type(16):before { content: "TOTAL:"; }
+            td:nth-of-type(17):before { content: "Actions:"; }
 
         }
 
         @media (max-width: 768px) {
-            .card, .wizard-content {
+            .card, .wizard-content, .modal-content {
                 padding: 20px;
                 margin-bottom: 15px;
             }
@@ -693,8 +695,8 @@
         }
 
         /* Styles for Task Name and Description Textareas */
-        #estimateTableBody td:nth-child(1) textarea, /* Task Name */
-        #estimateTableBody td:nth-child(2) textarea { /* Description */
+        #estimateTableBody td:nth-child(2) textarea, /* Task Name is now 2nd column */
+        #estimateTableBody td:nth-child(3) textarea { /* Description is now 3rd column */
             white-space: normal; /* Allow text to wrap */
             height: auto; /* Auto height based on content */
             min-height: 40px; /* Minimum height for visibility */
@@ -703,8 +705,8 @@
             overflow-y: auto; /* Add scrollbar if content exceeds min-height */
         }
         /* Ensure these textareas fill their cell width */
-        #estimateTableBody td:nth-child(1) textarea,
-        #estimateTableBody td:nth-child(2) textarea {
+        #estimateTableBody td:nth-child(2) textarea,
+        #estimateTableBody td:nth-child(3) textarea {
             width: 100%; /* Fill the cell */
             max-width: none; /* Override any max-width */
         }
@@ -721,16 +723,17 @@
         }
 
         /* Specific width adjustments for 'Skill' and 'OT/DT' selects */
-        #estimateTableBody td:nth-child(3) select, /* OT/DT Multiplier */
-        #estimateTableBody td:nth-child(4) select { /* Skill */
+        /* Adjusted indices for new 'Line' column */
+        #estimateTableBody td:nth-child(4) select, /* OT/DT Multiplier */
+        #estimateTableBody td:nth-child(5) select { /* Skill */
             width: 90px; /* Slightly more space for selects */
             text-align: left; /* Keep text aligned left for selections */
         }
 
         /* Keep currency output and total values on one line and bold */
-        /* This applies to $/hr and TOTAL */
-        #estimateTableBody td:nth-child(5), /* $/hr */
-        #estimateTableBody td:nth-child(15) { /* TOTAL */
+        /* Adjusted indices for new 'Line' column */
+        #estimateTableBody td:nth-child(6), /* $/hr */
+        #estimateTableBody td:nth-child(16) { /* TOTAL */
             white-space: nowrap;
             font-weight: bold;
             color: #1f2937; /* Darker text for totals */
@@ -739,9 +742,10 @@
         }
 
         /* Center Labor Total, Materials Total, Other Total Cells in tbody */
-        #estimateTableBody td:nth-child(7), /* Labor Total */
-        #estimateTableBody td:nth-child(10), /* Materials Total */
-        #estimateTableBody td:nth-child(14) { /* Other Total */
+        /* Adjusted indices for new 'Line' column */
+        #estimateTableBody td:nth-child(8), /* Labor Total */
+        #estimateTableBody td:nth-child(11), /* Materials Total */
+        #estimateTableBody td:nth-child(15) { /* Other Total */
             white-space: nowrap;
             font-weight: bold;
             color: #1f2937; /* Darker text for totals */
@@ -831,11 +835,12 @@
             color: #a0aec0; /* Lighter gray for general text */
         }
         /* Fix: Lighter color for table total columns in dark mode */
-        .dark-theme #estimateTableBody td:nth-child(5),
-        .dark-theme #estimateTableBody td:nth-child(7),
-        .dark-theme #estimateTableBody td:nth-child(10),
-        .dark-theme #estimateTableBody td:nth-child(14),
-        .dark-theme #estimateTableBody td:nth-child(15) {
+        /* Adjusted indices for new 'Line' column */
+        .dark-theme #estimateTableBody td:nth-child(6),
+        .dark-theme #estimateTableBody td:nth-child(8),
+        .dark-theme #estimateTableBody td:nth-child(11),
+        .dark-theme #estimateTableBody td:nth-child(15),
+        .dark-theme #estimateTableBody td:nth-child(16) {
             color: #e2e8f0; /* Light text for totals */
         }
         /* Fix: Lighter color for mobile table labels in dark mode */
@@ -916,7 +921,7 @@
         .dark-theme .logo-upload-area .default-icon {
             color: #63b3ed;
         }
-        .dark-theme .setup-wizard .wizard-content {
+        .dark-theme .setup-wizard .wizard-content, .dark-theme .modal-content {
             background: #2d3748;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
@@ -927,6 +932,50 @@
         .dark-theme .step.active {
             background: #4299e1;
             box-shadow: 0 2px 8px rgba(66, 153, 225, 0.4);
+        }
+        /* Styles for the Copy Lines Modal */
+        .modal-content-small { /* Specific style for smaller modal content */
+            max-width: 450px; /* Smaller width for this modal */
+            padding: 30px;
+        }
+        .modal-content-small h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .line-item-selection {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .line-item-selection label {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .line-item-selection label:hover {
+            background-color: #f3f4f6;
+        }
+        .line-item-selection input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        /* Dark mode for modal */
+        .dark-theme .modal-content {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        .dark-theme .modal-content h3 {
+            color: #e2e8f0;
+        }
+        .dark-theme .line-item-selection {
+            border-color: #4a5568;
+        }
+        .dark-theme .line-item-selection label:hover {
+            background-color: #4a5568;
         }
     </style>
 </head>
@@ -1016,11 +1065,15 @@
         <div class="card overflow-x-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-gray-800">Estimate Line Items</h3>
-                <button id="addItemBtn" class="btn btn-green">➕ Add Item</button>
+                <div class="flex gap-2">
+                    <button id="copyLinesBtn" class="btn btn-primary">📋 Copy Lines</button>
+                    <button id="addItemBtn" class="btn btn-green">➕ Add Item</button>
+                </div>
             </div>
             <table class="min-w-full">
                 <thead>
                     <tr>
+                        <th rowspan="2" class="line-col">Line</th> <!-- NEW: Line Column -->
                         <th rowspan="2" class="task-name-col">Task Name</th>
                         <th rowspan="2" class="description-col">Description</th>
                         <!-- Initial colspan="5" for LABOR (4 detail + 1 total) -->
@@ -1049,6 +1102,10 @@
                     </tr>
                     <tr>
                         <!-- These THs will be hidden/shown by JS and are targeted by data-col-group -->
+                        <th class="border-b line-col-sub"></th> <!-- Empty header for Line column second row -->
+                        <th class="border-b task-name-col-sub"></th> <!-- Empty header for Task Name second row -->
+                        <th class="border-b description-col-sub"></th> <!-- Empty header for Description second row -->
+
                         <th class="border-b" data-col-group="labor-details">OT/DT</th>
                         <th class="border-b" data-col-group="labor-details">Skill</th>
                         <th class="border-b" data-col-group="labor-details">$/hr</th>
@@ -1068,6 +1125,27 @@
                 <tbody id="estimateTableBody">
                     </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Copy Lines Modal -->
+    <div id="copyLinesModal" class="modal-overlay hidden">
+        <div class="modal-content modal-content-small">
+            <h3 class="text-xl font-semibold text-gray-800 mb-6">Copy Selected Lines</h3>
+            <div class="line-item-selection">
+                <p class="text-gray-600 text-center py-2" id="noLinesToCopyMessage">No lines available to copy.</p>
+                <div id="lineSelectionContainer">
+                    <!-- Checkboxes for lines will be inserted here -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="numCopies" class="label">Number of Copies:</label>
+                <input type="number" id="numCopies" class="input-field" value="1" min="1">
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancelCopyBtn" class="btn btn-red">Cancel</button>
+                <button id="performCopyBtn" class="btn btn-green">Copy</button>
+            </div>
         </div>
     </div>
 
@@ -1416,6 +1494,14 @@
 
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
+        // Copy Lines Modal elements
+        const copyLinesModal = document.getElementById('copyLinesModal');
+        const lineSelectionContainer = document.getElementById('lineSelectionContainer');
+        const numCopiesInput = document.getElementById('numCopies');
+        const performCopyBtn = document.getElementById('performCopyBtn');
+        const cancelCopyBtn = document.getElementById('cancelCopyBtn');
+        const noLinesToCopyMessage = document.getElementById('noLinesToCopyMessage');
+
 
         // State for advanced mode in Step 2
         let isAdvancedModeActive = false;
@@ -1496,6 +1582,12 @@
             document.getElementById('addItemBtn').addEventListener('click', addItem);
             themeToggleBtn.addEventListener('click', toggleTheme); // Event listener for theme toggle
 
+            // Copy Lines Modal Event Listeners
+            document.getElementById('copyLinesBtn').addEventListener('click', showCopyLinesModal);
+            performCopyBtn.addEventListener('click', performCopyLines);
+            cancelCopyBtn.addEventListener('click', hideCopyLinesModal);
+
+
             // Add event listeners for collapsible headers
             document.querySelectorAll('.collapsible-header').forEach(header => {
                 header.addEventListener('click', function() {
@@ -1544,19 +1636,23 @@
                 // Also hide the associated cells in the tbody
                 estimateTableBody.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
+                    // Adjusted indices for new "Line" column: Task Name (1), Description (2) etc.
                     if (group === 'labor') {
-                        // Original indices for labor details: 2(OT/DT), 3(Skill), 4($/hr), 5(#hrs)
-                        [2, 3, 4, 5].forEach(index => {
+                        // Original indices for labor details: 2(OT/DT), 3(Skill), 4($/hr), 5(#hrs) in *old* table.
+                        // Now: 3(OT/DT), 4(Skill), 5($/hr), 6(#hrs)
+                        [3, 4, 5, 6].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'materials') {
                         // Original indices for materials details: 7(QTY/UNIT), 8($/UNIT)
-                        [7, 8].forEach(index => {
+                        // Now: 8(QTY/UNIT), 9($/UNIT)
+                        [8, 9].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     } else if (group === 'other') {
                         // Original indices for other details: 10(Equipment), 11(Subcontractor), 12(Misc.)
-                        [10, 11, 12].forEach(index => {
+                        // Now: 11(Equipment), 12(Subcontractor), 13(Misc.)
+                        [11, 12, 13].forEach(index => {
                             if (cells[index]) cells[index].classList.add('column-hidden');
                         });
                     }
@@ -1579,16 +1675,17 @@
                 // Also show the associated cells in the tbody
                 estimateTableBody.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
+                    // Adjusted indices for new "Line" column
                     if (group === 'labor') {
-                        [2, 3, 4, 5].forEach(index => {
+                        [3, 4, 5, 6].forEach(index => {
                             if (cells[index]) cells[index].classList.remove('column-hidden');
                         });
                     } else if (group === 'materials') {
-                        [7, 8].forEach(index => {
+                        [8, 9].forEach(index => {
                             if (cells[index]) cells[index].classList.remove('column-hidden');
                         });
                     } else if (group === 'other') {
-                        [10, 11, 12].forEach(index => {
+                        [11, 12, 13].forEach(index => {
                             if (cells[index]) cells[index].classList.remove('column-hidden');
                         });
                     }
@@ -2367,7 +2464,7 @@
             estimateTableBody.innerHTML = '';
             let totalLaborHoursVal = 0;
 
-            estimateItems.forEach(item => {
+            estimateItems.forEach((item, index) => { // Added index to get line number
                 // Ensure trade and role are valid, fallback if needed
                 if (!projectSettings.activeTrades.includes(item.trade)) {
                     item.trade = projectSettings.activeTrades.length > 0 ? projectSettings.activeTrades[0] : "General";
@@ -2389,6 +2486,7 @@
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td data-label="Line">${index + 1}</td> <!-- NEW: Line Number -->
                     <td data-label="Task Name"><textarea rows="2" onchange="updateItem(${item.id}, 'taskName', this.value)" class="input-field">${item.taskName}</textarea></td>
                     <td data-label="Description"><textarea rows="2" onchange="updateItem(${item.id}, 'description', this.value)" class="input-field">${item.description}</textarea></td>
                     
@@ -2434,10 +2532,10 @@
         // Adjusts the min-width of the table based on collapsed/expanded state
         function adjustTableMinWidth() {
             const table = document.querySelector('.min-w-full');
-            // Base width for fixed columns (Task Name, Description, TOTAL, Actions)
+            // Base width for fixed columns (Line, Task Name, Description, TOTAL, Actions)
             // Approximate widths based on current input/text sizes:
-            // Task Name: ~150px, Description: ~200px, TOTAL: ~100px, Actions: ~80px
-            let currentMinWidth = 150 + 200 + 100 + 80; 
+            // Line: ~50px, Task Name: ~150px, Description: ~200px, TOTAL: ~100px, Actions: ~80px
+            let currentMinWidth = 50 + 150 + 200 + 100 + 80; 
 
             // Add width for currently visible Labor, Materials, Other Total columns (which are always visible)
             // Labor Total: ~100px, Materials Total: ~100px, Other Total: ~100px
@@ -2861,6 +2959,77 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+
+        // --- Copy Lines Modal Functions ---
+
+        function showCopyLinesModal() {
+            if (estimateItems.length === 0) {
+                noLinesToCopyMessage.classList.remove('hidden');
+                lineSelectionContainer.classList.add('hidden');
+                numCopiesInput.setAttribute('disabled', 'true');
+                performCopyBtn.setAttribute('disabled', 'true');
+            } else {
+                noLinesToCopyMessage.classList.add('hidden');
+                lineSelectionContainer.classList.remove('hidden');
+                numCopiesInput.removeAttribute('disabled');
+                performCopyBtn.removeAttribute('disabled');
+                populateCopyLinesModal();
+            }
+            copyLinesModal.classList.remove('hidden');
+            numCopiesInput.value = 1; // Reset to 1 copy by default
+        }
+
+        function hideCopyLinesModal() {
+            copyLinesModal.classList.add('hidden');
+        }
+
+        function populateCopyLinesModal() {
+            lineSelectionContainer.innerHTML = ''; // Clear previous selections
+            estimateItems.forEach((item, index) => {
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <input type="checkbox" data-id="${item.id}" value="${item.id}">
+                    Line ${index + 1}: ${item.taskName || 'Untitled Task'}
+                `;
+                lineSelectionContainer.appendChild(label);
+            });
+        }
+
+        function performCopyLines() {
+            const selectedIds = Array.from(lineSelectionContainer.querySelectorAll('input[type="checkbox"]:checked'))
+                                    .map(checkbox => parseInt(checkbox.dataset.id));
+            const numCopies = parseInt(numCopiesInput.value);
+
+            if (selectedIds.length === 0) {
+                renderMessageBox("Please select at least one line to copy.");
+                return;
+            }
+
+            if (isNaN(numCopies) || numCopies < 1) {
+                renderMessageBox("Please enter a valid number of copies (1 or more).");
+                return;
+            }
+
+            const newItems = [];
+            for (let i = 0; i < numCopies; i++) {
+                selectedIds.forEach(id => {
+                    const originalItem = estimateItems.find(item => item.id === id);
+                    if (originalItem) {
+                        // Create a deep copy of the original item
+                        const copiedItem = JSON.parse(JSON.stringify(originalItem));
+                        copiedItem.id = Date.now() + Math.random(); // Ensure unique ID for new copy
+                        copiedItem.taskName = `Copy of ${copiedItem.taskName}`; // Optionally prefix task name
+                        newItems.push(copiedItem);
+                    }
+                });
+            }
+            
+            // Add new items and re-render
+            estimateItems.push(...newItems);
+            renderItems();
+            hideCopyLinesModal();
+        }
+
     </script>
 </body>
 </html>
