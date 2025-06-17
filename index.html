@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Link to Chart.js for the pie chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Link to html2pdf.js for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* Base styles and UI improvements */
         body {
@@ -812,7 +814,6 @@
         .dark-theme .label,
         .dark-theme h1,
         .dark-theme h2,
-        .dark-theme h3,
         .dark-theme .summary-block h4,
         .dark-theme .summary-item strong {
             color: #e2e8f0; /* Light headings and strong text */
@@ -928,6 +929,67 @@
             background: #4299e1;
             box-shadow: 0 2px 8px rgba(66, 153, 225, 0.4);
         }
+        /* Styles for loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000; /* Higher than other modals */
+            color: white;
+            font-size: 1.5rem;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Styles for the auto-closing success notification */
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981; /* Green */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            z-index: 2002; /* Higher than loading overlay */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        .success-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* PDF specific styles */
+        .pdf-page-break {
+            page-break-before: always;
+            /* Optional: Add some space or a visual separator for clarity in print/PDF */
+            margin-top: 50px; /* Example spacing */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -938,7 +1000,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div class="header-info-container">
                     <div class="header-icon-box">
-                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDE1LjgwMTMyMiAzLjE3MjQ1MzM4TDEzLjE0NTgzOTQ5OSA3Ljg1NDgzMzkyNCA3Ljg4NDc5ODUzIDE1LjkwNDQwNTkgNS44MTIxNzcyMSAxMi42MjM1NjQ0NCAxMi4xOTA5MjgyIDMuMTcyNDUzMzggMTYuMiA3LjhCIi8+PHBwYXRoIGQ9Ik0xNi4yIDE2LjJMMTIuMiAyMC4yTDE4LjggMjAuMkw3LjggMTYuMiIvPjwvZ3N2Zz4='">
+                        <img id="mainAppLogo" class="header-logo-img" src="" alt="Contractor Logo" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjjaWNjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48cGF0aCBkPSJNMTYuMiA3LjhMMjAuMiAxSjguOEwzLjggMTYuMiIvPjxwYXRoIGQ9Ik03LjggNy44TDE1LjgwMTMyMiAzLjE3MjQ1MzM4TDEzLjE0NTgzOTQ5OSA3LjYxNDU4MzYwNyA3LjYxNDU4MzYwNyAxMy4xNDU4Mzk0OTkgMTIuNjIzNTY0NDQgMTYuODEyMTc3MjEgMy4xNzI0NTMzOCAxMi4xOTA5MjgyIDcuOCAxNi4yIi8+PHBhdGg de="MTE2LjIgMTYuMkwxMi4yIDIwLjJMMTguOCAyMC4yTDE2LjIgMTYuMiIvPjwvZ291dmc+'>
                         <!-- Default SVG if no logo or error -->
                     </div>
                     <div class="header-title-container">
@@ -1013,7 +1075,7 @@
             </div>
         </div>
 
-        <div class="card overflow-x-auto">
+        <div class="card overflow-x-auto" id="estimateLineItemsTableContainer">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-gray-800">Estimate Line Items</h3>
                 <button id="addItemBtn" class="btn btn-green">➕ Add Item</button>
@@ -1120,7 +1182,7 @@
                         <option value="FL">Florida</option>
                         <option value="WA">Washington</option>
                         <option value="IL">Illinois</option>
-                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</s option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</s option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</s option> <option value="TN">Tennessee</s option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</s option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</s option> <option value="WY">Wyoming</option>
+                        <option value="AL">Alabama</option> <option value="AK">Alaska</option> <option value="AZ">Arizona</option> <option value="AR">Arkansas</option> <option value="CO">Colorado</option> <option value="CT">Connecticut</option> <option value="DE">Delaware</option> <option value="GA">Georgia</option> <option value="HI">Hawaii</option> <option value="ID">Idaho</option> <option value="IN">Indiana</option> <option value="IA">Iowa</option> <option value="KS">Kansas</option> <option value="KY">Kentucky</option> <option value="LA">Louisiana</option> <option value="ME">Maine</option> <option value="MD">Maryland</option> <option value="MA">Massachusetts</option> <option value="MI">Michigan</option> <option value="MN">Minnesota</option> <option value="MS">Mississippi</option> <option value="MO">Missouri</option> <option value="MT">Montana</option> <option value="NE">Nebraska</option> <option value="NV">Nevada</option> <option value="NH">New Hampshire</option> <option value="NJ">New Jersey</option> <option value="NM">New Mexico</option> <option value="NC">North Carolina</option> <option value="ND">North Dakota</option> <option value="OH">Ohio</option> <option value="OK">Oklahoma</option> <option value="OR">Oregon</option> <option value="PA">Pennsylvania</option> <option value="RI">Rhode Island</option> <option value="SC">South Carolina</option> <option value="SD">South Dakota</option> <option value="TN">Tennessee</option> <option value="UT">Utah</option> <option value="VT">Vermont</option> <option value="VA">Virginia</option> <option value="WA">Washington</option> <option value="WV">West Virginia</option> <option value="WI">Wisconsin</option> <option value="WY">Wyoming</option>
                     </select>
                 </div>
                 
@@ -1264,6 +1326,18 @@
         </div>
     </div>
 
+    <!-- Loading Overlay for PDF Generation -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Generating PDF Report...</p>
+    </div>
+
+    <!-- Auto-closing Success Notification -->
+    <div id="successNotification" class="success-notification">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+        <span>PDF Report generated successfully!</span>
+    </div>
+
     <script>
         // Helper function for currency formatting
         function formatCurrency(amount) {
@@ -1293,7 +1367,7 @@
             projectDescription: "",
             contractorLogo: "",
             projectType: "Commercial",
-            projectState: "CA",
+            projectState: "CA", // Default state is California
             profitMargin: 0,
             salesTax: 0,
             miscellaneous: 0,
@@ -1350,7 +1424,7 @@
                 "Masonry": { "Project Manager": 128, "Superintendent": 102, "General Foreman": 93, "Foreman": 88, "Journeyman": 76, "Apprentice": 51 },
                 "Landscaping": { "Project Manager": 100, "Superintendent": 85, "General Foreman": 75, "Foreman": 70, "Journeyman": 60, "Apprentice": 40 }
             },
-            activeTrades: ["General"],
+            activeTrades: ["General"], // Default active trade
             travelCost: 0,
             equipmentCost: 0,
             fixedCost: 0,
@@ -1368,8 +1442,8 @@
                 rateRole: 'Journeyman', // This will be updated to match activeTrades later if needed
                 hours: 0,
                 otDtMultiplier: 1.0,
-                materialQuantity: 0,
-                materialUnitCost: 0,
+                materialQuantity: 0, // was materialUnits
+                materialUnitCost: 0, // was materialPerUnit
                 equipmentRentalCost: 0,
                 subcontractorCostLineItem: 0,
                 miscLineItem: 0
@@ -1404,7 +1478,9 @@
         const showAdvancedDetailsLink = document.getElementById('showAdvancedDetailsLink');
         const advancedDetailsSection = document.getElementById('advancedDetailsSection');
 
-        const tradeSearchInput = document.getElementById('tradeSearchInput');
+        const tradeSearchInput = document.getElementById('tradeSearchInput'); // Restored
+        const tradesDropdown = document.getElementById('tradesDropdown'); // Restored
+        const selectedTradesDisplay = document.getElementById('selectedTradesDisplay');
 
         const logoUploadInput = document.getElementById('logoUploadInput');
         const logoUploadArea = document.getElementById('logoUploadArea');
@@ -1415,6 +1491,8 @@
         const mainAppLogo = document.getElementById('mainAppLogo');
 
         const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const successNotification = document.getElementById('successNotification');
 
 
         // State for advanced mode in Step 2
@@ -1464,10 +1542,6 @@
         const laborMaterialPieChartCanvas = document.getElementById('laborMaterialPieChart');
         let laborMaterialPieChart;
 
-        // Trade multi-select elements
-        const tradesDropdown = document.getElementById('tradesDropdown');
-        const selectedTradesDisplay = document.getElementById('selectedTradesDisplay');
-
         // Initial setup - show wizard
         document.addEventListener('DOMContentLoaded', () => {
             // Set initial theme to light by default
@@ -1475,9 +1549,11 @@
             document.body.classList.remove('dark-theme'); // Ensure light theme is active
             themeToggleBtn.innerHTML = '🌙'; // Moon icon for light theme (toggle to dark)
 
+
+
             // Attach event listeners for static elements
             document.getElementById('reconfigureBtn').addEventListener('click', showSetup);
-            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            document.getElementById('generateReportBtn').addEventListener('click', generatePDFReport); // Changed to generatePDFReport
             document.getElementById('logoUploadArea').addEventListener('dragover', (event) => { event.preventDefault(); event.currentTarget.classList.add('drag-over'); });
             document.getElementById('logoUploadArea').addEventListener('dragleave', (event) => { event.currentTarget.classList.remove('drag-over'); });
             document.getElementById('logoUploadArea').addEventListener('drop', (event) => { handleLogoDrop(event); event.currentTarget.classList.remove('drag-over'); });
@@ -1742,6 +1818,7 @@
                 if (!projectType) { renderMessageBox("Please select a Project Type."); return; }
                 if (!projectState) { renderMessageBox("Please select a State/Location."); return; }
                 if (projectSettings.activeTrades.length === 0) { renderMessageBox("Please select at least one Trade Involved."); return; }
+
 
                 projectSettings.projectName = projectName;
                 projectSettings.clientName = clientName;
@@ -2026,7 +2103,6 @@
         function updateSkillTitle(trade, oldRole, newRole) {
             const trimmedNewRole = newRole.trim();
             console.log(`Attempting to update skill title for trade: ${trade}, oldRole: ${oldRole}, newRole: ${trimmedNewRole}`);
-
             if (trimmedNewRole === oldRole) {
                 console.log('New role is same as old role. No update needed.');
                 return;
@@ -2215,6 +2291,16 @@
             }
         }
 
+        // New function for auto-closing success notifications
+        function renderSuccessNotification(message, duration = 3000) {
+            successNotification.querySelector('span').textContent = message;
+            successNotification.classList.add('show');
+
+            setTimeout(() => {
+                successNotification.classList.remove('show');
+            }, duration);
+        }
+
         function populateTradesDropdown() {
             tradesDropdown.innerHTML = '';
             const allTrades = Object.keys(projectSettings.allTradeLaborRates);
@@ -2264,12 +2350,10 @@
             if (checkbox.checked) {
                 if (!projectSettings.activeTrades.includes(trade)) {
                     projectSettings.activeTrades.push(trade);
-                    if (!projectSettings.allTradeLaborRates[trade]) {
-                        projectSettings.allTradeLaborRates[trade] = {
-                            "Project Manager": 120, "Superintendent": 100, "General Foreman": 90,
-                            "Foreman": 85, "Journeyman": 75, "Apprentice": 50
-                        };
-                    }
+                    // When a default trade is selected, ensure its labor rates are initialized.
+                    // This is only needed if `allTradeLaborRates` were ever reset.
+                    // Since we reverted, the rates should already exist for default trades.
+                    // No need to add default rates here as they exist in the initial object.
                 }
             } else {
                 projectSettings.activeTrades = projectSettings.activeTrades.filter(t => t !== trade);
@@ -2674,192 +2758,277 @@
             // applyChartTheme(); 
         }
 
-        // --- Report Generation ---
+        // --- Report Generation (PDF) ---
+        async function generatePDFReport() {
+            loadingOverlay.classList.remove('hidden'); // Show loading overlay
 
-        function generateReport() {
-            let totalLaborCost = 0;
-            let totalMaterialCostRaw = 0;
-            let totalEquipmentCostReport = 0;
-            let totalSubcontractorCostReport = 0;
-            let totalMiscLineItemCostReport = 0;
+            // Create a temporary container to hold all content for PDF generation
+            const pdfContentContainer = document.createElement('div');
+            pdfContentContainer.style.position = 'absolute';
+            pdfContentContainer.style.left = '-9999px';
+            pdfContentContainer.style.top = '-9999px';
+            pdfContentContainer.style.width = '100%'; // Ensure it takes full width for rendering
 
-            let laborHoursBreakdownReport = {};
-            let totalLaborHoursReport = 0;
-
-            const allPossibleRolesReport = new Set();
-            Object.keys(projectSettings.allTradeLaborRates).forEach(trade => {
-                if (projectSettings.allTradeLaborRates[trade]) {
-                    Object.keys(projectSettings.allTradeLaborRates[trade]).forEach(role => allPossibleRolesReport.add(role));
-                }
-            });
-            allPossibleRolesReport.forEach(role => {
-                laborHoursBreakdownReport[role] = 0;
-            });
+            // Clone the necessary sections for the front page
+            const headerSection = document.querySelector('.card.mb-6').cloneNode(true);
+            const topSummaryRow = document.querySelector('.top-summary-row').cloneNode(true);
+            const executiveSummarySection = document.querySelector('.executive-summary-section').cloneNode(true);
+            const lineItemsTableContainer = document.getElementById('estimateLineItemsTableContainer').cloneNode(true); // Get the table container
 
 
-            estimateItems.forEach((item) => {
-                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
-                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
-                const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotal = item.materialQuantity * item.materialUnitCost;
-                
-                totalLaborCost += laborTotal;
-                totalMaterialCostRaw += materialsTotal;
-                totalEquipmentCostReport += item.equipmentRentalCost;
-                totalSubcontractorCostReport += item.subcontractorCostLineItem;
-                totalMiscLineItemCostReport += item.miscLineItem;
-
-                totalLaborHoursReport += item.hours;
-
-                if (laborHoursBreakdownReport[item.rateRole] !== undefined) {
-                    laborHoursBreakdownReport[item.rateRole] += item.hours;
-                }
-            });
-
-            // --- Core Calculation Logic (for Report) ---
-
-            // 1. Total Project Cost (Direct Line Item Costs - no material markup included yet)
-            const totalProjectCostDirectReport = totalLaborCost + totalMaterialCostRaw + totalEquipmentCostReport + totalSubcontractorCostReport + totalMiscLineItemCostReport;
-
-            // 2. Material Markup Amount (dollar value)
-            const materialMarkupAmountReport = totalMaterialCostRaw * (projectSettings.materialMarkup / 100);
-
-            // 3. Base for Overhead, Misc (%), and Profit (includes direct costs + material markup amount)
-            const baseCostForOverheadMiscProfitReport = totalProjectCostDirectReport + materialMarkupAmountReport;
-
-            // 4. Project-level Overhead Cost
-            const totalOverheadCostReport = baseCostForOverheadMiscProfitReport * (projectSettings.overhead / 100);
-
-            // 5. Project-level Miscellaneous Cost
-            const totalMiscCostAmountReport = baseCostForOverheadMiscProfitReport * (projectSettings.miscellaneous / 100);
+            // Remove buttons from the cloned header (they are for UI, not PDF)
+            headerSection.querySelector('.header-buttons').remove();
             
-            // 6. Subtotal before Profit Margin and Sales Tax (now includes all base costs + overhead + misc)
-            const subtotalBeforeProfitTaxReport = baseCostForOverheadMiscProfitReport + totalMiscCostAmountReport + totalOverheadCostReport;
-            
-            // 7. Profit Margin Amount
-            const totalProfitMarginAmountReport = subtotalBeforeProfitTaxReport * (projectSettings.profitMargin / 100);
-            
-            // 8. Estimate Subtotal (includes all costs before Sales Tax and Additional Considerations)
-            const estimateSubtotalAmountReport = subtotalBeforeProfitTaxReport + totalProfitMarginAmountReport;
-
-            // 9. Sales Tax Amount
-            const salesTaxAmountReport = estimateSubtotalAmountReport * (projectSettings.salesTax / 100);
-            
-            // 10. Additional Considerations Amount
-            let additionalConsiderationAmountReport = 0;
-            if (projectSettings.additionalConsiderationsType === '%') {
-                additionalConsiderationAmountReport = estimateSubtotalAmountReport * (projectSettings.additionalConsiderationsValue / 100);
-            } else {
-                additionalConsiderationAmountReport = projectSettings.additionalConsiderationsValue;
+            // Adjust the overall title to be just the project name, and remove the subtitle for the PDF report.
+            const clonedHeaderTitleContainer = headerSection.querySelector('.header-title-container');
+            if (clonedHeaderTitleContainer) {
+                clonedHeaderTitleContainer.innerHTML = `
+                    <h1 class="header-title" style="font-size: 2.5rem;">${projectSettings.projectName}</h1>
+                    <p class="header-subtitle" style="font-size: 1.2rem;">Estimate for ${projectSettings.clientName}</p>
+                    <p class="header-subtitle" style="font-size: 1rem;">${projectSettings.projectAddress}, ${projectSettings.projectCity}, ${projectSettings.projectState} ${projectSettings.projectZip}</p>
+                    <p class="header-subtitle" style="font-size: 1rem;">Start Date: ${projectSettings.startDate}</p>
+                    ${projectSettings.endDate ? `<p class="header-subtitle" style="font-size: 1rem;">End Date: ${projectSettings.endDate}</p>` : ''}
+                    ${projectSettings.projectID ? `<p class="header-subtitle" style="font-size: 1rem;">Project ID: ${projectSettings.projectID}</p>` : ''}
+                    ${projectSettings.projectDescription ? `<p class="header-subtitle" style="font-size: 1rem;">${projectSettings.projectDescription}</p>` : ''}
+                `;
             }
 
-            // 11. Grand Total (Total Proposal)
-            const grandTotalReport = estimateSubtotalAmountReport + salesTaxAmountReport + additionalConsiderationAmountReport;
+            // Append front page elements to the container
+            pdfContentContainer.appendChild(headerSection);
+            pdfContentContainer.appendChild(topSummaryRow);
+            pdfContentContainer.appendChild(executiveSummarySection);
+
+            // Add a page break before the line items table
+            lineItemsTableContainer.classList.add('pdf-page-break'); // Apply CSS for page break
+            pdfContentContainer.appendChild(lineItemsTableContainer);
 
 
-            let reportContent = `CONSTRUCTION ESTIMATE REPORT\n`;
-            reportContent += `============================\n\n`;
-            
-            reportContent += `Project: ${projectSettings.projectName}\n`;
-            reportContent += `Client: ${projectSettings.clientName || 'N/A'}\n`;
-            reportContent += `Address: ${projectSettings.projectAddress || 'N/A'}\n`;
-            reportContent += `City: ${projectSettings.projectCity || 'N/A'}\n`;
-            reportContent += `Zip Code: ${projectSettings.projectZip || 'N/A'}\n`;
-            reportContent += `State/Location: ${projectSettings.projectState}\n`;
-            reportContent += `Start Date: ${projectSettings.startDate || 'N/A'}\n`;
-            reportContent += `End Date: ${projectSettings.endDate || 'N/A'}\n`;
-            reportContent += `Project ID: ${projectSettings.projectID || 'N/A'}\n`;
-            reportContent += `Project Type: ${projectSettings.projectType}\n`;
-            reportContent += `Description: ${projectSettings.projectDescription || 'No description provided.'}\n`;
-            reportContent += `Date: ${new Date().toLocaleDateString()}\n\n`;
+            // Process Input/Textarea/Select values in the entire cloned content
+            pdfContentContainer.querySelectorAll('input, textarea, select').forEach(input => {
+                const value = input.type === 'checkbox' ? (input.checked ? 'Checked' : 'Unchecked') : 
+                              input.type === 'radio' ? (input.checked ? 'Selected' : '') :
+                              input.tagName === 'SELECT' ? input.options[input.selectedIndex]?.text :
+                              input.value;
+                
+                // For table input fields, directly replace them with a text node or span
+                if (input.closest('#estimateTableBody')) {
+                    const span = document.createElement('span');
+                    // Add class for styling, if needed for the replaced content in PDF
+                    span.className = input.className; // Inherit existing classes for basic styling
+                    span.textContent = value;
+                    input.parentNode.replaceChild(span, input);
 
-            reportContent += `OVERALL SUMMARY:\n`;
-            reportContent += `-------------------------------------------------\n`;
-            reportContent += `Total Proposal: ${formatCurrency(grandTotalReport)}\n`;
-            reportContent += `Total Labor Hours: ${totalLaborHoursReport.toFixed(2)}\n\n`;
-
-
-            reportContent += `EXECUTIVE SUMMARY DETAILS:\n`;
-            reportContent += `-------------------------------------------------\n`;
-            reportContent += `Total Project Cost (Direct Line Items): ${formatCurrency(totalProjectCostDirectReport)}\n`;
-            reportContent += `Total Miscellaneous Cost (${projectSettings.miscellaneous.toFixed(2)}%): ${formatCurrency(totalMiscCostAmountReport)}\n`;
-            reportContent += `Total Overhead Cost (${projectSettings.overhead.toFixed(2)}%): ${formatCurrency(totalOverheadCostReport)}\n`;
-            reportContent += `Material Markup Percentage: ${projectSettings.materialMarkup.toFixed(2)}%\n`; 
-            reportContent += `Material Markup Amount: ${formatCurrency(materialMarkupAmountReport)}\n`; // Explicitly show material markup amount
-            reportContent += `Estimate Subtotal (before sales tax and final markup): ${formatCurrency(estimateSubtotalAmountReport)}\n`;
-            reportContent += `Profit Margin (${projectSettings.profitMargin.toFixed(2)}%): ${formatCurrency(totalProfitMarginAmountReport)}\n`;
-            reportContent += `Sales Tax (${projectSettings.salesTax.toFixed(2)}%): ${formatCurrency(salesTaxAmountReport)}\n`;
-            reportContent += `Additional Considerations (${projectSettings.additionalConsiderationsValue.toFixed(2)}${projectSettings.additionalConsiderationsType}): ${formatCurrency(additionalConsiderationAmountReport)}\n\n`;
-
-
-            reportContent += `LABOR BREAKDOWN (HOURS):\n`;
-            reportContent += `-------------------------------------------------\n`;
-            const defaultRolesReport = ["Project Manager", "Superintendent", "General Foreman", "Foreman", "Journeyman", "Apprentice"];
-            defaultRolesReport.forEach(role => {
-                reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`;
-            });
-            Object.keys(laborHoursBreakdownReport).sort().forEach(role => {
-                if (!defaultRolesReport.includes(role)) {
-                    reportContent += `${role}: ${formatHours(laborHoursBreakdownReport[role] || 0)}\n`;
+                } else {
+                    // For wizard inputs (though they aren't in mainApp, this is a general safeguard), replace with a span
+                    const span = document.createElement('span');
+                    span.className = 'font-semibold text-gray-800'; // Basic styling for replaced text
+                    span.textContent = value;
+                    input.parentNode.replaceChild(span, input);
                 }
             });
-            reportContent += `Total Labor Hours (Breakdown): ${formatHours(totalLaborHoursReport)}\n\n`;
 
-            reportContent += `PROJECT COST BREAKDOWN:\n`;
-            reportContent += `-------------------------------------------------\n`;
-            reportContent += `Labor Total: ${formatCurrency(totalLaborCost)}\n`;
-            reportContent += `Material Total (Direct Cost): ${formatCurrency(totalMaterialCostRaw)}\n`; // Reflect RAW material cost in report
-            reportContent += `Equipment/Rental Total: ${formatCurrency(totalEquipmentCostReport)}\n`;
-            reportContent += `Sub-contractor Total: ${formatCurrency(totalSubcontractorCostReport)}\n`;
-            reportContent += `Misc. Total (Line Items): ${formatCurrency(totalMiscLineItemCostReport)}\n`;
-            reportContent += `Total Project Cost (Direct Sum): ${formatCurrency(totalProjectCostDirectReport)}\n\n`; // This total includes material markup
+            // Convert Chart to Image and replace in cloned element
+            const clonedChartCanvas = pdfContentContainer.querySelector('#laborMaterialPieChart');
+            if (laborMaterialPieChart && clonedChartCanvas) {
+                laborMaterialPieChart.update(); // Ensure chart is fully rendered before converting to image
+                const imageData = laborMaterialPieChartCanvas.toDataURL('image/png'); // Get current chart as image
+                
+                const img = document.createElement('img');
+                img.src = imageData;
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.style.display = 'block'; // Ensure image takes up space
+                img.style.margin = '0 auto'; // Center the image
 
+                clonedChartCanvas.parentNode.replaceChild(img, clonedChartCanvas);
+            }
 
-            reportContent += `ESTIMATE LINE ITEMS:\n`;
-            reportContent += `====================\n`;
-
-            estimateItems.forEach((item, index) => {
-                const laborRate = projectSettings.allTradeLaborRates[item.trade]?.[item.rateRole] || 0;
-                const effectiveLaborRate = laborRate * (item.otDtMultiplier || 1.0);
-                const laborTotal = item.hours * effectiveLaborRate;
-                const materialsTotalRawLineItem = item.materialQuantity * item.materialUnitCost;
-                // Material Total for line item in report reflects raw cost, as per breakdown.
-                // The markup for each line item is not typically broken out in line items, only in overall summary.
-                const otherCategoryTotal = item.equipmentRentalCost + item.subcontractorCostLineItem + item.miscLineItem;
-
-                // Line item total should still be the direct cost plus materials, equipment, sub, misc
-                const lineTotal = laborTotal + materialsTotalRawLineItem + otherCategoryTotal; 
-
-                reportContent += `\nItem ${index + 1}: ${item.taskName || 'N/A'}\n`;
-                reportContent += `    Description: ${item.description || 'No description'}\n`;
-                reportContent += `    --- LABOR ---\n`;
-                reportContent += `      OT/DT Multiplier: ${item.otDtMultiplier.toFixed(1)}\n`;
-                reportContent += `      Skill: ${item.rateRole} (${formatCurrency(laborRate)}/hr)\n`;
-                reportContent += `      # Hours: ${item.hours.toFixed(2)}\n`;
-                reportContent += `      Labor Total: ${formatCurrency(laborTotal)}\n`;
-                reportContent += `    --- MATERIALS ---\n`;
-                reportContent += `      Quantity / Unit: ${item.materialQuantity}\n`;
-                reportContent += `      $ / Unit (Raw): ${formatCurrency(item.materialUnitCost)}\n`;
-                reportContent += `      Materials Total (Direct): ${formatCurrency(materialsTotalRawLineItem)}\n`; // Reflect RAW material cost in line item
-                reportContent += `    --- OTHER ---\n`;
-                reportContent += `      Equipment / Rental: ${formatCurrency(item.equipmentRentalCost)}\n`;
-                reportContent += `      Subcontractor: ${formatCurrency(item.subcontractorCostLineItem)}\n`;
-                reportContent += `      Misc. Cost: ${formatCurrency(item.miscLineItem)}\n`;
-                reportContent += `      Other Total: ${formatCurrency(otherCategoryTotal)}\n`;
-                reportContent += `    Line Item Total (Direct): ${formatCurrency(lineTotal)}\n`; // Line total is direct
+            // Handle Mobile Table Labels in cloned element (for consistency if table is wide)
+            pdfContentContainer.querySelectorAll('#estimateTableBody td[data-label]').forEach(td => {
+                const labelText = td.getAttribute('data-label');
+                if (!td.querySelector('.pdf-label')) {
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'pdf-label font-bold text-gray-700 mr-2'; // Add a class for specific PDF styling
+                    labelSpan.textContent = labelText;
+                    td.prepend(labelSpan); // Add label at the beginning
+                }
+                td.style.textAlign = 'right';
+                td.style.paddingLeft = '10px';
             });
 
-            reportContent += `\nEnd of Report\n`;
+            // Temporarily expand collapsed columns for PDF rendering
+            const originalHeadersState = {};
+            for (const group in collapsedState) {
+                originalHeadersState[group] = {
+                    collapsed: collapsedState[group],
+                    mainThColSpan: 0,
+                    detailsThClasses: []
+                };
 
-            const blob = new Blob([reportContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${projectSettings.projectName.replace(/\s/g, '_')}_Estimate_Report.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+                const mainThElement = pdfContentContainer.querySelector(`#th${group.charAt(0).toUpperCase() + group.slice(1)}Header`);
+                if (mainThElement) {
+                    originalHeadersState[group].mainThColSpan = mainThElement.colSpan;
+                    mainThElement.colSpan = (group === 'labor' ? 5 : group === 'materials' ? 3 : 4); // Force expand
+                    const header = mainThElement.querySelector('.collapsible-header');
+                    if (header) header.classList.remove('collapsed');
+                }
+
+                const detailThs = pdfContentContainer.querySelectorAll(`th[data-col-group="${group}-details"]`);
+                detailThs.forEach(th => {
+                    originalHeadersState[group].detailsThClasses.push({ element: th, classList: th.classList.value });
+                    th.classList.remove('column-hidden'); // Show detail headers
+                });
+            }
+
+            // Also ensure the actual TD elements in tbody are visible in cloned element
+            pdfContentContainer.querySelectorAll('#estimateTableBody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                // Original indices for labor details: 2(OT/DT), 3(Skill), 4($/hr), 5(#hrs)
+                [2, 3, 4, 5].forEach(index => {
+                    if (cells[index]) cells[index].classList.remove('column-hidden');
+                    if (cells[index] && (index === 0 || index === 1)) { // Task Name and Description
+                         const textarea = cells[index].querySelector('textarea');
+                         if (textarea) {
+                             textarea.style.height = 'auto';
+                             textarea.style.minHeight = '40px';
+                             textarea.style.overflow = 'visible';
+                             textarea.style.resize = 'none';
+                         }
+                    }
+                });
+                // Original indices for materials details: 7(QTY/UNIT), 8($/UNIT)
+                [7, 8].forEach(index => {
+                    if (cells[index]) cells[index].classList.remove('column-hidden');
+                });
+                // Original indices for other details: 10(Equipment), 11(Subcontractor), 12(Misc.)
+                [10, 11, 12].forEach(index => {
+                    if (cells[index]) cells[index].classList.remove('column-hidden');
+                });
+                // Hide action buttons in table for PDF
+                const deleteBtn = cells[cells.length - 1].querySelector('.btn-red');
+                if(deleteBtn) deleteBtn.style.display = 'none';
+            });
+
+            // Hide the "Add Item" button in the cloned table
+            const addItemBtnClone = lineItemsTableContainer.querySelector('#addItemBtn');
+            if (addItemBtnClone) addItemBtnClone.style.display = 'none';
+
+            // Temporarily adjust table container overflow to render full table
+            const originalTableContainerOverflow = lineItemsTableContainer.querySelector('.card.overflow-x-auto') ? lineItemsTableContainer.querySelector('.card.overflow-x-auto').style.overflowX : 'auto';
+            if (lineItemsTableContainer.querySelector('.card.overflow-x-auto')) {
+                lineItemsTableContainer.querySelector('.card.overflow-x-auto').style.overflowX = 'visible';
+            }
+            
+            // Adjust cloned table min-width to prevent clipping
+            const clonedTable = lineItemsTableContainer.querySelector('.min-w-full');
+            const originalClonedTableMinWidth = clonedTable ? clonedTable.style.minWidth : '';
+            if (clonedTable) {
+                clonedTable.style.minWidth = '2000px'; // Generous width
+            }
+
+
+            document.body.appendChild(pdfContentContainer); // Add to DOM temporarily for rendering
+
+            try {
+                const options = {
+                    margin: [10, 10, 10, 10],
+                    filename: `${projectSettings.projectName.replace(/\s/g, '_')}_Estimate_Report.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        logging: true,
+                        dpi: 192,
+                        letterRendering: true,
+                        useCORS: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'landscape',
+                        putOnlyUsedFonts: true,
+                        floatPrecision: 16
+                    }
+                };
+
+                await html2pdf().from(pdfContentContainer).set(options).save();
+                renderSuccessNotification('PDF Report generated successfully!');
+
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                renderMessageBox('Failed to generate PDF report. Please try again.');
+            } finally {
+                // Clean up and restore original state of the live DOM
+                pdfContentContainer.remove(); // Remove the temporary container and cloned element
+
+                // Restore original collapsed state for columns in the live DOM
+                for (const group in originalHeadersState) {
+                    const mainThElement = document.querySelector(`#th${group.charAt(0).toUpperCase() + group.slice(1)}Header`);
+                    if (mainThElement) {
+                        mainThElement.colSpan = originalHeadersState[group].mainThColSpan;
+                        if (originalHeadersState[group].collapsed) {
+                            const header = mainThElement.querySelector('.collapsible-header');
+                            if (header) header.classList.add('collapsed');
+                        } else {
+                            const header = mainThElement.querySelector('.collapsible-header');
+                            if (header) header.classList.remove('collapsed');
+                        }
+                    }
+                    const detailThs = document.querySelectorAll(`th[data-col-group="${group}-details"]`);
+                    detailThs.forEach(th => {
+                        th.classList.value = originalHeadersState[group].detailsThClasses.find(o => o.element === th)?.classList || '';
+                    });
+                }
+                
+                // Restore original state for tbody cells (column-hidden class)
+                estimateTableBody.querySelectorAll('tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    [2, 3, 4, 5].forEach(index => {
+                        if (cells[index]) {
+                            if (collapsedState.labor) cells[index].classList.add('column-hidden');
+                            else cells[index].classList.remove('column-hidden');
+                            if ((index === 0 || index === 1)) {
+                                const textarea = cells[index].querySelector('textarea');
+                                if (textarea) {
+                                    textarea.style.height = '';
+                                    textarea.style.minHeight = '';
+                                    textarea.style.overflow = '';
+                                    textarea.style.resize = '';
+                                }
+                            }
+                        }
+                    });
+                    [7, 8].forEach(index => {
+                        if (cells[index]) {
+                            if (collapsedState.materials) cells[index].classList.add('column-hidden');
+                            else cells[index].classList.remove('column-hidden');
+                        }
+                    });
+                    [10, 11, 12].forEach(index => {
+                        if (cells[index]) {
+                            if (collapsedState.other) cells[index].classList.add('column-hidden');
+                            else cells[index].classList.remove('column-hidden');
+                        }
+                    });
+                    // Restore action buttons in table
+                    const deleteBtn = cells[cells.length - 1].querySelector('.btn-red');
+                    if(deleteBtn) deleteBtn.style.display = '';
+                });
+
+                // Restore "Add Item" button
+                const liveAddItemBtn = document.getElementById('addItemBtn');
+                if (liveAddItemBtn) liveAddItemBtn.style.display = '';
+
+                // Restore original table min-width
+                const liveTable = document.querySelector('.min-w-full');
+                if (liveTable) liveTable.style.minWidth = originalClonedTableMinWidth;
+                
+                // Restore table container overflow
+                const liveTableContainer = document.querySelector('.card.overflow-x-auto');
+                if (liveTableContainer) liveTableContainer.style.overflowX = originalTableContainerOverflow;
+
+                loadingOverlay.classList.add('hidden'); // Hide loading overlay
+                renderItems(); // Re-render live table to ensure everything is back to normal.
+            }
         }
     </script>
 </body>
